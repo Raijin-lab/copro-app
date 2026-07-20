@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GH5-SN8 Immeuble - Syndic</title>
     
-    <!-- PWA (Progressive Web App) Tags -->
+    <!-- PWA Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4f46e5">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -18,6 +18,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- FIREBASE SDK (Compat version pour une intégration simple et ultra-stable) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
     <style>
         :root {
@@ -81,7 +85,7 @@
 
         .table-container { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; } /* Ensures tables scroll on mobile instead of squishing */
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { text-align: left; padding: 12px 24px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.02); white-space: nowrap; }
         td { padding: 16px 24px; font-size: 0.875rem; border-bottom: 1px solid var(--border); }
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; display: inline-block;}
@@ -125,7 +129,6 @@
 
         @media screen { .no-screen { display: none !important; } }
 
-        /* ================= MOBILE RESPONSIVE CSS ================= */
         .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; padding: 5px; }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
         
@@ -134,23 +137,15 @@
             .sidebar { position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; transition: left 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.3); }
             .sidebar.open { left: 0; }
             .sidebar-overlay.active { display: block; }
-            
             .topbar { padding: 0 16px; }
             .page-content { padding: 16px; }
-            
             #page-title { font-size: 1.1rem; }
-            
             .modal-footer .btn { flex: 1; }
             .toast-container { left: 16px; right: 16px; bottom: 16px; align-items: stretch; }
-            
-            /* Responsive Forms in Modals */
             .modal-body > div[style*="display:flex"] { flex-direction: column; gap: 0 !important; }
-            
-            /* Hide print button on mobile to save space */
             .topbar .btn-outline { display: none; }
         }
 
-        /* IMPRESSION GLOBALE (Format A3 Paysage Parfait) */
         @media print {
             @page { size: A3 landscape; margin: 15mm; }
             body { background: white !important; color: black !important; display: block; overflow: visible; height: auto; }
@@ -245,7 +240,6 @@
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 4px; background: var(--bg-body); padding: 4px 8px; border-radius: 8px; border: 1px solid var(--border);">
-                    <i class="fa-regular fa-calendar" style="color: var(--text-muted); display: none;"></i>
                     <select id="yearSelector" onchange="changeYear(this.value)" style="border:none; background:transparent; font-weight:bold; color:var(--text-main); outline:none; cursor:pointer; font-size: 0.9rem;">
                         <!-- Options injectées en JS -->
                     </select>
@@ -380,10 +374,10 @@
             <div id="page-parametres" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
-                        <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-database"></i> Sauvegarde</h3>
-                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">Téléchargez une copie de vos données (JSON) ou restaurez-la.</p>
+                        <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-database"></i> Sauvegarde (Cloud Sync Actif 🟢)</h3>
+                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">Vos données sont désormais sauvegardées en temps réel sur le Cloud. Vous pouvez aussi faire une exportation locale de sécurité si besoin.</p>
                         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Exporter</button>
+                            <button class="btn btn-primary" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Exporter JSON</button>
                             <label class="btn btn-outline" style="cursor: pointer;">
                                 <i class="fa-solid fa-upload"></i> Importer
                                 <input type="file" id="importFile" accept=".json" onchange="importJSON(event)" style="display: none;">
@@ -470,8 +464,7 @@
                         <input type="number" class="form-control" id="charge-montant" value="500" readonly style="background:#f1f5f9;" oninput="updateChargeTotal()">
                     </div>
                     <div class="form-group" style="flex:1;">
-                        <label class="form-label">Date</label>
-                        <input type="date" class="form-control" id="charge-date">
+                        <label class="form-label">Date</label><input type="date" class="form-control" id="charge-date">
                     </div>
                 </div>
                 <div class="text-right" style="margin-top:10px;">
@@ -499,7 +492,18 @@
     <div class="toast-container" id="toastBox"></div>
 
     <script>
-        // CONFIGURATION INITIALE
+        // CONFIGURATION FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5mnc9M2fnUNVc2usFj7E4hHweJmis_m4",
+            authDomain: "gh5-sn8-syndic.firebaseapp.com",
+            projectId: "gh5-sn8-syndic",
+            storageBucket: "gh5-sn8-syndic.firebasestorage.app",
+            messagingSenderId: "1034031966129",
+            appId: "1:1034031966129:web:dc43a0bf539538b18e7f90"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const dbCloud = firebase.firestore();
+
         window.jsPDF = window.jspdf.jsPDF;
         const COTISATION_MENSUELLE = 50;
         const NB_APPARTEMENTS = 26;
@@ -509,7 +513,6 @@
         let currentYear = new Date().getFullYear();
         let chartBar, chartPie;
         
-        // AUTO LOCK TIMER
         let inactivityTimer;
         const INACTIVITY_LIMIT = 5 * 60 * 1000;
 
@@ -526,45 +529,84 @@
             inactivityTimer = setTimeout(showLockScreen, INACTIVITY_LIMIT);
         }
 
-        // MOBILE SIDEBAR TOGGLE
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('active');
         }
 
-        // THEME INIT
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         });
 
-        // STRUCTURE DE LA BASE DE DONNÉES
+        // STRUCTURE DE LA BASE DE DONNÉES LOCALE (Miroir du Cloud)
         let db = {
-            settings: JSON.parse(localStorage.getItem('settings')) || { pin: '0000' },
-            apartments: JSON.parse(localStorage.getItem('apartments')) || [],
-            cotisations: JSON.parse(localStorage.getItem('cotisations')) || [],
-            charges: JSON.parse(localStorage.getItem('charges')) || [],
-            depenses: JSON.parse(localStorage.getItem('depenses')) || [],
-            cotisationsAnnexes: JSON.parse(localStorage.getItem('cotisationsAnnexes')) || [],
-            fournisseurs: JSON.parse(localStorage.getItem('fournisseurs')) || []
+            settings: { pin: '0000' },
+            apartments: [],
+            cotisations: [],
+            charges: [],
+            depenses: [],
+            cotisationsAnnexes: [],
+            fournisseurs: []
         };
 
+        // CHARGEMENT EN DIRECT DEPUIS FIREBASE FIRESTORE
         function initDB() {
-            if (db.apartments.length === 0) {
-                for (let i = 1; i <= NB_APPARTEMENTS; i++) db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
-                saveDB();
-            }
-            populateYearSelector();
+            dbCloud.collection("syndic_data").doc("main_database").onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    db.settings = data.settings || { pin: '0000' };
+                    db.apartments = data.apartments || [];
+                    db.cotisations = data.cotisations || [];
+                    db.charges = data.charges || [];
+                    db.depenses = data.depenses || [];
+                    db.cotisationsAnnexes = data.cotisationsAnnexes || [];
+                    db.fournisseurs = data.fournisseurs || [];
+                }
+                
+                if (db.apartments.length === 0) {
+                    for (let i = 1; i <= NB_APPARTEMENTS; i++) {
+                        db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
+                    }
+                    saveDB();
+                }
+                populateYearSelector();
+                refreshUI();
+            }, (error) => {
+                console.error("Erreur de synchronisation Cloud, utilisation du cache local", error);
+                // Fallback local si pas de net
+                let localData = JSON.parse(localStorage.getItem('syndic_fallback'));
+                if (localData) db = localData;
+                if (db.apartments.length === 0) {
+                    for (let i = 1; i <= NB_APPARTEMENTS; i++) db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
+                }
+                populateYearSelector();
+                refreshUI();
+            });
         }
+
+        // SAUVEGARDE AUTOMATIQUE DANS LE CLOUD FIREBASE
         function saveDB() {
-            localStorage.setItem('settings', JSON.stringify(db.settings));
-            localStorage.setItem('apartments', JSON.stringify(db.apartments));
-            localStorage.setItem('cotisations', JSON.stringify(db.cotisations));
-            localStorage.setItem('charges', JSON.stringify(db.charges));
-            localStorage.setItem('depenses', JSON.stringify(db.depenses));
-            localStorage.setItem('cotisationsAnnexes', JSON.stringify(db.cotisationsAnnexes));
-            localStorage.setItem('fournisseurs', JSON.stringify(db.fournisseurs));
+            // Sauvegarde de secours locale
+            localStorage.setItem('syndic_fallback', JSON.stringify(db));
+
+            // Envoi vers Firestore Cloud
+            dbCloud.collection("syndic_data").doc("main_database").set({
+                settings: db.settings,
+                apartments: db.apartments,
+                cotisations: db.cotisations,
+                charges: db.charges,
+                depenses: db.depenses,
+                cotisationsAnnexes: db.cotisationsAnnexes,
+                fournisseurs: db.fournisseurs
+            }).then(() => {
+                console.log("Synchronisé avec le Cloud avec succès !");
+            }).catch((error) => {
+                console.error("Erreur lors de l'enregistrement Cloud : ", error);
+                toast("Erreur de sauvegarde Cloud (Hors-ligne)", "error");
+            });
+
             populateYearSelector();
         }
 
@@ -615,7 +657,6 @@
             const titles = { 'dashboard': 'Tableau de bord financier', 'apartments': 'Vue d\'ensemble des Lots', 'cotisations': 'Suivi des Recettes', 'annexes': 'Cotisations Annexes', 'charges': 'Suivi des Dépenses', 'rapport': 'Rapport & Relances', 'fournisseurs': 'Annuaire Fournisseurs', 'parametres': 'Paramètres Système' };
             document.getElementById('page-title').innerText = titles[pageId];
             
-            // Close mobile menu if open
             if(window.innerWidth <= 768) {
                 document.getElementById('sidebar').classList.remove('open');
                 document.getElementById('sidebarOverlay').classList.remove('active');
@@ -917,14 +958,14 @@
             saveDB(); refreshUI(); closeModal('modalCharge'); toast('Dépense enregistrée !');
         }
 
+        function deleteEntry(table, id) { if(confirm('Supprimer cette ligne ?')) { db[table] = db[table].filter(row => row.id !== id); saveDB(); refreshUI(); toast('Supprimé avec succès'); } }
+
         function saveFournisseur() {
             const type = document.getElementById('fourn-type').value; const nom = document.getElementById('fourn-nom').value;
             if(!nom) return toast('Nom requis', 'error');
             db.fournisseurs.push({ id: Date.now(), type: type, nom: nom, tel: document.getElementById('fourn-tel').value, notes: document.getElementById('fourn-notes').value });
             saveDB(); refreshUI(); closeModal('modalFournisseur'); toast('Fournisseur ajouté !');
         }
-
-        function deleteEntry(table, id) { if(confirm('Supprimer cette ligne ?')) { db[table] = db[table].filter(row => row.id !== id); saveDB(); refreshUI(); toast('Supprimé avec succès'); } }
 
         function toast(msg, type = 'success') {
             const box = document.getElementById('toastBox'); const el = document.createElement('div'); el.className = `toast ${type}`;
@@ -939,18 +980,6 @@
 
         // ================= DÉMARRAGE =================
         initDB();
-        refreshUI();
-    </script>
-    
-    <!-- REGISTRATION DU SERVICE WORKER (PWA) -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => console.log('Service Worker enregistré avec succès !'))
-                    .catch(err => console.log('Échec de l\'enregistrement du Service Worker : ', err));
-            });
-        }
     </script>
 </body>
 </html>
