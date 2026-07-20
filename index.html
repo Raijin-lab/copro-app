@@ -270,7 +270,7 @@
                     <div class="table-header">
                         <div>
                             <div class="table-title">Vue d'ensemble</div>
-                            <span style="font-size:0.8rem; font-weight:normal; color:var(--text-muted); display:block; margin-top:4px;">Appuyez pour voir le détail</span>
+                            <span style="font-size:0.8rem; font-weight:normal; color:var(--text-muted); display:block; margin-top:4px;">Appuyez pour voir le détail ou modifier le propriétaire</span>
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap: wrap; margin-top: 10px;">
                             <span class="badge badge-success" id="count-ok">0 À jour</span>
@@ -405,6 +405,32 @@
     </main>
 
     <!-- MODALS -->
+    <!-- NOUVEAU MODAL : ÉDITION APPARTEMENT -->
+    <div class="modal-overlay" id="modalEditApt">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Modifier le Propriétaire</h3><button class="btn-icon" onclick="closeModal('modalEditApt')"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-apt-id">
+                <div class="form-group">
+                    <label class="form-label">Numéro Appartement</label>
+                    <input type="text" class="form-control" id="edit-apt-num" readonly style="background:#f1f5f9;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nom du Propriétaire / Locataire</label>
+                    <input type="text" class="form-control" id="edit-apt-owner" placeholder="Nom de la personne">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Numéro de Téléphone</label>
+                    <input type="tel" class="form-control" id="edit-apt-phone" placeholder="Ex: 06 12 34 56 78">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modalEditApt')">Annuler</button>
+                <button class="btn btn-primary" onclick="saveAptEdit()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="modalPaiement">
         <div class="modal-content">
             <div class="modal-header"><h3>Nouveau paiement mensuel</h3><button class="btn-icon" onclick="closeModal('modalPaiement')"><i class="fa-solid fa-xmark"></i></button></div>
@@ -540,52 +566,23 @@
             document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         });
 
-        // STRUCTURE DE LA BASE DE DONNÉES LOCALE (Miroir du Cloud)
         let db = {
-            settings: { pin: '0000' },
-            apartments: [],
-            cotisations: [],
-            charges: [],
-            depenses: [],
-            cotisationsAnnexes: [],
-            fournisseurs: []
+            settings: { pin: '0000' }, apartments: [], cotisations: [], charges: [], depenses: [], cotisationsAnnexes: [], fournisseurs: []
         };
 
-        // SAUVEGARDE AUTOMATIQUE DANS LE CLOUD FIREBASE
         function saveDB() {
-            // Sauvegarde de secours locale
             localStorage.setItem('syndic_fallback', JSON.stringify(db));
-
-            // Envoi vers Firestore Cloud
             dbCloud.collection("syndic_data").doc("main_database").set({
-                settings: db.settings,
-                apartments: db.apartments,
-                cotisations: db.cotisations,
-                charges: db.charges,
-                depenses: db.depenses,
-                cotisationsAnnexes: db.cotisationsAnnexes,
-                fournisseurs: db.fournisseurs
-            }).then(() => {
-                console.log("Synchronisé avec le Cloud avec succès !");
-            }).catch((error) => {
-                console.error("Erreur lors de l'enregistrement Cloud : ", error);
-                toast("Erreur de sauvegarde Cloud (Hors-ligne)", "error");
-            });
-
+                settings: db.settings, apartments: db.apartments, cotisations: db.cotisations, charges: db.charges, depenses: db.depenses, cotisationsAnnexes: db.cotisationsAnnexes, fournisseurs: db.fournisseurs
+            }).then(() => console.log("Synchronisé avec le Cloud")).catch((e) => toast("Erreur de sauvegarde Cloud", "error"));
             populateYearSelector();
         }
 
-        // ================= SÉCURITÉ =================
         function verifyPin() {
             const input = document.getElementById('pinInput').value;
-            if(input === db.settings.pin) {
-                document.getElementById('pinScreen').style.opacity = '0';
-                setTimeout(() => { document.getElementById('pinScreen').style.display = 'none'; resetInactivityTimer(); }, 300);
-            } else {
-                document.getElementById('pinError').style.display = 'block'; document.getElementById('pinInput').value = '';
-            }
+            if(input === db.settings.pin) { document.getElementById('pinScreen').style.opacity = '0'; setTimeout(() => { document.getElementById('pinScreen').style.display = 'none'; resetInactivityTimer(); }, 300); } 
+            else { document.getElementById('pinError').style.display = 'block'; document.getElementById('pinInput').value = ''; }
         }
-        
         document.getElementById('pinInput').addEventListener('keypress', function (e) { if (e.key === 'Enter') verifyPin(); });
 
         function updatePin() {
@@ -595,37 +592,23 @@
             db.settings.pin = newPin; saveDB(); document.getElementById('oldPin').value = ''; document.getElementById('newPin').value = ''; toast('Code mis à jour !');
         }
 
-        // ================= GESTION DES ANNÉES =================
-        function getYearOf(item) {
-            if(item.annee) return parseInt(item.annee);
-            if(item.date) return new Date(item.date).getFullYear();
-            return currentYear;
-        }
+        function getYearOf(item) { if(item.annee) return parseInt(item.annee); if(item.date) return new Date(item.date).getFullYear(); return currentYear; }
 
         function populateYearSelector() {
             let years = new Set([new Date().getFullYear()]);
-            db.cotisations.forEach(c => years.add(getYearOf(c)));
-            db.charges.forEach(c => years.add(getYearOf(c)));
+            db.cotisations.forEach(c => years.add(getYearOf(c))); db.charges.forEach(c => years.add(getYearOf(c)));
             const select = document.getElementById('yearSelector');
             select.innerHTML = Array.from(years).sort().reverse().map(y => `<option value="${y}" ${y === currentYear ? 'selected' : ''}>Exercice ${y}</option>`).join('');
         }
 
         function changeYear(y) { currentYear = parseInt(y); refreshUI(); toast(`Année : ${currentYear}`, 'info'); }
 
-        // ================= NAVIGATION =================
         function switchPage(pageId) {
-            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.remove('hidden');
-            document.querySelector(`[data-target="${pageId}"]`).classList.add('active');
-            
+            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.remove('hidden'); document.querySelector(`[data-target="${pageId}"]`).classList.add('active');
             const titles = { 'dashboard': 'Tableau de bord financier', 'apartments': 'Vue d\'ensemble des Lots', 'cotisations': 'Suivi des Recettes', 'annexes': 'Cotisations Annexes', 'charges': 'Suivi des Dépenses', 'rapport': 'Rapport & Relances', 'fournisseurs': 'Annuaire Fournisseurs', 'parametres': 'Paramètres Système' };
             document.getElementById('page-title').innerText = titles[pageId];
-            
-            if(window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('sidebarOverlay').classList.remove('active');
-            }
+            if(window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('active'); }
             refreshUI();
         }
 
@@ -636,21 +619,16 @@
             if(chartBar) { Chart.defaults.color = html.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b'; chartBar.update(); chartPie.update(); }
         }
 
-        // ================= ACTUALISATION UI =================
         function refreshUI() {
             document.getElementById('rapport-title-year').innerText = `Bilan Annuel Complet - ${currentYear}`;
-            
             const recettesAnnee = db.cotisations.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0);
             const sortiesAnnee = db.charges.filter(c => getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.filter(d => getYearOf(d) === currentYear).reduce((s, d) => s + parseFloat(d.montant), 0);
-            
             const totalRecettesGlobal = db.cotisations.reduce((s, c) => s + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((s, c) => s + parseFloat(c.montant), 0);
             const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0);
             const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
             
-            document.getElementById('dash-recettes').innerText = formatMoney.format(recettesAnnee);
-            document.getElementById('dash-depenses').innerText = formatMoney.format(sortiesAnnee);
-            document.getElementById('dash-solde').innerText = formatMoney.format(soldeGlobal);
-            document.getElementById('dash-taux').innerText = Math.round((recettesAnnee/(NB_APPARTEMENTS * COTISATION_MENSUELLE * 12))*100) + '%';
+            document.getElementById('dash-recettes').innerText = formatMoney.format(recettesAnnee); document.getElementById('dash-depenses').innerText = formatMoney.format(sortiesAnnee);
+            document.getElementById('dash-solde').innerText = formatMoney.format(soldeGlobal); document.getElementById('dash-taux').innerText = Math.round((recettesAnnee/(NB_APPARTEMENTS * COTISATION_MENSUELLE * 12))*100) + '%';
 
             initCharts(); renderApartments(); renderAnnexes(); renderTables();
         }
@@ -658,7 +636,6 @@
         function initCharts() {
             Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b';
             let recMensuelles = Array(12).fill(0), depMensuelles = Array(12).fill(0);
-            
             db.cotisations.filter(c => getYearOf(c) === currentYear).forEach(c => { recMensuelles[c.date ? new Date(c.date).getMonth() : ((c.mois||1)-1)] += parseFloat(c.montant); });
             db.charges.filter(c => getYearOf(c) === currentYear).forEach(c => { depMensuelles[new Date(c.date).getMonth()] += parseFloat(c.montant); });
             db.depenses.filter(c => getYearOf(c) === currentYear).forEach(c => { depMensuelles[new Date(c.date).getMonth()] += parseFloat(c.montant); });
@@ -680,24 +657,53 @@
             });
         }
 
-        // ================= RENDU DE LA GRILLE =================
+        // ================= ÉDITION DES APPARTEMENTS =================
+        function openEditApt(aptId) {
+            const apt = db.apartments.find(a => a.id === aptId);
+            document.getElementById('edit-apt-id').value = apt.id;
+            document.getElementById('edit-apt-num').value = 'Apt ' + apt.number;
+            document.getElementById('edit-apt-owner').value = apt.owner;
+            document.getElementById('edit-apt-phone').value = apt.phone || '';
+            openModal('modalEditApt');
+        }
+
+        function saveAptEdit() {
+            const id = parseInt(document.getElementById('edit-apt-id').value);
+            const owner = document.getElementById('edit-apt-owner').value;
+            const phone = document.getElementById('edit-apt-phone').value;
+            const apt = db.apartments.find(a => a.id === id);
+            if(apt) {
+                apt.owner = owner;
+                apt.phone = phone;
+                saveDB();
+                refreshUI();
+                closeModal('modalEditApt');
+                toast('Propriétaire mis à jour !');
+            }
+        }
+
         function renderApartments() {
-            const grid = document.getElementById('aptGridContainer');
-            grid.innerHTML = ''; let ok=0, prt=0, bad=0;
+            const grid = document.getElementById('aptGridContainer'); grid.innerHTML = ''; let ok=0, prt=0, bad=0;
 
             db.apartments.forEach(apt => {
                 let paye = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0);
                 let du = COTISATION_MENSUELLE * 12; let statusCls = 'status-bad';
                 if(paye >= du) { statusCls = 'status-ok'; ok++; } else if(paye > 0) { statusCls = 'status-partial'; prt++; } else { bad++; }
 
-                grid.innerHTML += `<div class="apt-card ${statusCls}" onclick="showAptDetails(${apt.id})"><div class="apt-num">${apt.number}</div><div class="apt-owner">${apt.owner}</div><div style="font-size:0.75rem; font-weight:600; margin-top:8px; color:var(--text-main)">${paye} / ${du}</div></div>`;
+                grid.innerHTML += `
+                <div class="apt-card ${statusCls}" style="position:relative;" onclick="showAptDetails(${apt.id})">
+                    <button class="btn-icon no-print" style="position:absolute; top:4px; right:4px; padding:4px; font-size:0.9rem;" onclick="event.stopPropagation(); openEditApt(${apt.id})" title="Modifier Propriétaire"><i class="fa-solid fa-pen"></i></button>
+                    <div class="apt-num">${apt.number}</div>
+                    <div class="apt-owner" style="font-weight:600; color:var(--text-main);">${apt.owner}</div>
+                    <div class="apt-owner" style="font-size:0.7rem; margin-bottom:4px;">${apt.phone || 'Non renseigné'}</div>
+                    <div style="font-size:0.75rem; font-weight:600; margin-top:8px; color:var(--text-main)">${paye} / ${du}</div>
+                </div>`;
             });
             document.getElementById('count-ok').innerText = ok + ' À jour'; document.getElementById('count-partial').innerText = prt + ' Partiel'; document.getElementById('count-bad').innerText = bad + ' Retard';
         }
 
         function renderAnnexes() {
             document.getElementById('table-annexes').innerHTML = [...db.cotisationsAnnexes].filter(c => getYearOf(c) === currentYear).map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td><strong>${c.projet}</strong></td><td>Apt ${c.aptId}</td><td>${c.mode}</td><td class="text-right font-mono text-success">+${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisationsAnnexes', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
-            
             let projetsData = {}; let totalCollecteAnnexes = 0;
             db.cotisationsAnnexes.forEach(c => {
                 totalCollecteAnnexes += parseFloat(c.montant); let nomProj = c.projet.trim().toUpperCase();
@@ -722,20 +728,30 @@
             toast(`<div style="margin-bottom: 4px;"><strong>Appartement ${apt.number} - ${apt.owner}</strong></div><div>Payé : ${formatMoney.format(totalPaye)} / ${formatMoney.format(du)}</div><div style="${reste > 0 ? 'color:var(--danger)' : 'color:var(--success)'}; font-weight:600;">Reste à payer : ${formatMoney.format(reste)}</div>${detailMois}`, 'info');
         }
 
-        // ================= RENDU DES TABLEAUX =================
         function renderTables() {
             document.getElementById('table-cotisations').innerHTML = [...db.cotisations].filter(c => getYearOf(c) === currentYear).sort((a,b) => new Date(b.date||0) - new Date(a.date||0)).map(c => `<tr><td>${c.date ? new Date(c.date).toLocaleDateString() : ('01/'+(c.mois||1).toString().padStart(2,'0')+'/'+c.annee)}</td><td><span class="badge badge-success">Apt ${c.aptId}</span></td><td>${db.apartments.find(a=>a.id==c.aptId)?.owner || '-'}</td><td>${c.moisStr || (MOIS_NOMS[(c.mois||1)-1])}</td><td>${c.mode || 'Espèces'}</td><td class="text-right font-mono text-success">+${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisations', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
 
             const tbodyCharges = document.getElementById('table-charges'); tbodyCharges.innerHTML = '';
-            db.charges.forEach(c => { if(getYearOf(c) === currentYear) tbodyCharges.innerHTML += `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td><span class="badge badge-warning">${c.cat}</span></td><td>${c.desc}</td><td class="text-right font-mono text-danger">-${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('charges', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`; });
-            db.depenses.forEach(d => { if(getYearOf(d) === currentYear) tbodyCharges.innerHTML += `<tr><td>${new Date(d.date).toLocaleDateString()}</td><td><span class="badge badge-danger">${d.typeDepense || 'Dépense'}</span></td><td>${d.beneficiaire || d.description}</td><td class="text-right font-mono text-danger">-${formatMoney.format(d.montant)}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('depenses', ${d.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`; });
+            db.charges.forEach(c => { 
+                if(getYearOf(c) === currentYear) tbodyCharges.innerHTML += `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td><span class="badge badge-warning">${c.cat}</span></td><td>${c.desc}</td><td class="text-right font-mono text-danger">-${formatMoney.format(c.montant)}</td>
+                <td class="text-right no-print">
+                    <button class="btn-icon" title="Imprimer Reçu PDF" onclick="generateChargePDF(${c.id}, 'charges')"><i class="fa-solid fa-file-pdf" style="color:var(--info);"></i></button>
+                    <button class="btn-icon" onclick="deleteEntry('charges', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button>
+                </td></tr>`; 
+            });
+            db.depenses.forEach(d => { 
+                if(getYearOf(d) === currentYear) tbodyCharges.innerHTML += `<tr><td>${new Date(d.date).toLocaleDateString()}</td><td><span class="badge badge-danger">${d.typeDepense || 'Dépense'}</span></td><td>${d.beneficiaire || d.description}</td><td class="text-right font-mono text-danger">-${formatMoney.format(d.montant)}</td>
+                <td class="text-right no-print">
+                    <button class="btn-icon" title="Imprimer Reçu PDF" onclick="generateChargePDF(${d.id}, 'depenses')"><i class="fa-solid fa-file-pdf" style="color:var(--info);"></i></button>
+                    <button class="btn-icon" onclick="deleteEntry('depenses', ${d.id})"><i class="fa-solid fa-trash text-danger"></i></button>
+                </td></tr>`; 
+            });
 
             document.getElementById('table-fournisseurs').innerHTML = db.fournisseurs.map(f => `<tr><td><span class="badge badge-info">${f.type}</span></td><td><strong>${f.nom}</strong></td><td><a href="tel:${f.tel}" style="color:var(--info); text-decoration:none;">${f.tel}</a></td><td>${f.notes}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('fournisseurs', ${f.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
 
             document.getElementById('table-rapport').innerHTML = db.apartments.map(apt => {
                 let paye = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0);
                 let reste = (COTISATION_MENSUELLE * 12) - paye; if(reste < 0) reste = 0;
-                
                 let stat = reste === 0 ? '<span class="badge badge-success">À jour</span>' : (paye > 0 ? '<span class="badge badge-warning">Partiel</span>' : '<span class="badge badge-danger">Impayé</span>');
                 let rowClass = reste === 0 ? 'print-row-ok' : (paye > 0 ? 'print-row-partial' : 'print-row-bad');
                 
@@ -744,7 +760,7 @@
                 
                 return `<tr class="${rowClass}">
                             <td><strong>Apt ${apt.number}</strong></td>
-                            <td class="hide-on-print">${apt.owner}</td>
+                            <td class="hide-on-print">${apt.owner} <br><span style="font-size:0.7rem; color:gray;">${apt.phone || ''}</span></td>
                             <td class="text-right font-mono">${formatMoney.format(paye)}</td>
                             <td class="text-right font-mono ${reste>0?'text-danger':''}">${formatMoney.format(reste)}</td>
                             <td>${stat}</td>
@@ -753,10 +769,8 @@
             }).join('');
         }
 
-        // ================= IMPRESSION DU BILAN GLOBAL (A3) =================
         function printBilanGlobal() {
             const year = currentYear;
-            
             const cots = db.cotisations.filter(c => getYearOf(c) === year).sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
             const anns = db.cotisationsAnnexes.filter(c => getYearOf(c) === year);
             const chgs = db.charges.filter(c => getYearOf(c) === year).sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
@@ -769,63 +783,34 @@
             const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0);
             const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
 
-            const allSorties = [
-                ...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), 
-                ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))
-            ].sort((a,b) => new Date(a.date) - new Date(b.date));
+            const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))].sort((a,b) => new Date(a.date) - new Date(b.date));
 
-            let html = `
-                <h1>BILAN FINANCIER GLOBAL - GH5-SN8 Immeuble (${year})</h1>
-                <div class="print-summary-box">
-                    <div style="color:#10b981;">Total Recettes (${year}) : +${formatMoney.format(totalRecettesAnnee)}</div>
-                    <div style="color:#ef4444;">Total Dépenses (${year}) : -${formatMoney.format(totalDepensesAnnee)}</div>
-                    <div style="color:${soldeGlobal >= 0 ? '#4f46e5' : '#ef4444'};">Solde Trésorerie Actuel : ${formatMoney.format(soldeGlobal)}</div>
-                </div>
-                <div style="display: flex; gap: 20px; align-items: flex-start;">
-                    <div style="flex: 1;">
-                        <h3 style="margin-bottom:10px; color:#10b981;">Détail des Recettes (Cotisations & Travaux)</h3>
-                        <table>
-                            <thead><tr><th>Date</th><th>Apt</th><th>Mois / Projet</th><th>Montant</th></tr></thead>
-                            <tbody>
-                                ${cots.map(c => `<tr><td>${c.date ? new Date(c.date).toLocaleDateString() : ('01/'+(c.mois||1).toString().padStart(2,'0')+'/'+c.annee)}</td><td>${c.aptId}</td><td>${c.moisStr || MOIS_NOMS[(c.mois||1)-1]}</td><td>${c.montant} DH</td></tr>`).join('')}
-                                ${anns.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.aptId}</td><td>${c.projet} (Annexe)</td><td>${c.montant} DH</td></tr>`).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div style="flex: 1;">
-                        <h3 style="margin-bottom:10px; color:#ef4444;">Détail des Dépenses (Charges & Frais)</h3>
-                        <table>
-                            <thead><tr><th>Date</th><th>Catégorie</th><th>Description</th><th>Montant</th></tr></thead>
-                            <tbody>
-                                ${allSorties.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.type}</td><td>${c.desc}</td><td>${c.montant} DH</td></tr>`).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div style="margin-top: 30px; text-align: right; font-weight: bold; font-size: 12pt;">
-                    Fait le ${new Date().toLocaleDateString('fr-FR')} - Le Syndic
-                </div>
-            `;
-
-            document.getElementById('print-global-container').innerHTML = html;
-            document.body.classList.add('print-global-mode');
-            window.print();
-            setTimeout(() => { document.body.classList.remove('print-global-mode'); }, 500);
+            let html = `<h1>BILAN FINANCIER GLOBAL - GH5-SN8 Immeuble (${year})</h1><div class="print-summary-box"><div style="color:#10b981;">Total Recettes (${year}) : +${formatMoney.format(totalRecettesAnnee)}</div><div style="color:#ef4444;">Total Dépenses (${year}) : -${formatMoney.format(totalDepensesAnnee)}</div><div style="color:${soldeGlobal >= 0 ? '#4f46e5' : '#ef4444'};">Solde Trésorerie Actuel : ${formatMoney.format(soldeGlobal)}</div></div><div style="display: flex; gap: 20px; align-items: flex-start;"><div style="flex: 1;"><h3 style="margin-bottom:10px; color:#10b981;">Détail des Recettes (Cotisations & Travaux)</h3><table><thead><tr><th>Date</th><th>Apt</th><th>Mois / Projet</th><th>Montant</th></tr></thead><tbody>${cots.map(c => `<tr><td>${c.date ? new Date(c.date).toLocaleDateString() : ('01/'+(c.mois||1).toString().padStart(2,'0')+'/'+c.annee)}</td><td>${c.aptId}</td><td>${c.moisStr || MOIS_NOMS[(c.mois||1)-1]}</td><td>${c.montant} DH</td></tr>`).join('')}${anns.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.aptId}</td><td>${c.projet} (Annexe)</td><td>${c.montant} DH</td></tr>`).join('')}</tbody></table></div><div style="flex: 1;"><h3 style="margin-bottom:10px; color:#ef4444;">Détail des Dépenses (Charges & Frais)</h3><table><thead><tr><th>Date</th><th>Catégorie</th><th>Description</th><th>Montant</th></tr></thead><tbody>${allSorties.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.type}</td><td>${c.desc}</td><td>${c.montant} DH</td></tr>`).join('')}</tbody></table></div></div><div style="margin-top: 30px; text-align: right; font-weight: bold; font-size: 12pt;">Fait le ${new Date().toLocaleDateString('fr-FR')} - Le Syndic</div>`;
+            document.getElementById('print-global-container').innerHTML = html; document.body.classList.add('print-global-mode'); window.print(); setTimeout(() => { document.body.classList.remove('print-global-mode'); }, 500);
         }
 
-        // ================= ACTIONS WHATSAPP & PDF =================
-        function relanceWA(aptId, reste) { const apt = db.apartments.find(a => a.id === aptId); window.open(`https://wa.me/?text=Bonjour ${apt.owner},%0A%0ASauf erreur de notre part, il reste un solde de *${reste} DH* pour vos cotisations syndicales de l'année ${currentYear} (Appartement ${apt.number}).%0A%0AMerci d'avance pour votre régularisation.%0A%0ABien cordialement, le Syndic.`, '_blank'); }
+        // ================= ACTIONS WHATSAPP & PDF (Avec prise en charge du téléphone) =================
+        function relanceWA(aptId, reste) { 
+            const apt = db.apartments.find(a => a.id === aptId); 
+            let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : '';
+            if(tel.startsWith('0')) tel = '212' + tel.substring(1);
+            window.open(`https://wa.me/${tel}?text=Bonjour ${apt.owner},%0A%0ASauf erreur de notre part, il reste un solde de *${reste} DH* pour vos cotisations syndicales de l'année ${currentYear} (Appartement ${apt.number}).%0A%0AMerci d'avance pour votre régularisation.%0A%0ABien cordialement, le Syndic.`, '_blank'); 
+        }
+
         function shareReceiptWA(aptId) {
             const apt = db.apartments.find(a => a.id === aptId); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear);
             const totalPaye = paiements.reduce((s, c) => s + parseFloat(c.montant), 0); const reste = (COTISATION_MENSUELLE * 12) - totalPaye;
             let details = paiements.map(p => `- ${p.moisStr || MOIS_NOMS[(p.mois||1)-1]} : ${p.montant} DH`).join('%0A'); if(!details) details = "Aucun paiement enregistré pour le moment.";
-            window.open(`https://wa.me/?text=🏢 *REÇU GLOBAL SYNDIC - ${currentYear}* 🏢%0A%0A👤 *Appartement ${apt.number}* - ${apt.owner}%0A%0A✅ *Détail des paiements reçus :*%0A${details}%0A%0A💰 *Total payé :* ${totalPaye} DH%0A⚠️ *Reste à payer :* ${Math.max(reste, 0)} DH%0A%0AMerci pour votre collaboration ! 🙏`, '_blank');
+            let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : '';
+            if(tel.startsWith('0')) tel = '212' + tel.substring(1);
+            window.open(`https://wa.me/${tel}?text=🏢 *REÇU GLOBAL SYNDIC - ${currentYear}* 🏢%0A%0A👤 *Appartement ${apt.number}* - ${apt.owner}%0A%0A✅ *Détail des paiements reçus :*%0A${details}%0A%0A💰 *Total payé :* ${totalPaye} DH%0A⚠️ *Reste à payer :* ${Math.max(reste, 0)} DH%0A%0AMerci pour votre collaboration ! 🙏`, '_blank');
         }
+
         function generatePDF(aptId) {
             const apt = db.apartments.find(a => a.id === aptId); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear);
             const totalPaye = paiements.reduce((s, c) => s + parseFloat(c.montant), 0); const reste = Math.max((COTISATION_MENSUELLE * 12) - totalPaye, 0);
             const doc = new jsPDF();
-            doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.text(`RECU GLOBAL - SYNDIC (${currentYear})`, 105, 20, { align: "center" });
+            doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.text(`REÇU GLOBAL - SYNDIC (${currentYear})`, 105, 20, { align: "center" });
             doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text(`Date d'édition : ${new Date().toLocaleDateString('fr-FR')}`, 14, 40); doc.text(`Appartement N° : ${apt.number}`, 14, 50); doc.text(`Propriétaire : ${apt.owner}`, 14, 60);
             let bodyData = paiements.map(p => [ p.date ? new Date(p.date).toLocaleDateString() : '01/'+(p.mois||1).toString().padStart(2,'0')+'/'+p.annee, p.moisStr || MOIS_NOMS[(p.mois||1)-1], p.mode || 'Espèces', p.montant + ' DH' ]);
             if(bodyData.length === 0) bodyData.push(["-", "Aucun paiement", "-", "-"]);
@@ -833,8 +818,40 @@
             let finalY = doc.lastAutoTable.finalY || 70;
             doc.setFont("helvetica", "bold"); doc.text(`Total Payé : ${totalPaye} DH`, 14, finalY + 15); doc.setTextColor(220, 38, 38);
             if(reste > 0) doc.text(`Reste à payer : ${reste} DH`, 14, finalY + 25); else { doc.setTextColor(16, 185, 129); doc.text(`Appartement à jour.`, 14, finalY + 25); }
-            doc.setTextColor(0,0,0); doc.setFont("helvetica", "italic"); doc.setFontSize(10); doc.text("Pour servir et valoir ce que de droit.", 14, finalY + 45); doc.text("Le Syndic", 150, finalY + 45);
+            doc.setTextColor(0,0,0); doc.setFont("helvetica", "italic"); doc.setFontSize(10); doc.text("Pour servir et valoir ce que de droit.", 14, finalY + 45); doc.text("Le Syndic GH5-SN8", 150, finalY + 45);
             doc.save(`Recu_Apt_${apt.number}_${currentYear}.pdf`); toast("Reçu PDF généré !", "success");
+        }
+
+        // ================= IMPRESSION REÇU DÉPENSES (Femme de ménage, Ascenseur...) =================
+        function generateChargePDF(id, type) {
+            let charge = type === 'charges' ? db.charges.find(c => c.id === id) : db.depenses.find(d => d.id === id);
+            if(!charge) return;
+            
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold"); doc.setFontSize(20); 
+            doc.text(`BON DE PAIEMENT`, 105, 20, { align: "center" });
+            
+            doc.setFontSize(12); doc.setFont("helvetica", "normal"); 
+            doc.text(`Date de paiement : ${new Date(charge.date).toLocaleDateString('fr-FR')}`, 14, 40); 
+            doc.text(`Bénéficiaire / Motif : ${charge.desc || charge.beneficiaire || charge.description}`, 14, 50); 
+            doc.text(`Catégorie : ${charge.cat || charge.typeDepense || 'Dépense'}`, 14, 60);
+            
+            doc.autoTable({ 
+                startY: 70, 
+                head: [['Date', 'Désignation', 'Montant Payé']], 
+                body: [[new Date(charge.date).toLocaleDateString('fr-FR'), charge.desc || charge.beneficiaire || charge.description, charge.montant + ' DH']], 
+                theme: 'striped', 
+                headStyles: { fillColor: [239, 68, 68] } 
+            });
+            
+            let finalY = doc.lastAutoTable.finalY || 70;
+            doc.setFont("helvetica", "bold"); doc.text(`Total Réglé : ${charge.montant} DH`, 14, finalY + 15); 
+            
+            doc.setTextColor(0,0,0); doc.setFont("helvetica", "italic"); doc.setFontSize(10); 
+            doc.text("Signature du Syndic GH5-SN8", 140, finalY + 40);
+            
+            doc.save(`Recu_Paiement_${new Date(charge.date).getTime()}.pdf`); 
+            toast("Reçu PDF généré !", "success");
         }
 
         function exportJSON() {
@@ -847,7 +864,6 @@
             reader.readAsText(file);
         }
 
-        // ================= MODALS & LOGIQUE DES DEPENSES =================
         function openModal(id) {
             document.getElementById(id).classList.add('active');
             let aptOptions = db.apartments.map(a => `<option value="${a.id}">Apt ${a.number} - ${a.owner}</option>`).join('');
@@ -856,16 +872,8 @@
             if(document.getElementById('form-date')) document.getElementById('form-date').value = today;
             if(document.getElementById('charge-date')) document.getElementById('charge-date').value = today;
             if(document.getElementById('annexe-date')) document.getElementById('annexe-date').value = today;
-            
-            if(id === 'modalPaiement') {
-                document.getElementById('form-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateTotalModalPaiement()"><span class="month-btn">${m}</span></label>`).join('');
-                updateTotalModalPaiement();
-            }
-            if(id === 'modalCharge') {
-                document.getElementById('charge-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateChargeTotal()"><span class="month-btn">${m}</span></label>`).join('');
-                document.getElementById('charge-type').value = 'femme';
-                onChargeTypeChange();
-            }
+            if(id === 'modalPaiement') { document.getElementById('form-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateTotalModalPaiement()"><span class="month-btn">${m}</span></label>`).join(''); updateTotalModalPaiement(); }
+            if(id === 'modalCharge') { document.getElementById('charge-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateChargeTotal()"><span class="month-btn">${m}</span></label>`).join(''); document.getElementById('charge-type').value = 'femme'; onChargeTypeChange(); }
         }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
         
@@ -875,7 +883,6 @@
             const type = document.getElementById('charge-type').value; const montantInput = document.getElementById('charge-montant');
             const moisSection = document.getElementById('charge-mois-section'); const descSection = document.getElementById('charge-desc-section');
             const label = document.getElementById('charge-montant-label');
-
             if(type === 'femme') { montantInput.value = 500; montantInput.readOnly = true; montantInput.style.background = '#f1f5f9'; moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)'; }
             else if(type === 'ascenseur') { montantInput.value = 150; montantInput.readOnly = true; montantInput.style.background = '#f1f5f9'; moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)'; }
             else if(type === 'electricite') { montantInput.value = ''; montantInput.readOnly = false; montantInput.style.background = 'white'; moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)'; }
@@ -940,7 +947,6 @@
 
         // ================= DÉMARRAGE ET SYNCHRONISATION CLOUD =================
         function initDB() {
-            // onSnapshot permet une mise à jour en temps réel (instantanée) entre PC et Téléphone
             dbCloud.collection("syndic_data").doc("main_database").onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
@@ -955,7 +961,7 @@
                 
                 if (db.apartments.length === 0) {
                     for (let i = 1; i <= NB_APPARTEMENTS; i++) {
-                        db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
+                        db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}`, phone: '' });
                     }
                     saveDB();
                 }
