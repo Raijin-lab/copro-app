@@ -59,6 +59,7 @@
         .btn { padding: 8px 16px; border-radius: 8px; border: none; font-family: inherit; font-size: 0.875rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
         .btn-primary { background: var(--primary); color: white; } .btn-primary:hover { background: var(--primary-hover); }
         .btn-success { background: var(--success); color: white; } .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
         .btn-icon { padding: 8px; border-radius: 50%; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
         .btn-icon:hover { color: var(--primary); background: var(--bg-body); }
@@ -67,6 +68,7 @@
         .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 6px; color: var(--text-main); }
         .form-control { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); font-family: inherit; }
         .form-control:read-only { background: rgba(0,0,0,0.05); color: var(--text-muted); cursor: not-allowed; }
+        textarea.form-control { resize: vertical; }
 
         /* ===== CARDS & TABLES ===== */
         .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-bottom: 24px; }
@@ -82,10 +84,12 @@
         .bg-red-100 { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
         .bg-yellow-100 { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
         .bg-blue-100 { background: rgba(59, 130, 246, 0.1); color: var(--info); }
-        .bg-gray-100 { background: rgba(100, 116, 139, 0.1); color: var(--secondary); }
+        .bg-cyan-100 { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
+        .bg-orange-100 { background: rgba(249, 115, 22, 0.1); color: #ea580c; }
 
-        .table-container { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table-container { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 24px;}
         .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .table-title { font-size: 1.1rem; font-weight: 600; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { text-align: left; padding: 12px 24px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.02); white-space: nowrap; }
         td { padding: 16px 24px; font-size: 0.875rem; border-bottom: 1px solid var(--border); }
@@ -94,7 +98,6 @@
         .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
         .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
         .badge-info { background: rgba(59, 130, 246, 0.1); color: var(--info); }
-        .badge-gray { background: rgba(100, 116, 139, 0.1); color: var(--secondary); }
 
         /* ===== APARTMENTS GRID ===== */
         .apt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 16px; padding: 24px; }
@@ -108,7 +111,7 @@
         /* ===== MODALS & TOASTS ===== */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; padding: 16px; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: 16px; transform: translateY(10px); transition: 0.3s; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 550px; border-radius: 16px; transform: translateY(10px); transition: 0.3s; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
         .modal-overlay.active .modal-content { transform: translateY(0); }
         .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .modal-body { padding: 20px; overflow-y: auto; }
@@ -129,8 +132,13 @@
         .progress-bar-container { width: 100%; background-color: var(--border); border-radius: 4px; height: 8px; overflow: hidden; margin-top: 8px; }
         .progress-bar-fill { height: 100%; background-color: var(--success); transition: width 0.4s ease; }
 
-        @media screen { .no-screen { display: none !important; } }
+        /* ===== AG CHECKBOXES ===== */
+        .ag-apt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
+        .ag-apt-cb input { display: none; }
+        .ag-apt-btn { display: block; padding: 6px; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 0.75rem; cursor: pointer; transition: 0.2s; background: var(--bg-body); }
+        .ag-apt-cb input:checked ~ .ag-apt-btn { background: var(--primary); color: white; border-color: var(--primary); }
 
+        @media screen { .no-screen { display: none !important; } }
         .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; padding: 5px; }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
         
@@ -180,7 +188,6 @@
 </head>
 <body>
 
-    <!-- ÉCRAN DE VERROUILLAGE -->
     <div id="pinScreen">
         <div class="pin-box">
             <i class="fa-solid fa-shield-halved" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
@@ -193,10 +200,7 @@
         </div>
     </div>
 
-    <!-- CONTENEUR CACHÉ POUR LE BILAN GLOBAL A3 -->
     <div id="print-global-container" class="no-screen"></div>
-
-    <!-- OVERLAY POUR MENU MOBILE -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- SIDEBAR -->
@@ -206,34 +210,20 @@
             <span style="font-size: 1rem;">GH5-SN8 Immeuble</span>
         </div>
         <div class="sidebar-nav">
-            <div class="nav-item active" data-target="dashboard" onclick="switchPage('dashboard')">
-                <i class="fa-solid fa-chart-pie"></i> Tableau de bord
-            </div>
-            <div class="nav-item" data-target="apartments" onclick="switchPage('apartments')">
-                <i class="fa-solid fa-door-closed"></i> Appartements
-            </div>
-            <div class="nav-item" data-target="cotisations" onclick="switchPage('cotisations')">
-                <i class="fa-solid fa-hand-holding-dollar"></i> Cotisations
-            </div>
-            <div class="nav-item" data-target="annexes" onclick="switchPage('annexes')">
-                <i class="fa-solid fa-toolbox"></i> Travaux & Annexes
-            </div>
-            <div class="nav-item" data-target="charges" onclick="switchPage('charges')">
-                <i class="fa-solid fa-file-invoice-dollar"></i> Charges & Dépenses
-            </div>
-            <!-- NOUVEL ONGLET PHASE 1 : PÔLE TECHNIQUE -->
-            <div class="nav-item" data-target="technique" onclick="switchPage('technique')">
-                <i class="fa-solid fa-wrench"></i> Pôle Technique
-            </div>
-            <div class="nav-item" data-target="rapport" onclick="switchPage('rapport')">
-                <i class="fa-solid fa-file-pdf"></i> Rapport & Relances
-            </div>
-            <div class="nav-item" data-target="fournisseurs" onclick="switchPage('fournisseurs')">
-                <i class="fa-solid fa-address-book"></i> Fournisseurs
-            </div>
-            <div class="nav-item" data-target="parametres" onclick="switchPage('parametres')">
-                <i class="fa-solid fa-gear"></i> Paramètres
-            </div>
+            <div class="nav-item active" data-target="dashboard" onclick="switchPage('dashboard')"><i class="fa-solid fa-chart-pie"></i> Tableau de bord</div>
+            <div class="nav-item" data-target="apartments" onclick="switchPage('apartments')"><i class="fa-solid fa-door-closed"></i> Appartements</div>
+            <div class="nav-item" data-target="cotisations" onclick="switchPage('cotisations')"><i class="fa-solid fa-hand-holding-dollar"></i> Cotisations</div>
+            <div class="nav-item" data-target="annexes" onclick="switchPage('annexes')"><i class="fa-solid fa-toolbox"></i> Travaux & Annexes</div>
+            <div class="nav-item" data-target="charges" onclick="switchPage('charges')"><i class="fa-solid fa-file-invoice-dollar"></i> Charges & Dépenses</div>
+            <div class="nav-item" data-target="technique" onclick="switchPage('technique')"><i class="fa-solid fa-wrench"></i> Pôle Technique</div>
+            
+            <!-- NOUVEAUX ONGLETS PHASE 2 -->
+            <div class="nav-item" data-target="energie" onclick="switchPage('energie')"><i class="fa-solid fa-bolt"></i> Énergie & Compteurs</div>
+            <div class="nav-item" data-target="assemblees" onclick="switchPage('assemblees')"><i class="fa-solid fa-users"></i> Assemblées (AG)</div>
+            
+            <div class="nav-item" data-target="rapport" onclick="switchPage('rapport')"><i class="fa-solid fa-file-pdf"></i> Rapport & Relances</div>
+            <div class="nav-item" data-target="fournisseurs" onclick="switchPage('fournisseurs')"><i class="fa-solid fa-address-book"></i> Fournisseurs</div>
+            <div class="nav-item" data-target="parametres" onclick="switchPage('parametres')"><i class="fa-solid fa-gear"></i> Paramètres</div>
         </div>
     </nav>
 
@@ -246,9 +236,7 @@
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 4px; background: var(--bg-body); padding: 4px 8px; border-radius: 8px; border: 1px solid var(--border);">
-                    <select id="yearSelector" onchange="changeYear(this.value)" style="border:none; background:transparent; font-weight:bold; color:var(--text-main); outline:none; cursor:pointer; font-size: 0.9rem;">
-                        <!-- Options injectées en JS -->
-                    </select>
+                    <select id="yearSelector" onchange="changeYear(this.value)" style="border:none; background:transparent; font-weight:bold; color:var(--text-main); outline:none; cursor:pointer; font-size: 0.9rem;"></select>
                 </div>
                 <button class="btn-icon" onclick="toggleTheme()" title="Mode Sombre"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
                 <button class="btn btn-outline" onclick="window.print()" title="Imprimer"><i class="fa-solid fa-print"></i></button>
@@ -291,14 +279,8 @@
             <!-- PAGE: COTISATIONS -->
             <div id="page-cotisations" class="page-view hidden">
                 <div class="table-container">
-                    <div class="table-header">
-                        <div class="table-title">Historique des Paiements</div>
-                        <button class="btn btn-primary" onclick="openModal('modalPaiement')"><i class="fa-solid fa-plus"></i> Ajouter</button>
-                    </div>
-                    <table>
-                        <thead><tr><th>Date</th><th>Apt N°</th><th>Propriétaire</th><th>Mois payés</th><th>Mode</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead>
-                        <tbody id="table-cotisations"></tbody>
-                    </table>
+                    <div class="table-header"><div class="table-title">Historique des Paiements</div><button class="btn btn-primary" onclick="openModal('modalPaiement')"><i class="fa-solid fa-plus"></i> Ajouter</button></div>
+                    <table><thead><tr><th>Date</th><th>Apt N°</th><th>Propriétaire</th><th>Mois payés</th><th>Mode</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead><tbody id="table-cotisations"></tbody></table>
                 </div>
             </div>
 
@@ -310,14 +292,8 @@
                     <div class="card"><div class="stat-header"><div><div class="stat-title">Projets Actifs</div><div class="stat-value" id="annexes-nb-projets">0</div></div><div class="stat-icon bg-blue-100"><i class="fa-solid fa-folder-open"></i></div></div></div>
                 </div>
                 <div class="table-container">
-                    <div class="table-header">
-                        <div class="table-title">Travaux Exceptionnels</div>
-                        <button class="btn btn-primary" onclick="openModal('modalAnnexe')"><i class="fa-solid fa-plus"></i> Participation</button>
-                    </div>
-                    <table>
-                        <thead><tr><th>Date</th><th>Projet</th><th>Apt</th><th>Mode</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead>
-                        <tbody id="table-annexes"></tbody>
-                    </table>
+                    <div class="table-header"><div class="table-title">Travaux Exceptionnels</div><button class="btn btn-primary" onclick="openModal('modalAnnexe')"><i class="fa-solid fa-plus"></i> Participation</button></div>
+                    <table><thead><tr><th>Date</th><th>Projet</th><th>Apt</th><th>Mode</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead><tbody id="table-annexes"></tbody></table>
                 </div>
                 <div class="grid-2" id="annexes-projects-container" style="margin-top: 24px;"></div>
             </div>
@@ -325,56 +301,61 @@
             <!-- PAGE: CHARGES -->
             <div id="page-charges" class="page-view hidden">
                 <div class="table-container">
-                    <div class="table-header">
-                        <div class="table-title">Dépenses & Charges</div>
-                        <button class="btn btn-danger" onclick="openModal('modalCharge')"><i class="fa-solid fa-minus"></i> Ajouter</button>
-                    </div>
-                    <table>
-                        <thead><tr><th>Date</th><th>Catégorie</th><th>Motif</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead>
-                        <tbody id="table-charges"></tbody>
-                    </table>
+                    <div class="table-header"><div class="table-title">Dépenses & Charges</div><button class="btn btn-danger" onclick="openModal('modalCharge')"><i class="fa-solid fa-minus"></i> Ajouter</button></div>
+                    <table><thead><tr><th>Date</th><th>Catégorie</th><th>Motif</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead><tbody id="table-charges"></tbody></table>
                 </div>
             </div>
 
-            <!-- PAGE: PÔLE TECHNIQUE (PHASE 1) -->
+            <!-- PAGE: TECHNIQUE -->
             <div id="page-technique" class="page-view hidden">
                 <div class="grid-2">
-                    <!-- Section Incidents -->
                     <div class="table-container">
-                        <div class="table-header">
-                            <div class="table-title">Incidents & Réclamations</div>
-                            <button class="btn btn-outline" onclick="openModal('modalIncident')"><i class="fa-solid fa-triangle-exclamation"></i> Signaler</button>
-                        </div>
-                        <table style="min-width: 400px;">
-                            <thead><tr><th>Date</th><th>Description</th><th>Statut</th><th class="text-right no-print">Action</th></tr></thead>
-                            <tbody id="table-incidents"></tbody>
-                        </table>
+                        <div class="table-header"><div class="table-title">Incidents & Réclamations</div><button class="btn btn-outline" onclick="openModal('modalIncident')"><i class="fa-solid fa-triangle-exclamation"></i> Signaler</button></div>
+                        <table style="min-width: 400px;"><thead><tr><th>Date</th><th>Description</th><th>Statut</th><th class="text-right no-print">Action</th></tr></thead><tbody id="table-incidents"></tbody></table>
                     </div>
-                    <!-- Section Maintenance Préventive -->
                     <div class="table-container">
-                        <div class="table-header">
-                            <div class="table-title">Maintenance Préventive</div>
-                            <button class="btn btn-primary" onclick="openModal('modalMaintenance')"><i class="fa-solid fa-clipboard-check"></i> Planifier</button>
-                        </div>
-                        <table style="min-width: 400px;">
-                            <thead><tr><th>Date Prévue</th><th>Équipement</th><th>Rapport</th><th class="text-right no-print">Action</th></tr></thead>
-                            <tbody id="table-maintenance"></tbody>
-                        </table>
+                        <div class="table-header"><div class="table-title">Maintenance Préventive</div><button class="btn btn-primary" onclick="openModal('modalMaintenance')"><i class="fa-solid fa-clipboard-check"></i> Planifier</button></div>
+                        <table style="min-width: 400px;"><thead><tr><th>Date Prévue</th><th>Équipement</th><th>Rapport</th><th class="text-right no-print">Action</th></tr></thead><tbody id="table-maintenance"></tbody></table>
                     </div>
+                </div>
+            </div>
+
+            <!-- PAGE: ENERGIE -->
+            <div id="page-energie" class="page-view hidden">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="stat-header">
+                            <div><div class="stat-title">Suivi Analytique (Factures)</div><span style="font-size:0.75rem; color:var(--text-muted);">Ce suivi détecte les fuites. (Les montants payés doivent être ajoutés dans l'onglet Charges).</span></div>
+                            <button class="btn btn-primary" onclick="openModal('modalConso')"><i class="fa-solid fa-plus"></i> Saisir Facture</button>
+                        </div>
+                        <div style="position:relative; height:250px; margin-top:20px;"><canvas id="consoChart"></canvas></div>
+                    </div>
+                    <div class="table-container" style="margin-bottom:0;">
+                        <div class="table-header"><div class="table-title">Historique des Factures</div></div>
+                        <table style="min-width: 300px;"><thead><tr><th>Mois</th><th>Type</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead><tbody id="table-conso"></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: ASSEMBLEES -->
+            <div id="page-assemblees" class="page-view hidden">
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Assemblées Générales (AG)</div>
+                        <button class="btn btn-primary" onclick="openModal('modalAG')"><i class="fa-solid fa-plus"></i> Organiser une AG</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>Date</th><th>Type</th><th>Statut</th><th>Présents</th><th class="text-right no-print">Actions / PV</th></tr></thead>
+                        <tbody id="table-ag"></tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- PAGE: FOURNISSEURS -->
             <div id="page-fournisseurs" class="page-view hidden">
                 <div class="table-container">
-                    <div class="table-header">
-                        <div class="table-title">Annuaire Prestataires</div>
-                        <button class="btn btn-outline" onclick="openModal('modalFournisseur')"><i class="fa-solid fa-user-plus"></i> Ajouter</button>
-                    </div>
-                    <table>
-                        <thead><tr><th>Spécialité</th><th>Société</th><th>Téléphone</th><th>Notes</th><th class="text-right no-print">Action</th></tr></thead>
-                        <tbody id="table-fournisseurs"></tbody>
-                    </table>
+                    <div class="table-header"><div class="table-title">Annuaire Prestataires</div><button class="btn btn-outline" onclick="openModal('modalFournisseur')"><i class="fa-solid fa-user-plus"></i> Ajouter</button></div>
+                    <table><thead><tr><th>Spécialité</th><th>Société</th><th>Téléphone</th><th>Notes</th><th class="text-right no-print">Action</th></tr></thead><tbody id="table-fournisseurs"></tbody></table>
                 </div>
             </div>
 
@@ -389,16 +370,7 @@
                         </div>
                     </div>
                     <table>
-                        <thead>
-                            <tr>
-                                <th>Apt</th>
-                                <th class="hide-on-print">Propriétaire</th>
-                                <th class="text-right">Payé</th>
-                                <th class="text-right">Reste</th>
-                                <th>Statut</th>
-                                <th class="text-right no-print">WhatsApp / Reçu</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Apt</th><th class="hide-on-print">Propriétaire</th><th class="text-right">Payé</th><th class="text-right">Reste</th><th>Statut</th><th class="text-right no-print">WhatsApp / Reçu</th></tr></thead>
                         <tbody id="table-rapport"></tbody>
                     </table>
                 </div>
@@ -408,28 +380,15 @@
             <div id="page-parametres" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
-                        <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-database"></i> Sauvegarde (Cloud Sync Actif 🟢)</h3>
-                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">Vos données sont désormais sauvegardées en temps réel sur le Cloud. Vous pouvez aussi faire une exportation locale de sécurité si besoin.</p>
-                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Exporter JSON</button>
-                            <label class="btn btn-outline" style="cursor: pointer;">
-                                <i class="fa-solid fa-upload"></i> Importer
-                                <input type="file" id="importFile" accept=".json" onchange="importJSON(event)" style="display: none;">
-                            </label>
-                        </div>
+                        <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-database"></i> Sauvegarde (Cloud Sync)</h3>
+                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">Vos données sont synchronisées en temps réel sur le Cloud.</p>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;"><button class="btn btn-primary" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Exporter JSON</button><label class="btn btn-outline" style="cursor: pointer;"><i class="fa-solid fa-upload"></i> Importer<input type="file" id="importFile" accept=".json" onchange="importJSON(event)" style="display: none;"></label></div>
                         <a id="downloadAnchorElem" style="display:none"></a>
                     </div>
-                    
                     <div class="card">
                         <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-lock"></i> Code PIN</h3>
-                        <div class="form-group">
-                            <label class="form-label">Code Actuel</label>
-                            <input type="password" id="oldPin" class="form-control" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="••••">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Nouveau Code (4 chiffres)</label>
-                            <input type="password" id="newPin" class="form-control" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="Ex: 1234">
-                        </div>
+                        <div class="form-group"><label class="form-label">Code Actuel</label><input type="password" id="oldPin" class="form-control" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="••••"></div>
+                        <div class="form-group"><label class="form-label">Nouveau Code (4 chiffres)</label><input type="password" id="newPin" class="form-control" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="Ex: 1234"></div>
                         <button class="btn btn-success" onclick="updatePin()">Mettre à jour</button>
                     </div>
                 </div>
@@ -438,423 +397,32 @@
         </div>
     </main>
 
-    <!-- MODALS EXISTANTS -->
-    <div class="modal-overlay" id="modalEditApt">
-        <div class="modal-content">
-            <div class="modal-header"><h3>Modifier le Propriétaire</h3><button class="btn-icon" onclick="closeModal('modalEditApt')"><i class="fa-solid fa-xmark"></i></button></div>
-            <div class="modal-body">
-                <input type="hidden" id="edit-apt-id">
-                <div class="form-group"><label class="form-label">Numéro Appartement</label><input type="text" class="form-control" id="edit-apt-num" readonly style="background:#f1f5f9;"></div>
-                <div class="form-group"><label class="form-label">Nom du Propriétaire / Locataire</label><input type="text" class="form-control" id="edit-apt-owner" placeholder="Nom de la personne"></div>
-                <div class="form-group"><label class="form-label">Numéro de Téléphone</label><input type="tel" class="form-control" id="edit-apt-phone" placeholder="Ex: 06 12 34 56 78"></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalEditApt')">Annuler</button><button class="btn btn-primary" onclick="saveAptEdit()">Enregistrer</button></div>
-        </div>
-    </div>
+    <!-- TOUS LES MODALS -->
+    <!-- Modal Édition Appartement -->
+    <div class="modal-overlay" id="modalEditApt"><div class="modal-content"><div class="modal-header"><h3>Modifier le Propriétaire</h3><button class="btn-icon" onclick="closeModal('modalEditApt')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><input type="hidden" id="edit-apt-id"><div class="form-group"><label class="form-label">Numéro Appartement</label><input type="text" class="form-control" id="edit-apt-num" readonly style="background:#f1f5f9;"></div><div class="form-group"><label class="form-label">Nom du Propriétaire / Locataire</label><input type="text" class="form-control" id="edit-apt-owner" placeholder="Nom de la personne"></div><div class="form-group"><label class="form-label">Numéro de Téléphone</label><input type="tel" class="form-control" id="edit-apt-phone" placeholder="Ex: 06 12 34 56 78"></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalEditApt')">Annuler</button><button class="btn btn-primary" onclick="saveAptEdit()">Enregistrer</button></div></div></div>
 
-    <div class="modal-overlay" id="modalPaiement">
-        <div class="modal-content">
-            <div class="modal-header"><h3>Nouveau paiement mensuel</h3><button class="btn-icon" onclick="closeModal('modalPaiement')"><i class="fa-solid fa-xmark"></i></button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">Appartement</label><select class="form-control form-apt"></select></div>
-                <div class="form-group"><label class="form-label">Mois payés</label><div class="month-grid" id="form-months"></div></div>
-                <div style="display:flex; gap:16px;">
-                    <div class="form-group" style="flex:1;"><label class="form-label">Mode</label><select class="form-control" id="form-mode"><option>Espèces</option><option>Virement</option><option>Chèque</option></select></div>
-                    <div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="form-date"></div>
-                </div>
-                <div class="text-right" style="margin-top:10px;"><strong style="font-size:1.25rem; color:var(--success);" id="form-total">0 DH</strong></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-success" onclick="savePaiement()">Valider</button></div>
-        </div>
-    </div>
+    <!-- Modals Financiers & Techniques (Paiement, Annexe, Charge, Fournisseur, Incident, Maintenance) -->
+    <div class="modal-overlay" id="modalPaiement"><div class="modal-content"><div class="modal-header"><h3>Nouveau paiement</h3><button class="btn-icon" onclick="closeModal('modalPaiement')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Appartement</label><select class="form-control form-apt"></select></div><div class="form-group"><label class="form-label">Mois payés</label><div class="month-grid" id="form-months"></div></div><div style="display:flex; gap:16px;"><div class="form-group" style="flex:1;"><label class="form-label">Mode</label><select class="form-control" id="form-mode"><option>Espèces</option><option>Virement</option><option>Chèque</option></select></div><div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="form-date"></div></div><div class="text-right" style="margin-top:10px;"><strong style="font-size:1.25rem; color:var(--success);" id="form-total">0 DH</strong></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-success" onclick="savePaiement()">Valider</button></div></div></div>
+    <div class="modal-overlay" id="modalAnnexe"><div class="modal-content"><div class="modal-header"><h3>Participation Travaux</h3><button class="btn-icon" onclick="closeModal('modalAnnexe')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Nom du Projet</label><input type="text" class="form-control" id="annexe-projet" placeholder="Ex: Ascenseur..."></div><div class="form-group"><label class="form-label">Appartement</label><select class="form-control form-apt" id="annexe-apt"></select></div><div class="form-group"><label class="form-label">Montant (DH)</label><input type="number" class="form-control" id="annexe-montant"></div><div style="display:flex; gap:16px;"><div class="form-group" style="flex:1;"><label class="form-label">Mode</label><select class="form-control" id="annexe-mode"><option>Espèces</option><option>Virement</option></select></div><div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="annexe-date"></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAnnexe')">Annuler</button><button class="btn btn-primary" onclick="saveAnnexe()">Valider</button></div></div></div>
+    <div class="modal-overlay" id="modalCharge"><div class="modal-content"><div class="modal-header"><h3>Ajouter une dépense</h3><button class="btn-icon" onclick="closeModal('modalCharge')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Type de Dépense</label><select class="form-control" id="charge-type" onchange="onChargeTypeChange()"><option value="femme">Ménage (500 DH/mois)</option><option value="ascenseur">Entretien Ascenseur (150 DH/mois)</option><option value="electricite">Électricité (Variable)</option><option value="custom">Autre dépense unique</option></select></div><div class="form-group" id="charge-mois-section"><label class="form-label">Mois concernés</label><div class="month-grid" id="charge-months"></div></div><div class="form-group" id="charge-desc-section" style="display:none;"><label class="form-label">Motif / Bénéficiaire</label><input type="text" class="form-control" id="charge-desc" placeholder="Ex: Plombier..."></div><div style="display:flex; gap:16px;"><div class="form-group" style="flex:1;"><label class="form-label" id="charge-montant-label">Montant (DH)</label><input type="number" class="form-control" id="charge-montant" value="500" readonly style="background:#f1f5f9;" oninput="updateChargeTotal()"></div><div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="charge-date"></div></div><div class="text-right" style="margin-top:10px;"><span style="font-size:0.875rem; color:var(--text-muted);">Total : </span><strong style="font-size:1.25rem; color:var(--danger);" id="charge-total-display">500 DH</strong></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalCharge')">Annuler</button><button class="btn btn-danger" onclick="saveCharge()">Valider</button></div></div></div>
+    <div class="modal-overlay" id="modalFournisseur"><div class="modal-content"><div class="modal-header"><h3>Nouveau Fournisseur</h3><button class="btn-icon" onclick="closeModal('modalFournisseur')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Spécialité</label><input type="text" class="form-control" id="fourn-type" placeholder="Ex: Plombier..."></div><div class="form-group"><label class="form-label">Nom / Société</label><input type="text" class="form-control" id="fourn-nom" placeholder="Ex: Mohamed"></div><div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-control" id="fourn-tel" placeholder="06 XX XX XX XX"></div><div class="form-group"><label class="form-label">Notes</label><input type="text" class="form-control" id="fourn-notes" placeholder="Infos..."></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalFournisseur')">Annuler</button><button class="btn btn-primary" onclick="saveFournisseur()">Enregistrer</button></div></div></div>
+    <div class="modal-overlay" id="modalIncident"><div class="modal-content"><div class="modal-header"><h3>Signaler un Incident</h3><button class="btn-icon" onclick="closeModal('modalIncident')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Titre / Problème</label><input type="text" class="form-control" id="incident-titre" placeholder="Ex: Fuite d'eau au 2ème"></div><div class="form-group"><label class="form-label">Détails</label><textarea class="form-control" id="incident-desc" rows="3" placeholder="Informations complémentaires..."></textarea></div><div style="display:flex; gap:16px;"><div class="form-group" style="flex:1;"><label class="form-label">Date signalement</label><input type="date" class="form-control" id="incident-date"></div><div class="form-group" style="flex:1;"><label class="form-label">Priorité</label><select class="form-control" id="incident-prio"><option value="Basse">Basse</option><option value="Haute">Urgent / Haute</option></select></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalIncident')">Annuler</button><button class="btn btn-warning" onclick="saveIncident()">Enregistrer</button></div></div></div>
+    <div class="modal-overlay" id="modalMaintenance"><div class="modal-content"><div class="modal-header"><h3>Rapport de Maintenance</h3><button class="btn-icon" onclick="closeModal('modalMaintenance')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Équipement concerné</label><select class="form-control" id="maint-equip"><option value="Ascenseur">Ascenseur / Système de guidage</option><option value="Porte Automatique">Porte de garage automatique</option><option value="Surpresseur Eau">Pompes & Surpresseur d'eau</option><option value="Extincteurs">Extincteurs (Sécurité incendie)</option><option value="Éclairage">Éclairage parties communes</option></select></div><div class="form-group"><label class="form-label">Date du contrôle préventif</label><input type="date" class="form-control" id="maint-date"></div><div class="form-group"><label class="form-label">Observations techniques</label><textarea class="form-control" id="maint-obs" rows="4" placeholder="Ex: Pièce X vérifiée."></textarea></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalMaintenance')">Annuler</button><button class="btn btn-primary" onclick="saveMaintenance()">Sauvegarder</button></div></div></div>
 
-    <div class="modal-overlay" id="modalAnnexe">
+    <!-- NOUVEAU MODAL : SAISIE ENERGIE -->
+    <div class="modal-overlay" id="modalConso">
         <div class="modal-content">
-            <div class="modal-header"><h3>Participation Travaux</h3><button class="btn-icon" onclick="closeModal('modalAnnexe')"><i class="fa-solid fa-xmark"></i></button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">Nom du Projet</label><input type="text" class="form-control" id="annexe-projet" placeholder="Ex: Ascenseur..."></div>
-                <div class="form-group"><label class="form-label">Appartement</label><select class="form-control form-apt" id="annexe-apt"></select></div>
-                <div class="form-group"><label class="form-label">Montant (DH)</label><input type="number" class="form-control" id="annexe-montant"></div>
-                <div style="display:flex; gap:16px;">
-                    <div class="form-group" style="flex:1;"><label class="form-label">Mode</label><select class="form-control" id="annexe-mode"><option>Espèces</option><option>Virement</option></select></div>
-                    <div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="annexe-date"></div>
-                </div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAnnexe')">Annuler</button><button class="btn btn-primary" onclick="saveAnnexe()">Valider</button></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modalCharge">
-        <div class="modal-content">
-            <div class="modal-header"><h3>Ajouter une dépense</h3><button class="btn-icon" onclick="closeModal('modalCharge')"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="modal-header"><h3>Saisir une Facture (Analyse)</h3><button class="btn-icon" onclick="closeModal('modalConso')"><i class="fa-solid fa-xmark"></i></button></div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">Type de Dépense</label>
-                    <select class="form-control" id="charge-type" onchange="onChargeTypeChange()">
-                        <option value="femme">Ménage (500 DH/mois)</option>
-                        <option value="ascenseur">Entretien Ascenseur (150 DH/mois)</option>
-                        <option value="electricite">Électricité (Variable)</option>
-                        <option value="custom">Autre dépense unique</option>
+                    <label class="form-label">Type de fluide</label>
+                    <select class="form-control" id="conso-type">
+                        <option value="Eau">Eau (Amendis/RADEEMA...)</option>
+                        <option value="Électricité">Électricité (ONEE...)</option>
                     </select>
                 </div>
-                <div class="form-group" id="charge-mois-section"><label class="form-label">Mois concernés</label><div class="month-grid" id="charge-months"></div></div>
-                <div class="form-group" id="charge-desc-section" style="display:none;"><label class="form-label">Motif / Bénéficiaire</label><input type="text" class="form-control" id="charge-desc" placeholder="Ex: Plombier..."></div>
                 <div style="display:flex; gap:16px;">
-                    <div class="form-group" style="flex:1;"><label class="form-label" id="charge-montant-label">Montant (DH)</label><input type="number" class="form-control" id="charge-montant" value="500" readonly style="background:#f1f5f9;" oninput="updateChargeTotal()"></div>
-                    <div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="charge-date"></div>
-                </div>
-                <div class="text-right" style="margin-top:10px;"><span style="font-size:0.875rem; color:var(--text-muted);">Total : </span><strong style="font-size:1.25rem; color:var(--danger);" id="charge-total-display">500 DH</strong></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalCharge')">Annuler</button><button class="btn btn-danger" onclick="saveCharge()">Valider</button></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modalFournisseur">
-        <div class="modal-content">
-            <div class="modal-header"><h3>Nouveau Fournisseur</h3><button class="btn-icon" onclick="closeModal('modalFournisseur')"><i class="fa-solid fa-xmark"></i></button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">Spécialité</label><input type="text" class="form-control" id="fourn-type" placeholder="Ex: Plombier..."></div>
-                <div class="form-group"><label class="form-label">Nom / Société</label><input type="text" class="form-control" id="fourn-nom" placeholder="Ex: Mohamed"></div>
-                <div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-control" id="fourn-tel" placeholder="06 XX XX XX XX"></div>
-                <div class="form-group"><label class="form-label">Notes</label><input type="text" class="form-control" id="fourn-notes" placeholder="Infos..."></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalFournisseur')">Annuler</button><button class="btn btn-primary" onclick="saveFournisseur()">Enregistrer</button></div>
-        </div>
-    </div>
-
-    <!-- NOUVEAUX MODALS PÔLE TECHNIQUE -->
-    <div class="modal-overlay" id="modalIncident">
-        <div class="modal-content">
-            <div class="modal-header"><h3>Signaler un Incident</h3><button class="btn-icon" onclick="closeModal('modalIncident')"><i class="fa-solid fa-xmark"></i></button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">Titre / Problème</label><input type="text" class="form-control" id="incident-titre" placeholder="Ex: Fuite d'eau au 2ème"></div>
-                <div class="form-group"><label class="form-label">Détails</label><textarea class="form-control" id="incident-desc" rows="3" placeholder="Informations complémentaires..."></textarea></div>
-                <div style="display:flex; gap:16px;">
-                    <div class="form-group" style="flex:1;"><label class="form-label">Date signalement</label><input type="date" class="form-control" id="incident-date"></div>
-                    <div class="form-group" style="flex:1;"><label class="form-label">Priorité</label><select class="form-control" id="incident-prio"><option value="Basse">Basse</option><option value="Haute">Urgent / Haute</option></select></div>
-                </div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalIncident')">Annuler</button><button class="btn btn-warning" onclick="saveIncident()">Enregistrer</button></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modalMaintenance">
-        <div class="modal-content">
-            <div class="modal-header"><h3>Rapport de Maintenance</h3><button class="btn-icon" onclick="closeModal('modalMaintenance')"><i class="fa-solid fa-xmark"></i></button></div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Équipement concerné</label>
-                    <select class="form-control" id="maint-equip">
-                        <option value="Ascenseur">Ascenseur / Système de guidage</option>
-                        <option value="Porte Automatique">Porte de garage automatique</option>
-                        <option value="Surpresseur Eau">Pompes & Surpresseur d'eau</option>
-                        <option value="Extincteurs">Extincteurs (Sécurité incendie)</option>
-                        <option value="Éclairage">Éclairage parties communes</option>
-                    </select>
-                </div>
-                <div class="form-group"><label class="form-label">Date du contrôle préventif</label><input type="date" class="form-control" id="maint-date"></div>
-                <div class="form-group">
-                    <label class="form-label">Observations techniques</label>
-                    <textarea class="form-control" id="maint-obs" rows="4" placeholder="Ex: Le système de guidage de la porte est bien présent mais nécessite un remplacement en raison de son mauvais état."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalMaintenance')">Annuler</button><button class="btn btn-primary" onclick="saveMaintenance()">Sauvegarder Rapport</button></div>
-        </div>
-    </div>
-
-    <div class="toast-container" id="toastBox"></div>
-
-    <script>
-        // CONFIGURATION FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyB5mnc9M2fnUNVc2usFj7E4hHweJmis_m4",
-            authDomain: "gh5-sn8-syndic.firebaseapp.com",
-            projectId: "gh5-sn8-syndic",
-            storageBucket: "gh5-sn8-syndic.firebasestorage.app",
-            messagingSenderId: "1034031966129",
-            appId: "1:1034031966129:web:dc43a0bf539538b18e7f90"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const dbCloud = firebase.firestore();
-
-        window.jsPDF = window.jspdf.jsPDF;
-        const COTISATION_MENSUELLE = 50;
-        const NB_APPARTEMENTS = 26;
-        const MOIS_NOMS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-        const formatMoney = new Intl.NumberFormat('fr-MA', { style: 'currency', currency: 'MAD' });
-        
-        let currentYear = new Date().getFullYear();
-        let chartBar, chartPie;
-        let inactivityTimer; const INACTIVITY_LIMIT = 5 * 60 * 1000;
-
-        function showLockScreen() { document.getElementById('pinScreen').style.display = 'flex'; setTimeout(() => document.getElementById('pinScreen').style.opacity = '1', 10); document.getElementById('pinInput').value = ''; document.getElementById('pinError').style.display = 'none'; }
-        function resetInactivityTimer() { clearTimeout(inactivityTimer); if (document.getElementById('pinScreen').style.display !== 'none') return; inactivityTimer = setTimeout(showLockScreen, INACTIVITY_LIMIT); }
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
-
-        const savedTheme = localStorage.getItem('theme') || 'light'; document.documentElement.setAttribute('data-theme', savedTheme);
-        window.addEventListener('DOMContentLoaded', () => { document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon'; });
-
-        // UPDATE DB STRUCTURE FOR PHASE 1
-        let db = {
-            settings: { pin: '0000' }, apartments: [], cotisations: [], charges: [], depenses: [], cotisationsAnnexes: [], fournisseurs: [], incidents: [], maintenance: []
-        };
-
-        function saveDB() {
-            localStorage.setItem('syndic_fallback', JSON.stringify(db));
-            dbCloud.collection("syndic_data").doc("main_database").set({
-                settings: db.settings, apartments: db.apartments, cotisations: db.cotisations, charges: db.charges, depenses: db.depenses, cotisationsAnnexes: db.cotisationsAnnexes, fournisseurs: db.fournisseurs, incidents: db.incidents || [], maintenance: db.maintenance || []
-            }).then(() => console.log("Synchronisé avec le Cloud")).catch((e) => toast("Erreur de sauvegarde Cloud", "error"));
-            populateYearSelector();
-        }
-
-        function verifyPin() { const input = document.getElementById('pinInput').value; if(input === db.settings.pin) { document.getElementById('pinScreen').style.opacity = '0'; setTimeout(() => { document.getElementById('pinScreen').style.display = 'none'; resetInactivityTimer(); }, 300); } else { document.getElementById('pinError').style.display = 'block'; document.getElementById('pinInput').value = ''; } }
-        document.getElementById('pinInput').addEventListener('keypress', function (e) { if (e.key === 'Enter') verifyPin(); });
-
-        function updatePin() {
-            const oldPin = document.getElementById('oldPin').value; const newPin = document.getElementById('newPin').value;
-            if(oldPin !== db.settings.pin) return toast('Code PIN actuel incorrect', 'error'); if(newPin.length !== 4) return toast('Le nouveau code doit faire 4 chiffres', 'error');
-            db.settings.pin = newPin; saveDB(); document.getElementById('oldPin').value = ''; document.getElementById('newPin').value = ''; toast('Code mis à jour !');
-        }
-
-        function getYearOf(item) { if(item.annee) return parseInt(item.annee); if(item.date) return new Date(item.date).getFullYear(); return currentYear; }
-
-        function populateYearSelector() {
-            let years = new Set([new Date().getFullYear()]); db.cotisations.forEach(c => years.add(getYearOf(c))); db.charges.forEach(c => years.add(getYearOf(c)));
-            const select = document.getElementById('yearSelector'); select.innerHTML = Array.from(years).sort().reverse().map(y => `<option value="${y}" ${y === currentYear ? 'selected' : ''}>Exercice ${y}</option>`).join('');
-        }
-
-        function changeYear(y) { currentYear = parseInt(y); refreshUI(); toast(`Année : ${currentYear}`, 'info'); }
-
-        function switchPage(pageId) {
-            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.remove('hidden'); document.querySelector(`[data-target="${pageId}"]`).classList.add('active');
-            const titles = { 'dashboard': 'Tableau de bord financier', 'apartments': 'Vue d\'ensemble des Lots', 'cotisations': 'Suivi des Recettes', 'annexes': 'Cotisations Annexes', 'charges': 'Suivi des Dépenses', 'technique': 'Gestion Technique & Maintenance', 'rapport': 'Rapport & Relances', 'fournisseurs': 'Annuaire Fournisseurs', 'parametres': 'Paramètres Système' };
-            document.getElementById('page-title').innerText = titles[pageId];
-            if(window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('active'); }
-            refreshUI();
-        }
-
-        function toggleTheme() {
-            const html = document.documentElement; const icon = document.getElementById('themeIcon'); const currentTheme = html.getAttribute('data-theme');
-            if (currentTheme === 'light') { html.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); icon.className = 'fa-solid fa-sun'; } else { html.setAttribute('data-theme', 'light'); localStorage.setItem('theme', 'light'); icon.className = 'fa-solid fa-moon'; }
-            if(chartBar) { Chart.defaults.color = html.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b'; chartBar.update(); chartPie.update(); }
-        }
-
-        function refreshUI() {
-            document.getElementById('rapport-title-year').innerText = `Bilan Annuel Complet - ${currentYear}`;
-            const recettesAnnee = db.cotisations.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0);
-            const sortiesAnnee = db.charges.filter(c => getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.filter(d => getYearOf(d) === currentYear).reduce((s, d) => s + parseFloat(d.montant), 0);
-            const totalRecettesGlobal = db.cotisations.reduce((s, c) => s + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((s, c) => s + parseFloat(c.montant), 0);
-            const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0);
-            const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
-            
-            document.getElementById('dash-recettes').innerText = formatMoney.format(recettesAnnee); document.getElementById('dash-depenses').innerText = formatMoney.format(sortiesAnnee);
-            document.getElementById('dash-solde').innerText = formatMoney.format(soldeGlobal); document.getElementById('dash-taux').innerText = Math.round((recettesAnnee/(NB_APPARTEMENTS * COTISATION_MENSUELLE * 12))*100) + '%';
-
-            initCharts(); renderApartments(); renderAnnexes(); renderTables(); renderTechnique();
-        }
-
-        function initCharts() {
-            Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b';
-            let recMensuelles = Array(12).fill(0), depMensuelles = Array(12).fill(0);
-            db.cotisations.filter(c => getYearOf(c) === currentYear).forEach(c => { recMensuelles[c.date ? new Date(c.date).getMonth() : ((c.mois||1)-1)] += parseFloat(c.montant); });
-            db.charges.filter(c => getYearOf(c) === currentYear).forEach(c => { depMensuelles[new Date(c.date).getMonth()] += parseFloat(c.montant); });
-            db.depenses.filter(c => getYearOf(c) === currentYear).forEach(c => { depMensuelles[new Date(c.date).getMonth()] += parseFloat(c.montant); });
-
-            if(chartBar) chartBar.destroy(); if(chartPie) chartPie.destroy();
-            chartBar = new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: MOIS_NOMS, datasets: [{ label: 'Recettes', data: recMensuelles, backgroundColor: '#10b981', borderRadius:4 }, { label: 'Dépenses', data: depMensuelles, backgroundColor: '#ef4444', borderRadius:4 }] }, options: { responsive: true, maintainAspectRatio: false } });
-            let aJour = 0, partiel = 0, retard = 0;
-            db.apartments.forEach(apt => { let paye = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0); if(paye >= COTISATION_MENSUELLE * 12) aJour++; else if(paye > 0) partiel++; else retard++; });
-            chartPie = new Chart(document.getElementById('pieChart'), { type: 'doughnut', data: { labels: ['À Jour', 'Partiel', 'Impayé'], datasets: [{ data: [aJour, partiel, retard], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth:0 }] }, options: { cutout: '70%', responsive: true, maintainAspectRatio: false } });
-        }
-
-        function openEditApt(aptId) {
-            const apt = db.apartments.find(a => a.id === aptId); document.getElementById('edit-apt-id').value = apt.id; document.getElementById('edit-apt-num').value = 'Apt ' + apt.number; document.getElementById('edit-apt-owner').value = apt.owner; document.getElementById('edit-apt-phone').value = apt.phone || ''; openModal('modalEditApt');
-        }
-
-        function saveAptEdit() {
-            const id = parseInt(document.getElementById('edit-apt-id').value); const owner = document.getElementById('edit-apt-owner').value; const phone = document.getElementById('edit-apt-phone').value; const apt = db.apartments.find(a => a.id === id);
-            if(apt) { apt.owner = owner; apt.phone = phone; saveDB(); refreshUI(); closeModal('modalEditApt'); toast('Propriétaire mis à jour !'); }
-        }
-
-        function renderApartments() {
-            const grid = document.getElementById('aptGridContainer'); grid.innerHTML = ''; let ok=0, prt=0, bad=0;
-            db.apartments.forEach(apt => {
-                let paye = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0); let du = COTISATION_MENSUELLE * 12; let statusCls = 'status-bad';
-                if(paye >= du) { statusCls = 'status-ok'; ok++; } else if(paye > 0) { statusCls = 'status-partial'; prt++; } else { bad++; }
-                grid.innerHTML += `<div class="apt-card ${statusCls}" style="position:relative;" onclick="showAptDetails(${apt.id})"><button class="btn-icon no-print" style="position:absolute; top:4px; right:4px; padding:4px; font-size:0.9rem;" onclick="event.stopPropagation(); openEditApt(${apt.id})" title="Modifier Propriétaire"><i class="fa-solid fa-pen"></i></button><div class="apt-num">${apt.number}</div><div class="apt-owner" style="font-weight:600; color:var(--text-main);">${apt.owner}</div><div class="apt-owner" style="font-size:0.7rem; margin-bottom:4px;">${apt.phone || 'Non renseigné'}</div><div style="font-size:0.75rem; font-weight:600; margin-top:8px; color:var(--text-main)">${paye} / ${du}</div></div>`;
-            });
-            document.getElementById('count-ok').innerText = ok + ' À jour'; document.getElementById('count-partial').innerText = prt + ' Partiel'; document.getElementById('count-bad').innerText = bad + ' Retard';
-        }
-
-        function renderAnnexes() {
-            document.getElementById('table-annexes').innerHTML = [...db.cotisationsAnnexes].filter(c => getYearOf(c) === currentYear).map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td><strong>${c.projet}</strong></td><td>Apt ${c.aptId}</td><td>${c.mode}</td><td class="text-right font-mono text-success">+${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisationsAnnexes', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
-            let projetsData = {}; let totalCollecteAnnexes = 0;
-            db.cotisationsAnnexes.forEach(c => { totalCollecteAnnexes += parseFloat(c.montant); let nomProj = c.projet.trim().toUpperCase(); if(!projetsData[nomProj]) projetsData[nomProj] = { nom: c.projet, montantApt: parseFloat(c.montantTotal || c.montant), payeurs: [] }; if(!projetsData[nomProj].payeurs.includes(c.aptId)) projetsData[nomProj].payeurs.push(c.aptId); });
-            let totalAttenduAnnexes = 0; const cardsContainer = document.getElementById('annexes-projects-container'); cardsContainer.innerHTML = '';
-            Object.values(projetsData).forEach(p => { let prevu = p.montantApt * NB_APPARTEMENTS; totalAttenduAnnexes += prevu; let collecteProjet = p.payeurs.length * p.montantApt; let pct = Math.min((collecteProjet / prevu) * 100, 100); cardsContainer.innerHTML += `<div class="card"><div class="stat-header"><div class="table-title" style="color:var(--primary);">${p.nom}</div><span class="badge badge-info">${p.payeurs.length}/${NB_APPARTEMENTS} payé</span></div><div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.875rem;"><span style="color:var(--text-muted)">Montant par Apt :</span><strong>${formatMoney.format(p.montantApt)}</strong></div><div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:0.875rem;"><span style="color:var(--text-muted)">Réuni :</span><strong class="text-success">${formatMoney.format(collecteProjet)} / ${formatMoney.format(prevu)}</strong></div><div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${pct}%"></div></div><div class="text-right" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">${pct.toFixed(1)}% achevé</div></div>`; });
-            document.getElementById('annexes-total-collecte').innerText = formatMoney.format(totalCollecteAnnexes); document.getElementById('annexes-total-impayes').innerText = formatMoney.format(Math.max(totalAttenduAnnexes - totalCollecteAnnexes, 0)); document.getElementById('annexes-nb-projets').innerText = Object.keys(projetsData).length;
-        }
-
-        function showAptDetails(aptId) {
-            const apt = db.apartments.find(a => a.id === aptId); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear); const totalPaye = paiements.reduce((s, c) => s + parseFloat(c.montant), 0); const du = COTISATION_MENSUELLE * 12; const reste = du - totalPaye; let details = paiements.map(p => p.moisStr || MOIS_NOMS[(p.mois||1)-1]).join(', '); let detailMois = paiements.length > 0 ? `<div style="font-size:0.85rem; color:var(--text-muted); margin-top:8px;"><strong>Mois couverts :</strong> ${details}</div>` : `<div style="font-size:0.85rem; color:var(--danger); margin-top:8px;">Aucun paiement enregistré cette année.</div>`; toast(`<div style="margin-bottom: 4px;"><strong>Appartement ${apt.number} - ${apt.owner}</strong></div><div>Payé : ${formatMoney.format(totalPaye)} / ${formatMoney.format(du)}</div><div style="${reste > 0 ? 'color:var(--danger)' : 'color:var(--success)'}; font-weight:600;">Reste à payer : ${formatMoney.format(reste)}</div>${detailMois}`, 'info');
-        }
-
-        function renderTables() {
-            document.getElementById('table-cotisations').innerHTML = [...db.cotisations].filter(c => getYearOf(c) === currentYear).sort((a,b) => new Date(b.date||0) - new Date(a.date||0)).map(c => `<tr><td>${c.date ? new Date(c.date).toLocaleDateString() : ('01/'+(c.mois||1).toString().padStart(2,'0')+'/'+c.annee)}</td><td><span class="badge badge-success">Apt ${c.aptId}</span></td><td>${db.apartments.find(a=>a.id==c.aptId)?.owner || '-'}</td><td>${c.moisStr || (MOIS_NOMS[(c.mois||1)-1])}</td><td>${c.mode || 'Espèces'}</td><td class="text-right font-mono text-success">+${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisations', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
-
-            const tbodyCharges = document.getElementById('table-charges'); tbodyCharges.innerHTML = '';
-            db.charges.forEach(c => { if(getYearOf(c) === currentYear) tbodyCharges.innerHTML += `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td><span class="badge badge-warning">${c.cat}</span></td><td>${c.desc}</td><td class="text-right font-mono text-danger">-${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" title="Imprimer Reçu PDF" onclick="generateChargePDF(${c.id}, 'charges')"><i class="fa-solid fa-file-pdf" style="color:var(--info);"></i></button><button class="btn-icon" onclick="deleteEntry('charges', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`; });
-            db.depenses.forEach(d => { if(getYearOf(d) === currentYear) tbodyCharges.innerHTML += `<tr><td>${new Date(d.date).toLocaleDateString()}</td><td><span class="badge badge-danger">${d.typeDepense || 'Dépense'}</span></td><td>${d.beneficiaire || d.description}</td><td class="text-right font-mono text-danger">-${formatMoney.format(d.montant)}</td><td class="text-right no-print"><button class="btn-icon" title="Imprimer Reçu PDF" onclick="generateChargePDF(${d.id}, 'depenses')"><i class="fa-solid fa-file-pdf" style="color:var(--info);"></i></button><button class="btn-icon" onclick="deleteEntry('depenses', ${d.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`; });
-
-            document.getElementById('table-fournisseurs').innerHTML = db.fournisseurs.map(f => `<tr><td><span class="badge badge-info">${f.type}</span></td><td><strong>${f.nom}</strong></td><td><a href="tel:${f.tel}" style="color:var(--info); text-decoration:none;">${f.tel}</a></td><td>${f.notes}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('fournisseurs', ${f.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
-
-            document.getElementById('table-rapport').innerHTML = db.apartments.map(apt => {
-                let paye = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0); let reste = (COTISATION_MENSUELLE * 12) - paye; if(reste < 0) reste = 0;
-                let stat = reste === 0 ? '<span class="badge badge-success">À jour</span>' : (paye > 0 ? '<span class="badge badge-warning">Partiel</span>' : '<span class="badge badge-danger">Impayé</span>'); let rowClass = reste === 0 ? 'print-row-ok' : (paye > 0 ? 'print-row-partial' : 'print-row-bad');
-                let actionBtn = ''; if(reste > 0) actionBtn += `<button class="btn btn-outline" style="color:#25D366; border-color:#25D366; padding:4px 8px; font-size:0.8rem; margin-right:5px; margin-bottom:5px;" onclick="relanceWA(${apt.id}, ${reste})"><i class="fa-brands fa-whatsapp"></i></button>`;
-                actionBtn += `<button class="btn btn-outline" style="color:var(--primary); border-color:var(--primary); padding:4px 8px; font-size:0.8rem; margin-right:5px; margin-bottom:5px;" onclick="shareReceiptWA(${apt.id})"><i class="fa-solid fa-comment-sms"></i></button><button class="btn btn-outline" style="padding:4px 8px; font-size:0.8rem; margin-bottom:5px;" onclick="generatePDF(${apt.id})"><i class="fa-solid fa-file-pdf"></i></button>`;
-                return `<tr class="${rowClass}"><td><strong>Apt ${apt.number}</strong></td><td class="hide-on-print">${apt.owner} <br><span style="font-size:0.7rem; color:gray;">${apt.phone || ''}</span></td><td class="text-right font-mono">${formatMoney.format(paye)}</td><td class="text-right font-mono ${reste>0?'text-danger':''}">${formatMoney.format(reste)}</td><td>${stat}</td><td class="text-right no-print">${actionBtn}</td></tr>`;
-            }).join('');
-        }
-
-        // ================= RENDU PÔLE TECHNIQUE =================
-        function renderTechnique() {
-            if(!db.incidents) db.incidents = []; if(!db.maintenance) db.maintenance = [];
-            
-            // Rendu Incidents
-            document.getElementById('table-incidents').innerHTML = db.incidents.map(inc => {
-                let badgeClass = inc.statut === 'Résolu' ? 'badge-success' : (inc.prio === 'Haute' ? 'badge-danger' : 'badge-warning');
-                let resoluBtn = inc.statut === 'Résolu' ? '' : `<button class="btn-icon" title="Marquer Résolu" onclick="resolveIncident(${inc.id})"><i class="fa-solid fa-check text-success"></i></button>`;
-                return `<tr><td>${new Date(inc.date).toLocaleDateString()}</td><td><strong>${inc.titre}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">${inc.desc}</span></td><td><span class="badge ${badgeClass}">${inc.statut}</span></td><td class="text-right no-print">${resoluBtn} <button class="btn-icon" onclick="deleteEntry('incidents', ${inc.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`;
-            }).join('');
-
-            // Rendu Maintenance
-            document.getElementById('table-maintenance').innerHTML = db.maintenance.map(m => `<tr><td>${new Date(m.date).toLocaleDateString()}</td><td><strong>${m.equip}</strong></td><td><span style="font-size:0.75rem; color:var(--text-main);">${m.obs}</span></td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('maintenance', ${m.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
-        }
-
-        function saveIncident() {
-            const titre = document.getElementById('incident-titre').value; const desc = document.getElementById('incident-desc').value; const date = document.getElementById('incident-date').value; const prio = document.getElementById('incident-prio').value;
-            if(!titre) return toast('Titre requis', 'error');
-            if(!db.incidents) db.incidents = [];
-            db.incidents.push({ id: Date.now(), titre, desc, date, prio, statut: 'En attente' });
-            saveDB(); refreshUI(); closeModal('modalIncident'); toast('Incident signalé !');
-        }
-
-        function resolveIncident(id) {
-            let inc = db.incidents.find(i => i.id === id); if(inc) { inc.statut = 'Résolu'; saveDB(); refreshUI(); toast('Incident résolu !', 'success'); }
-        }
-
-        function saveMaintenance() {
-            const equip = document.getElementById('maint-equip').value; const date = document.getElementById('maint-date').value; const obs = document.getElementById('maint-obs').value;
-            if(!obs) return toast('Observation requise', 'error');
-            if(!db.maintenance) db.maintenance = [];
-            db.maintenance.push({ id: Date.now(), equip, date, obs });
-            saveDB(); refreshUI(); closeModal('modalMaintenance'); toast('Rapport sauvegardé !');
-        }
-
-        function printBilanGlobal() {
-            const year = currentYear; const cots = db.cotisations.filter(c => getYearOf(c) === year).sort((a,b) => new Date(a.date||0) - new Date(b.date||0)); const anns = db.cotisationsAnnexes.filter(c => getYearOf(c) === year); const chgs = db.charges.filter(c => getYearOf(c) === year).sort((a,b) => new Date(a.date||0) - new Date(b.date||0)); const deps = db.depenses.filter(c => getYearOf(c) === year).sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
-            const totalRecettesAnnee = cots.reduce((s, c) => s + parseFloat(c.montant), 0) + anns.reduce((s, c) => s + parseFloat(c.montant), 0); const totalDepensesAnnee = chgs.reduce((s, c) => s + parseFloat(c.montant), 0) + deps.reduce((s, c) => s + parseFloat(c.montant), 0);
-            const totalRecettesGlobal = db.cotisations.reduce((s, c) => s + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((s, c) => s + parseFloat(c.montant), 0); const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0); const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
-            const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))].sort((a,b) => new Date(a.date) - new Date(b.date));
-
-            let html = `<h1>BILAN FINANCIER GLOBAL - GH5-SN8 Immeuble (${year})</h1><div class="print-summary-box"><div style="color:#10b981;">Total Recettes (${year}) : +${formatMoney.format(totalRecettesAnnee)}</div><div style="color:#ef4444;">Total Dépenses (${year}) : -${formatMoney.format(totalDepensesAnnee)}</div><div style="color:${soldeGlobal >= 0 ? '#4f46e5' : '#ef4444'};">Solde Trésorerie Actuel : ${formatMoney.format(soldeGlobal)}</div></div><div style="display: flex; gap: 20px; align-items: flex-start;"><div style="flex: 1;"><h3 style="margin-bottom:10px; color:#10b981;">Détail des Recettes (Cotisations & Travaux)</h3><table><thead><tr><th>Date</th><th>Apt</th><th>Mois / Projet</th><th>Montant</th></tr></thead><tbody>${cots.map(c => `<tr><td>${c.date ? new Date(c.date).toLocaleDateString() : ('01/'+(c.mois||1).toString().padStart(2,'0')+'/'+c.annee)}</td><td>${c.aptId}</td><td>${c.moisStr || MOIS_NOMS[(c.mois||1)-1]}</td><td>${c.montant} DH</td></tr>`).join('')}${anns.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.aptId}</td><td>${c.projet} (Annexe)</td><td>${c.montant} DH</td></tr>`).join('')}</tbody></table></div><div style="flex: 1;"><h3 style="margin-bottom:10px; color:#ef4444;">Détail des Dépenses (Charges & Frais)</h3><table><thead><tr><th>Date</th><th>Catégorie</th><th>Description</th><th>Montant</th></tr></thead><tbody>${allSorties.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.type}</td><td>${c.desc}</td><td>${c.montant} DH</td></tr>`).join('')}</tbody></table></div></div><div style="margin-top: 30px; text-align: right; font-weight: bold; font-size: 12pt;">Fait le ${new Date().toLocaleDateString('fr-FR')} - Le Syndic</div>`;
-            document.getElementById('print-global-container').innerHTML = html; document.body.classList.add('print-global-mode'); window.print(); setTimeout(() => { document.body.classList.remove('print-global-mode'); }, 500);
-        }
-
-        // ================= ACTIONS WHATSAPP & PDF =================
-        function relanceWA(aptId, reste) { 
-            const apt = db.apartments.find(a => a.id === aptId); let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1);
-            window.open(`https://wa.me/${tel}?text=Bonjour ${apt.owner},%0A%0ASauf erreur de notre part, il reste un solde de *${reste} DH* pour vos cotisations syndicales de l'année ${currentYear} (Appartement ${apt.number}).%0A%0AMerci d'avance pour votre régularisation.%0A%0ABien cordialement, le Syndic.`, '_blank'); 
-        }
-
-        function shareReceiptWA(aptId) {
-            const apt = db.apartments.find(a => a.id === aptId); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear); const totalPaye = paiements.reduce((s, c) => s + parseFloat(c.montant), 0); const reste = (COTISATION_MENSUELLE * 12) - totalPaye;
-            let details = paiements.map(p => `- ${p.moisStr || MOIS_NOMS[(p.mois||1)-1]} : ${p.montant} DH`).join('%0A'); if(!details) details = "Aucun paiement enregistré pour le moment.";
-            let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1);
-            window.open(`https://wa.me/${tel}?text=🏢 *REÇU GLOBAL SYNDIC - ${currentYear}* 🏢%0A%0A👤 *Appartement ${apt.number}* - ${apt.owner}%0A%0A✅ *Détail des paiements reçus :*%0A${details}%0A%0A💰 *Total payé :* ${totalPaye} DH%0A⚠️ *Reste à payer :* ${Math.max(reste, 0)} DH%0A%0AMerci pour votre collaboration ! 🙏`, '_blank');
-        }
-
-        function generatePDF(aptId) {
-            const apt = db.apartments.find(a => a.id === aptId); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear); const totalPaye = paiements.reduce((s, c) => s + parseFloat(c.montant), 0); const reste = Math.max((COTISATION_MENSUELLE * 12) - totalPaye, 0);
-            const doc = new jsPDF(); doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.text(`REÇU GLOBAL - SYNDIC (${currentYear})`, 105, 20, { align: "center" }); doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text(`Date d'édition : ${new Date().toLocaleDateString('fr-FR')}`, 14, 40); doc.text(`Appartement N° : ${apt.number}`, 14, 50); doc.text(`Propriétaire : ${apt.owner}`, 14, 60);
-            let bodyData = paiements.map(p => [ p.date ? new Date(p.date).toLocaleDateString() : '01/'+(p.mois||1).toString().padStart(2,'0')+'/'+p.annee, p.moisStr || MOIS_NOMS[(p.mois||1)-1], p.mode || 'Espèces', p.montant + ' DH' ]); if(bodyData.length === 0) bodyData.push(["-", "Aucun paiement", "-", "-"]);
-            doc.autoTable({ startY: 70, head: [['Date', 'Mois Couverts', 'Mode', 'Montant']], body: bodyData, theme: 'striped', headStyles: { fillColor: [79, 70, 229] } });
-            let finalY = doc.lastAutoTable.finalY || 70; doc.setFont("helvetica", "bold"); doc.text(`Total Payé : ${totalPaye} DH`, 14, finalY + 15); doc.setTextColor(220, 38, 38); if(reste > 0) doc.text(`Reste à payer : ${reste} DH`, 14, finalY + 25); else { doc.setTextColor(16, 185, 129); doc.text(`Appartement à jour.`, 14, finalY + 25); }
-            doc.setTextColor(0,0,0); doc.setFont("helvetica", "italic"); doc.setFontSize(10); doc.text("Pour servir et valoir ce que de droit.", 14, finalY + 45); doc.text("Le Syndic GH5-SN8", 150, finalY + 45); doc.save(`Recu_Apt_${apt.number}_${currentYear}.pdf`); toast("Reçu PDF généré !", "success");
-        }
-
-        function generateChargePDF(id, type) {
-            let charge = type === 'charges' ? db.charges.find(c => c.id === id) : db.depenses.find(d => d.id === id); if(!charge) return;
-            const doc = new jsPDF(); doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.text(`BON DE PAIEMENT`, 105, 20, { align: "center" }); doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text(`Date de paiement : ${new Date(charge.date).toLocaleDateString('fr-FR')}`, 14, 40); doc.text(`Bénéficiaire / Motif : ${charge.desc || charge.beneficiaire || charge.description}`, 14, 50); doc.text(`Catégorie : ${charge.cat || charge.typeDepense || 'Dépense'}`, 14, 60);
-            doc.autoTable({ startY: 70, head: [['Date', 'Désignation', 'Montant Payé']], body: [[new Date(charge.date).toLocaleDateString('fr-FR'), charge.desc || charge.beneficiaire || charge.description, charge.montant + ' DH']], theme: 'striped', headStyles: { fillColor: [239, 68, 68] } });
-            let finalY = doc.lastAutoTable.finalY || 70; doc.setFont("helvetica", "bold"); doc.text(`Total Réglé : ${charge.montant} DH`, 14, finalY + 15); doc.setTextColor(0,0,0); doc.setFont("helvetica", "italic"); doc.setFontSize(10); doc.text("Signature du Syndic GH5-SN8", 140, finalY + 40); doc.save(`Recu_Paiement_${new Date(charge.date).getTime()}.pdf`); toast("Reçu PDF généré !", "success");
-        }
-
-        function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dlElem = document.getElementById('downloadAnchorElem'); dlElem.setAttribute("href", dataStr); dlElem.setAttribute("download", `Sauvegarde_Copro_${new Date().toISOString().slice(0,10)}.json`); dlElem.click(); toast('Sauvegarde effectuée !'); }
-        function importJSON(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { let imported = JSON.parse(e.target.result); if(imported.apartments && imported.cotisations) { db = imported; saveDB(); window.location.reload(); } else toast('Fichier invalide', 'error'); } catch(err) { toast('Erreur fichier', 'error'); } }; reader.readAsText(file); }
-
-        function openModal(id) {
-            document.getElementById(id).classList.add('active'); let aptOptions = db.apartments.map(a => `<option value="${a.id}">Apt ${a.number} - ${a.owner}</option>`).join(''); document.querySelectorAll('.form-apt').forEach(select => select.innerHTML = aptOptions); let today = new Date().toISOString().split('T')[0];
-            if(document.getElementById('form-date')) document.getElementById('form-date').value = today; if(document.getElementById('charge-date')) document.getElementById('charge-date').value = today; if(document.getElementById('annexe-date')) document.getElementById('annexe-date').value = today; if(document.getElementById('incident-date')) document.getElementById('incident-date').value = today; if(document.getElementById('maint-date')) document.getElementById('maint-date').value = today;
-            if(id === 'modalPaiement') { document.getElementById('form-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateTotalModalPaiement()"><span class="month-btn">${m}</span></label>`).join(''); updateTotalModalPaiement(); }
-            if(id === 'modalCharge') { document.getElementById('charge-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateChargeTotal()"><span class="month-btn">${m}</span></label>`).join(''); document.getElementById('charge-type').value = 'femme'; onChargeTypeChange(); }
-        }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        
-        function updateTotalModalPaiement() { document.getElementById('form-total').innerText = (document.querySelectorAll('#form-months input:checked').length * COTISATION_MENSUELLE) + ' DH'; }
-        function onChargeTypeChange() {
-            const type = document.getElementById('charge-type').value; const montantInput = document.getElementById('charge-montant'); const moisSection = document.getElementById('charge-mois-section'); const descSection = document.getElementById('charge-desc-section'); const label = document.getElementById('charge-montant-label');
-            if(type === 'femme') { montantInput.value = 500; montantInput.readOnly = true; montantInput.style.background = '#f1f5f9'; moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)'; }
-            else if(type === 'ascenseur') { montantInput.value = 150; montantInput.readOnly = true; montantInput.style.background = '#f1f5f9'; moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)'; }
-            else if(type === 'electricite') { montantInput.value = ''; montantInput.readOnly = false; montantInput.style.background = 'white'; moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)'; }
-            else if(type === 'custom') { montantInput.value = ''; montantInput.readOnly = false; montantInput.style.background = 'white'; moisSection.style.display = 'none'; descSection.style.display = 'block'; label.innerText = 'Montant Total (DH)'; }
-            updateChargeTotal();
-        }
-        function updateChargeTotal() { const type = document.getElementById('charge-type').value; const checked = document.querySelectorAll('#charge-months input:checked').length; const montant = parseFloat(document.getElementById('charge-montant').value) || 0; let total = type !== 'custom' ? (checked * montant) : montant; document.getElementById('charge-total-display').innerText = total + ' DH'; }
-
-        function savePaiement() {
-            const aptId = document.querySelector('#modalPaiement .form-apt').value; const mode = document.getElementById('form-mode').value; const date = document.getElementById('form-date').value; const boxes = document.querySelectorAll('#form-months input:checked'); if(boxes.length === 0) return toast('Cochez au moins un mois', 'error');
-            let moisNames = []; boxes.forEach(b => moisNames.push(MOIS_NOMS[b.value - 1])); db.cotisations.push({ id: Date.now(), aptId: parseInt(aptId), date: date, mode: mode, montant: boxes.length * COTISATION_MENSUELLE, moisStr: moisNames.join(', ') }); saveDB(); refreshUI(); closeModal('modalPaiement'); toast('Paiement enregistré !');
-        }
-        function saveAnnexe() {
-            const projet = document.getElementById('annexe-projet').value; const aptId = document.getElementById('annexe-apt').value; const montant = document.getElementById('annexe-montant').value; if(!projet.trim() || !montant) return toast('Vérifiez les champs', 'error');
-            db.cotisationsAnnexes.push({ id: Date.now(), projet: projet, aptId: parseInt(aptId), montant: parseFloat(montant), mode: document.getElementById('annexe-mode').value, date: document.getElementById('annexe-date').value }); saveDB(); refreshUI(); closeModal('modalAnnexe'); toast('Participation enregistrée !');
-        }
-        function saveCharge() {
-            const type = document.getElementById('charge-type').value; const date = document.getElementById('charge-date').value; const montantParMois = parseFloat(document.getElementById('charge-montant').value) || 0; if(!montantParMois || montantParMois <= 0) return toast('Montant invalide', 'error');
-            let cat, descBase;
-            if(type === 'femme') { cat = 'Femme de ménage'; descBase = 'Ménage'; } else if(type === 'ascenseur') { cat = 'Ascenseur'; descBase = 'Entretien Ascenseur'; } else if(type === 'electricite') { cat = 'Électricité (ONE)'; descBase = 'Facture Électricité'; } else { cat = 'Autre Dépense'; descBase = document.getElementById('charge-desc').value; if(!descBase) return toast('Description requise', 'error'); }
-            const boxes = document.querySelectorAll('#charge-months input:checked'); if(type !== 'custom' && boxes.length === 0) return toast('Cochez au moins un mois', 'error');
-            const baseId = Date.now();
-            if(type === 'custom') { db.charges.push({ id: baseId, cat: cat, date: date, desc: descBase, montant: montantParMois }); } else { boxes.forEach(b => { let moisIndex = parseInt(b.value) - 1; db.charges.push({ id: baseId + moisIndex, cat: cat, date: date, desc: descBase + ' - ' + MOIS_NOMS[moisIndex], montant: montantParMois }); }); }
-            saveDB(); refreshUI(); closeModal('modalCharge'); toast('Dépense enregistrée !');
-        }
-        function deleteEntry(table, id) { if(confirm('Supprimer cette ligne ?')) { db[table] = db[table].filter(row => row.id !== id); saveDB(); refreshUI(); toast('Supprimé avec succès'); } }
-        function saveFournisseur() {
-            const type = document.getElementById('fourn-type').value; const nom = document.getElementById('fourn-nom').value; if(!nom) return toast('Nom requis', 'error');
-            db.fournisseurs.push({ id: Date.now(), type: type, nom: nom, tel: document.getElementById('fourn-tel').value, notes: document.getElementById('fourn-notes').value }); saveDB(); refreshUI(); closeModal('modalFournisseur'); toast('Fournisseur ajouté !');
-        }
-
-        function toast(msg, type = 'success') { const box = document.getElementById('toastBox'); const el = document.createElement('div'); el.className = `toast ${type}`; let iconClass = type === 'success' ? 'fa-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-info-circle'; el.innerHTML = `<i class="fa-solid ${iconClass}"></i> <div>${msg}</div>`; box.appendChild(el); setTimeout(() => el.remove(), 4000); }
-
-        // ================= DÉMARRAGE ET SYNCHRONISATION CLOUD =================
-        function initDB() {
-            dbCloud.collection("syndic_data").doc("main_database").onSnapshot((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    db.settings = data.settings || { pin: '0000' }; db.apartments = data.apartments || []; db.cotisations = data.cotisations || []; db.charges = data.charges || []; db.depenses = data.depenses || []; db.cotisationsAnnexes = data.cotisationsAnnexes || []; db.fournisseurs = data.fournisseurs || []; db.incidents = data.incidents || []; db.maintenance = data.maintenance || [];
-                }
-                if (db.apartments.length === 0) { for (let i = 1; i <= NB_APPARTEMENTS; i++) { db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}`, phone: '' }); } saveDB(); }
-                populateYearSelector(); refreshUI();
-            }, (error) => { console.error("Erreur de synchronisation Cloud", error); });
-        }
-
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').then(reg => { reg.update(); console.log('Application prête pour installation et hors-ligne'); }).catch(err => console.log('Erreur Service Worker:', err)); }); }
-        window.onload = function() { ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => document.addEventListener(evt, resetInactivityTimer, true)); resetInactivityTimer(); };
-
-        initDB();
-    </script>
-</body>
-</html>
+                    <div class="form-group" style="flex:1;">
+                        <label class="form-label">Mois</label>
+                        <select class="form-control" id="conso-mois">
+                            <option value="1">Janvier</option><option value="2">Février</option><option value="3">Mars</option><option value="4">Avril</option><option value="5">Mai</option><option value="6">JNormally I can help with things like this, but I don't seem to have access to that content. You can try again or ask me for something else.
