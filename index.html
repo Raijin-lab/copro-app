@@ -19,7 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
-    <!-- FIREBASE SDK (Compat version pour une intégration simple et ultra-stable) -->
+    <!-- FIREBASE SDK (Compat version) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
@@ -551,61 +551,6 @@
             fournisseurs: []
         };
 
-        // CHARGEMENT EN DIRECT DEPUIS FIREBASE FIRESTORE
-function initDB() {
-            dbCloud.collection("syndic_data").doc("main_database").get().then((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    db.settings = data.settings || { pin: '0000' };
-                    db.apartments = data.apartments || [];
-                    db.cotisations = data.cotisations || [];
-                    db.charges = data.charges || [];
-                    db.depenses = data.depenses || [];
-                    db.cotisationsAnnexes = data.cotisationsAnnexes || [];
-                    db.fournisseurs = data.fournisseurs || [];
-                }
-                
-                if (db.apartments.length === 0) {
-                    for (let i = 1; i <= NB_APPARTEMENTS; i++) {
-                        db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
-                    }
-                    saveDB();
-                }
-                populateYearSelector();
-                refreshUI();
-            }).catch((error) => {
-                console.error("Erreur de chargement Cloud", error);
-                let localData = JSON.parse(localStorage.getItem('syndic_fallback'));
-                if (localData) db = localData;
-                if (db.apartments.length === 0) {
-                    for (let i = 1; i <= NB_APPARTEMENTS; i++) db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
-                }
-                populateYearSelector();
-                refreshUI();
-            });
-        }
-                
-                if (db.apartments.length === 0) {
-                    for (let i = 1; i <= NB_APPARTEMENTS; i++) {
-                        db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
-                    }
-                    saveDB();
-                }
-                populateYearSelector();
-                refreshUI();
-            }, (error) => {
-                console.error("Erreur de synchronisation Cloud, utilisation du cache local", error);
-                // Fallback local si pas de net
-                let localData = JSON.parse(localStorage.getItem('syndic_fallback'));
-                if (localData) db = localData;
-                if (db.apartments.length === 0) {
-                    for (let i = 1; i <= NB_APPARTEMENTS; i++) db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
-                }
-                populateYearSelector();
-                refreshUI();
-            });
-        }
-
         // SAUVEGARDE AUTOMATIQUE DANS LE CLOUD FIREBASE
         function saveDB() {
             // Sauvegarde de secours locale
@@ -993,12 +938,49 @@ function initDB() {
             el.innerHTML = `<i class="fa-solid ${iconClass}"></i> <div>${msg}</div>`; box.appendChild(el); setTimeout(() => el.remove(), 4000);
         }
 
+        // ================= DÉMARRAGE ET SYNCHRONISATION CLOUD =================
+        function initDB() {
+            // onSnapshot permet une mise à jour en temps réel (instantanée) entre PC et Téléphone
+            dbCloud.collection("syndic_data").doc("main_database").onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    db.settings = data.settings || { pin: '0000' };
+                    db.apartments = data.apartments || [];
+                    db.cotisations = data.cotisations || [];
+                    db.charges = data.charges || [];
+                    db.depenses = data.depenses || [];
+                    db.cotisationsAnnexes = data.cotisationsAnnexes || [];
+                    db.fournisseurs = data.fournisseurs || [];
+                }
+                
+                if (db.apartments.length === 0) {
+                    for (let i = 1; i <= NB_APPARTEMENTS; i++) {
+                        db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
+                    }
+                    saveDB();
+                }
+                populateYearSelector();
+                refreshUI();
+            }, (error) => {
+                console.error("Erreur de synchronisation Cloud", error);
+            });
+        }
+
+        // ================= INSTALLATION TÉLÉPHONE (PWA) =================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    reg.update(); // Force le téléphone à prendre la nouvelle version
+                    console.log('Application prête pour installation et hors-ligne');
+                }).catch(err => console.log('Erreur Service Worker:', err));
+            });
+        }
+
         window.onload = function() {
             ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => document.addEventListener(evt, resetInactivityTimer, true));
             resetInactivityTimer();
         };
 
-        // ================= DÉMARRAGE =================
         initDB();
     </script>
 </body>
