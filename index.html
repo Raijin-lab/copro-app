@@ -552,8 +552,8 @@
         };
 
         // CHARGEMENT EN DIRECT DEPUIS FIREBASE FIRESTORE
-        function initDB() {
-            dbCloud.collection("syndic_data").doc("main_database").onSnapshot((doc) => {
+function initDB() {
+            dbCloud.collection("syndic_data").doc("main_database").get().then((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
                     db.settings = data.settings || { pin: '0000' };
@@ -564,6 +564,26 @@
                     db.cotisationsAnnexes = data.cotisationsAnnexes || [];
                     db.fournisseurs = data.fournisseurs || [];
                 }
+                
+                if (db.apartments.length === 0) {
+                    for (let i = 1; i <= NB_APPARTEMENTS; i++) {
+                        db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
+                    }
+                    saveDB();
+                }
+                populateYearSelector();
+                refreshUI();
+            }).catch((error) => {
+                console.error("Erreur de chargement Cloud", error);
+                let localData = JSON.parse(localStorage.getItem('syndic_fallback'));
+                if (localData) db = localData;
+                if (db.apartments.length === 0) {
+                    for (let i = 1; i <= NB_APPARTEMENTS; i++) db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}` });
+                }
+                populateYearSelector();
+                refreshUI();
+            });
+        }
                 
                 if (db.apartments.length === 0) {
                     for (let i = 1; i <= NB_APPARTEMENTS; i++) {
