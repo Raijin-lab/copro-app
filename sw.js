@@ -1,4 +1,4 @@
-const CACHE_NAME = 'copro-syndic-v2';
+const CACHE_NAME = 'copro-syndic-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
