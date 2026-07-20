@@ -2,7 +2,7 @@
 <html lang="fr" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GH5-SN8 Immeuble - Syndic</title>
     
     <!-- PWA (Progressive Web App) Tags -->
@@ -36,23 +36,23 @@
 
         /* ===== LOCK SCREEN ===== */
         #pinScreen { position: fixed; inset: 0; background-color: var(--sidebar-bg); z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; transition: opacity 0.3s; }
-        .pin-box { background: rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; text-align: center; backdrop-filter: blur(10px); }
-        .pin-input { font-size: 2rem; letter-spacing: 10px; text-align: center; padding: 10px; border-radius: 8px; border: none; width: 180px; margin: 20px 0; font-weight: bold; color: #333; outline: none;}
+        .pin-box { background: rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; text-align: center; backdrop-filter: blur(10px); width: 90%; max-width: 400px; }
+        .pin-input { font-size: 2rem; letter-spacing: 10px; text-align: center; padding: 10px; border-radius: 8px; border: none; width: 100%; max-width: 180px; margin: 20px auto; font-weight: bold; color: #333; outline: none; display: block;}
 
         /* ===== SIDEBAR & LAYOUT ===== */
-        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; z-index: 100; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; z-index: 100; flex-shrink: 0; }
         .sidebar-brand { padding: 24px; font-size: 1.1rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-nav { flex: 1; padding: 20px 0; overflow-y: auto; }
         .nav-item { padding: 12px 24px; display: flex; align-items: center; gap: 16px; cursor: pointer; font-weight: 500; transition: all 0.2s; border-left: 4px solid transparent; }
         .nav-item:hover, .nav-item.active { background-color: var(--sidebar-hover); color: white; border-left-color: var(--primary); }
         .nav-item i { width: 20px; text-align: center; }
         
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .topbar { height: 70px; background-color: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .page-content { flex: 1; padding: 32px; overflow-y: auto; }
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; width: 100%; }
+        .topbar { height: 70px; background-color: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0; }
+        .page-content { flex: 1; padding: 32px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
         /* ===== BUTTONS & FORMS ===== */
-        .btn { padding: 8px 16px; border-radius: 8px; border: none; font-family: inherit; font-size: 0.875rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; font-family: inherit; font-size: 0.875rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
         .btn-primary { background: var(--primary); color: white; } .btn-primary:hover { background: var(--primary-hover); }
         .btn-success { background: var(--success); color: white; } .btn-danger { background: var(--danger); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
@@ -66,12 +66,12 @@
 
         /* ===== CARDS & TABLES ===== */
         .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-bottom: 24px; }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 24px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px; }
         .card { background: var(--bg-card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-md); border: 1px solid var(--border); }
         .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
         .stat-title { font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
-        .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
-        .stat-value { font-size: 1.875rem; font-weight: 700; color: var(--text-main); }
+        .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; }
+        .stat-value { font-size: 1.875rem; font-weight: 700; color: var(--text-main); word-break: break-word; }
         
         .bg-indigo-100 { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
         .bg-green-100 { background: rgba(16, 185, 129, 0.1); color: var(--success); }
@@ -79,21 +79,20 @@
         .bg-yellow-100 { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
         .bg-blue-100 { background: rgba(59, 130, 246, 0.1); color: var(--info); }
 
-        .table-container { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto; }
-        .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px 24px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.02); }
+        .table-container { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; } /* Ensures tables scroll on mobile instead of squishing */
+        th { text-align: left; padding: 12px 24px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.02); white-space: nowrap; }
         td { padding: 16px 24px; font-size: 0.875rem; border-bottom: 1px solid var(--border); }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; display: inline-block;}
         .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
         .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
         .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
         .badge-info { background: rgba(59, 130, 246, 0.1); color: var(--info); }
 
         /* ===== APARTMENTS GRID ===== */
-        .apt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; padding: 24px; }
-        .apt-card { border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; background: var(--bg-card); }
-        .apt-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .apt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 16px; padding: 24px; }
+        .apt-card { border: 1px solid var(--border); border-radius: 10px; padding: 16px 10px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--bg-card); }
         .apt-card.status-ok { border-top: 4px solid var(--success); }
         .apt-card.status-partial { border-top: 4px solid var(--warning); }
         .apt-card.status-bad { border-top: 4px solid var(--danger); }
@@ -101,21 +100,21 @@
         .apt-owner { font-size: 0.75rem; color: var(--text-muted); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 
         /* ===== MODALS & TOASTS ===== */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; padding: 16px; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: 16px; transform: translateY(10px); transition: 0.3s; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: 16px; transform: translateY(10px); transition: 0.3s; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
         .modal-overlay.active .modal-content { transform: translateY(0); }
-        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-        .modal-body { padding: 24px; }
-        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; overflow-y: auto; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
 
         .month-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .month-cb input { display: none; }
-        .month-btn { display: block; padding: 6px 0; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
+        .month-btn { display: block; padding: 8px 0; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
         .month-cb input:checked ~ .month-btn { background: var(--success); color: white; border-color: var(--success); }
 
-        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: var(--bg-card); border-left: 4px solid var(--primary); padding: 16px 24px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; gap: 12px; animation: slideIn 0.3s; line-height: 1.5;}
+        .toast-container { position: fixed; bottom: 24px; right: 24px; left: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; align-items: flex-end; }
+        .toast { background: var(--bg-card); border-left: 4px solid var(--primary); padding: 16px 20px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; gap: 12px; animation: slideIn 0.3s; line-height: 1.5; pointer-events: auto; max-width: 100%; word-break: break-word;}
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         .hidden { display: none !important; }
@@ -124,18 +123,40 @@
         .progress-bar-container { width: 100%; background-color: var(--border); border-radius: 4px; height: 8px; overflow: hidden; margin-top: 8px; }
         .progress-bar-fill { height: 100%; background-color: var(--success); transition: width 0.4s ease; }
 
-        @media screen {
-            .no-screen { display: none !important; }
+        @media screen { .no-screen { display: none !important; } }
+
+        /* ================= MOBILE RESPONSIVE CSS ================= */
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; padding: 5px; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: block; }
+            .sidebar { position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; transition: left 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.3); }
+            .sidebar.open { left: 0; }
+            .sidebar-overlay.active { display: block; }
+            
+            .topbar { padding: 0 16px; }
+            .page-content { padding: 16px; }
+            
+            #page-title { font-size: 1.1rem; }
+            
+            .modal-footer .btn { flex: 1; }
+            .toast-container { left: 16px; right: 16px; bottom: 16px; align-items: stretch; }
+            
+            /* Responsive Forms in Modals */
+            .modal-body > div[style*="display:flex"] { flex-direction: column; gap: 0 !important; }
+            
+            /* Hide print button on mobile to save space */
+            .topbar .btn-outline { display: none; }
         }
 
         /* IMPRESSION GLOBALE (Format A3 Paysage Parfait) */
         @media print {
             @page { size: A3 landscape; margin: 15mm; }
             body { background: white !important; color: black !important; display: block; overflow: visible; height: auto; }
-            .sidebar, .topbar, .btn, .no-print, .toast-container, .modal-overlay { display: none !important; }
+            .sidebar, .topbar, .btn, .no-print, .toast-container, .modal-overlay, .mobile-menu-btn, .sidebar-overlay { display: none !important; }
             .hide-on-print { display: none !important; }
             
-            /* Cas 1 : Impression classique de la page visible (ex: Charges ou Cotisations) */
             body:not(.print-global-mode) .main-wrapper { display: block; overflow: visible; width: 100%; }
             body:not(.print-global-mode) .page-content { padding: 0; overflow: visible; }
             body:not(.print-global-mode) .page-view.hidden { display: none !important; }
@@ -148,13 +169,11 @@
             
             .grid-4, .grid-2 { display: grid; gap: 15px; grid-template-columns: repeat(4, 1fr); }
             
-            /* Couleurs des lignes pour le rapport annuel classique */
             #page-rapport tr.print-row-ok td { background-color: #d1fae5 !important; color: #065f46 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             #page-rapport tr.print-row-partial td { background-color: #fef3c7 !important; color: #92400e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             #page-rapport tr.print-row-bad td { background-color: #fee2e2 !important; color: #991b1b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             #page-rapport .badge { border: none !important; font-weight: bold; background: transparent !important; }
 
-            /* Cas 2 : Impression du BILAN GLOBAL A3 */
             body.print-global-mode .main-wrapper, body.print-global-mode .sidebar { display: none !important; }
             body.print-global-mode #print-global-container { display: block !important; width: 100%; }
             #print-global-container h1 { text-align: center; margin-bottom: 20px; font-size: 18pt; }
@@ -170,7 +189,7 @@
             <i class="fa-solid fa-shield-halved" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
             <h2 style="margin-bottom: 10px;">Accès Sécurisé</h2>
             <p style="color: #cbd5e1; font-size: 0.9rem;">Veuillez entrer le code PIN syndic.</p>
-            <input type="password" id="pinInput" class="pin-input" maxlength="4" placeholder="••••">
+            <input type="password" id="pinInput" class="pin-input" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="••••">
             <br>
             <button class="btn btn-primary" onclick="verifyPin()" style="width: 100%; justify-content: center; padding: 12px; font-size: 1.1rem;">Déverrouiller</button>
             <p id="pinError" style="color: #ff6b6b; margin-top: 15px; font-size: 0.85rem; display: none;">Code incorrect.</p>
@@ -179,6 +198,9 @@
 
     <!-- CONTENEUR CACHÉ POUR LE BILAN GLOBAL A3 -->
     <div id="print-global-container" class="no-screen"></div>
+
+    <!-- OVERLAY POUR MENU MOBILE -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- SIDEBAR -->
     <nav class="sidebar" id="sidebar">
@@ -218,17 +240,18 @@
     <main class="main-wrapper">
         <header class="topbar no-print">
             <div style="display: flex; align-items: center; gap: 16px;">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
                 <h2 id="page-title" style="font-size: 1.25rem; font-weight: 600;">Tableau de bord financier</h2>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 8px; background: var(--bg-body); padding: 4px 12px; border-radius: 8px; border: 1px solid var(--border);">
-                    <i class="fa-regular fa-calendar" style="color: var(--text-muted);"></i>
-                    <select id="yearSelector" onchange="changeYear(this.value)" style="border:none; background:transparent; font-weight:bold; color:var(--text-main); outline:none; cursor:pointer;">
+                <div style="display: flex; align-items: center; gap: 4px; background: var(--bg-body); padding: 4px 8px; border-radius: 8px; border: 1px solid var(--border);">
+                    <i class="fa-regular fa-calendar" style="color: var(--text-muted); display: none;"></i>
+                    <select id="yearSelector" onchange="changeYear(this.value)" style="border:none; background:transparent; font-weight:bold; color:var(--text-main); outline:none; cursor:pointer; font-size: 0.9rem;">
                         <!-- Options injectées en JS -->
                     </select>
                 </div>
                 <button class="btn-icon" onclick="toggleTheme()" title="Mode Sombre"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
-                <button class="btn btn-outline" onclick="window.print()" title="Imprimer la vue actuelle"><i class="fa-solid fa-print"></i> Imprimer la page</button>
+                <button class="btn btn-outline" onclick="window.print()" title="Imprimer"><i class="fa-solid fa-print"></i></button>
             </div>
         </header>
 
@@ -238,7 +261,7 @@
                 <div class="grid-4">
                     <div class="card"><div class="stat-header"><div><div class="stat-title">Recettes Annuelles</div><div class="stat-value text-success" id="dash-recettes">0 DH</div></div><div class="stat-icon bg-green-100"><i class="fa-solid fa-arrow-trend-up"></i></div></div></div>
                     <div class="card"><div class="stat-header"><div><div class="stat-title">Dépenses Annuelles</div><div class="stat-value text-danger" id="dash-depenses">0 DH</div></div><div class="stat-icon bg-red-100"><i class="fa-solid fa-arrow-trend-down"></i></div></div></div>
-                    <div class="card"><div class="stat-header"><div><div class="stat-title">Solde Trésorerie</div><div class="stat-value" id="dash-solde">0 DH</div></div><div class="stat-icon bg-indigo-100"><i class="fa-solid fa-vault"></i></div></div><div style="font-size:0.75rem; color:var(--text-muted);">Réel en banque (Toutes années)</div></div>
+                    <div class="card"><div class="stat-header"><div><div class="stat-title">Solde Trésorerie</div><div class="stat-value" id="dash-solde">0 DH</div></div><div class="stat-icon bg-indigo-100"><i class="fa-solid fa-vault"></i></div></div><div style="font-size:0.75rem; color:var(--text-muted);">Réel en banque</div></div>
                     <div class="card"><div class="stat-header"><div><div class="stat-title">Recouvrement</div><div class="stat-value text-warning" id="dash-taux">0%</div></div><div class="stat-icon bg-yellow-100"><i class="fa-solid fa-percent"></i></div></div></div>
                 </div>
                 <div class="grid-2">
@@ -252,10 +275,10 @@
                 <div class="table-container">
                     <div class="table-header">
                         <div>
-                            <div class="table-title">Vue d'ensemble (26 Lots)</div>
-                            <span style="font-size:0.8rem; font-weight:normal; color:var(--text-muted); display:block; margin-top:4px;">Cliquez sur un appartement pour voir le détail des mois payés</span>
+                            <div class="table-title">Vue d'ensemble</div>
+                            <span style="font-size:0.8rem; font-weight:normal; color:var(--text-muted); display:block; margin-top:4px;">Appuyez pour voir le détail</span>
                         </div>
-                        <div style="display:flex; gap:10px;">
+                        <div style="display:flex; gap:10px; flex-wrap: wrap; margin-top: 10px;">
                             <span class="badge badge-success" id="count-ok">0 À jour</span>
                             <span class="badge badge-warning" id="count-partial">0 Partiel</span>
                             <span class="badge badge-danger" id="count-bad">0 En retard</span>
@@ -270,7 +293,7 @@
                 <div class="table-container">
                     <div class="table-header">
                         <div class="table-title">Historique des Paiements</div>
-                        <button class="btn btn-primary" onclick="openModal('modalPaiement')"><i class="fa-solid fa-plus"></i> Nouveau Paiement</button>
+                        <button class="btn btn-primary" onclick="openModal('modalPaiement')"><i class="fa-solid fa-plus"></i> Ajouter</button>
                     </div>
                     <table>
                         <thead><tr><th>Date</th><th>Apt N°</th><th>Propriétaire</th><th>Mois payés</th><th>Mode</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead>
@@ -288,11 +311,11 @@
                 </div>
                 <div class="table-container">
                     <div class="table-header">
-                        <div class="table-title">Versements pour Travaux Exceptionnels</div>
-                        <button class="btn btn-primary" onclick="openModal('modalAnnexe')"><i class="fa-solid fa-plus"></i> Participation Travaux</button>
+                        <div class="table-title">Travaux Exceptionnels</div>
+                        <button class="btn btn-primary" onclick="openModal('modalAnnexe')"><i class="fa-solid fa-plus"></i> Participation</button>
                     </div>
                     <table>
-                        <thead><tr><th>Date</th><th>Projet</th><th>Appartement</th><th>Mode</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead>
+                        <thead><tr><th>Date</th><th>Projet</th><th>Apt</th><th>Mode</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead>
                         <tbody id="table-annexes"></tbody>
                     </table>
                 </div>
@@ -303,11 +326,11 @@
             <div id="page-charges" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header">
-                        <div class="table-title">Registre des Dépenses & Charges</div>
-                        <button class="btn btn-danger" onclick="openModal('modalCharge')"><i class="fa-solid fa-minus"></i> Ajouter Dépense</button>
+                        <div class="table-title">Dépenses & Charges</div>
+                        <button class="btn btn-danger" onclick="openModal('modalCharge')"><i class="fa-solid fa-minus"></i> Ajouter</button>
                     </div>
                     <table>
-                        <thead><tr><th>Date</th><th>Catégorie</th><th>Bénéficiaire / Motif</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead>
+                        <thead><tr><th>Date</th><th>Catégorie</th><th>Motif</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead>
                         <tbody id="table-charges"></tbody>
                     </table>
                 </div>
@@ -317,11 +340,11 @@
             <div id="page-fournisseurs" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header">
-                        <div class="table-title">Annuaire des Prestataires</div>
-                        <button class="btn btn-outline" onclick="openModal('modalFournisseur')"><i class="fa-solid fa-user-plus"></i> Ajouter Fournisseur</button>
+                        <div class="table-title">Annuaire Prestataires</div>
+                        <button class="btn btn-outline" onclick="openModal('modalFournisseur')"><i class="fa-solid fa-user-plus"></i> Ajouter</button>
                     </div>
                     <table>
-                        <thead><tr><th>Spécialité</th><th>Nom / Société</th><th>Téléphone</th><th>Notes</th><th class="text-right no-print">Action</th></tr></thead>
+                        <thead><tr><th>Spécialité</th><th>Société</th><th>Téléphone</th><th>Notes</th><th class="text-right no-print">Action</th></tr></thead>
                         <tbody id="table-fournisseurs"></tbody>
                     </table>
                 </div>
@@ -330,11 +353,11 @@
             <!-- PAGE: RAPPORT & RELANCES -->
             <div id="page-rapport" class="page-view hidden">
                 <div class="table-container">
-                    <div class="table-header">
-                        <div class="table-title" id="rapport-title-year">Bilan Annuel Complet</div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn btn-primary" onclick="printBilanGlobal()"><i class="fa-solid fa-file-invoice-dollar"></i> Imprimer Bilan Global (A3)</button>
-                            <button class="btn btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimer Tableau A3</button>
+                    <div class="table-header" style="flex-direction: column; align-items: flex-start;">
+                        <div class="table-title" id="rapport-title-year" style="margin-bottom: 10px;">Bilan Annuel Complet</div>
+                        <div style="display:flex; gap:10px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="printBilanGlobal()"><i class="fa-solid fa-file-invoice-dollar"></i> Imprimer Bilan (A3)</button>
+                            <button class="btn btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> Tableau</button>
                         </div>
                     </div>
                     <table>
@@ -342,10 +365,10 @@
                             <tr>
                                 <th>Apt</th>
                                 <th class="hide-on-print">Propriétaire</th>
-                                <th class="text-right">Total Payé</th>
-                                <th class="text-right">Reste dû</th>
+                                <th class="text-right">Payé</th>
+                                <th class="text-right">Reste</th>
                                 <th>Statut</th>
-                                <th class="text-right no-print">Communication (WhatsApp / Reçu)</th>
+                                <th class="text-right no-print">WhatsApp / Reçu</th>
                             </tr>
                         </thead>
                         <tbody id="table-rapport"></tbody>
@@ -357,12 +380,12 @@
             <div id="page-parametres" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
-                        <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-database"></i> Sauvegarde des Données</h3>
-                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">Téléchargez une copie complète de vos données (recommandé une fois par mois) ou restaurez une ancienne sauvegarde.</p>
-                        <div style="display: flex; gap: 12px;">
-                            <button class="btn btn-primary" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Sauvegarder (Export)</button>
+                        <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-database"></i> Sauvegarde</h3>
+                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">Téléchargez une copie de vos données (JSON) ou restaurez-la.</p>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Exporter</button>
                             <label class="btn btn-outline" style="cursor: pointer;">
-                                <i class="fa-solid fa-upload"></i> Restaurer (Import)
+                                <i class="fa-solid fa-upload"></i> Importer
                                 <input type="file" id="importFile" accept=".json" onchange="importJSON(event)" style="display: none;">
                             </label>
                         </div>
@@ -370,16 +393,16 @@
                     </div>
                     
                     <div class="card">
-                        <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-lock"></i> Sécurité (Code PIN)</h3>
+                        <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-lock"></i> Code PIN</h3>
                         <div class="form-group">
-                            <label class="form-label">Code PIN Actuel</label>
-                            <input type="password" id="oldPin" class="form-control" maxlength="4" placeholder="••••">
+                            <label class="form-label">Code Actuel</label>
+                            <input type="password" id="oldPin" class="form-control" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="••••">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Nouveau Code PIN (4 chiffres)</label>
-                            <input type="password" id="newPin" class="form-control" maxlength="4" placeholder="Ex: 1234">
+                            <label class="form-label">Nouveau Code (4 chiffres)</label>
+                            <input type="password" id="newPin" class="form-control" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="Ex: 1234">
                         </div>
-                        <button class="btn btn-success" onclick="updatePin()">Mettre à jour le code</button>
+                        <button class="btn btn-success" onclick="updatePin()">Mettre à jour</button>
                     </div>
                 </div>
             </div>
@@ -388,7 +411,6 @@
     </main>
 
     <!-- MODALS -->
-    <!-- Modal Paiement -->
     <div class="modal-overlay" id="modalPaiement">
         <div class="modal-content">
             <div class="modal-header"><h3>Nouveau paiement mensuel</h3><button class="btn-icon" onclick="closeModal('modalPaiement')"><i class="fa-solid fa-xmark"></i></button></div>
@@ -405,12 +427,11 @@
         </div>
     </div>
 
-    <!-- Modal Annexe -->
     <div class="modal-overlay" id="modalAnnexe">
         <div class="modal-content">
             <div class="modal-header"><h3>Participation Travaux</h3><button class="btn-icon" onclick="closeModal('modalAnnexe')"><i class="fa-solid fa-xmark"></i></button></div>
             <div class="modal-body">
-                <div class="form-group"><label class="form-label">Nom du Projet</label><input type="text" class="form-control" id="annexe-projet" placeholder="Ex: Ascenseur, Peinture..."></div>
+                <div class="form-group"><label class="form-label">Nom du Projet</label><input type="text" class="form-control" id="annexe-projet" placeholder="Ex: Ascenseur..."></div>
                 <div class="form-group"><label class="form-label">Appartement</label><select class="form-control form-apt" id="annexe-apt"></select></div>
                 <div class="form-group"><label class="form-label">Montant (DH)</label><input type="number" class="form-control" id="annexe-montant"></div>
                 <div style="display:flex; gap:16px;">
@@ -422,7 +443,6 @@
         </div>
     </div>
 
-    <!-- Modal Dépense -->
     <div class="modal-overlay" id="modalCharge">
         <div class="modal-content">
             <div class="modal-header"><h3>Ajouter une dépense</h3><button class="btn-icon" onclick="closeModal('modalCharge')"><i class="fa-solid fa-xmark"></i></button></div>
@@ -430,23 +450,23 @@
                 <div class="form-group">
                     <label class="form-label">Type de Dépense</label>
                     <select class="form-control" id="charge-type" onchange="onChargeTypeChange()">
-                        <option value="femme">Femme de ménage (500 DH/mois)</option>
+                        <option value="femme">Ménage (500 DH/mois)</option>
                         <option value="ascenseur">Entretien Ascenseur (150 DH/mois)</option>
-                        <option value="electricite">Électricité (Montant variable)</option>
+                        <option value="electricite">Électricité (Variable)</option>
                         <option value="custom">Autre dépense unique</option>
                     </select>
                 </div>
                 <div class="form-group" id="charge-mois-section">
-                    <label class="form-label">Mois concernés (cochez les mois)</label>
+                    <label class="form-label">Mois concernés</label>
                     <div class="month-grid" id="charge-months"></div>
                 </div>
                 <div class="form-group" id="charge-desc-section" style="display:none;">
-                    <label class="form-label">Description / Bénéficiaire</label>
-                    <input type="text" class="form-control" id="charge-desc" placeholder="Ex: Plombier, Réparation...">
+                    <label class="form-label">Motif / Bénéficiaire</label>
+                    <input type="text" class="form-control" id="charge-desc" placeholder="Ex: Plombier...">
                 </div>
                 <div style="display:flex; gap:16px;">
                     <div class="form-group" style="flex:1;">
-                        <label class="form-label" id="charge-montant-label">Montant par mois (DH)</label>
+                        <label class="form-label" id="charge-montant-label">Montant (DH)</label>
                         <input type="number" class="form-control" id="charge-montant" value="500" readonly style="background:#f1f5f9;" oninput="updateChargeTotal()">
                     </div>
                     <div class="form-group" style="flex:1;">
@@ -455,7 +475,7 @@
                     </div>
                 </div>
                 <div class="text-right" style="margin-top:10px;">
-                    <span style="font-size:0.875rem; color:var(--text-muted);">Total calculé : </span>
+                    <span style="font-size:0.875rem; color:var(--text-muted);">Total : </span>
                     <strong style="font-size:1.25rem; color:var(--danger);" id="charge-total-display">500 DH</strong>
                 </div>
             </div>
@@ -463,15 +483,14 @@
         </div>
     </div>
 
-    <!-- Modal Fournisseur -->
     <div class="modal-overlay" id="modalFournisseur">
         <div class="modal-content">
             <div class="modal-header"><h3>Nouveau Fournisseur</h3><button class="btn-icon" onclick="closeModal('modalFournisseur')"><i class="fa-solid fa-xmark"></i></button></div>
             <div class="modal-body">
-                <div class="form-group"><label class="form-label">Spécialité</label><input type="text" class="form-control" id="fourn-type" placeholder="Ex: Plombier, Électricien..."></div>
-                <div class="form-group"><label class="form-label">Nom / Société</label><input type="text" class="form-control" id="fourn-nom" placeholder="Ex: Mohamed Services"></div>
-                <div class="form-group"><label class="form-label">Téléphone</label><input type="text" class="form-control" id="fourn-tel" placeholder="06 XX XX XX XX"></div>
-                <div class="form-group"><label class="form-label">Notes</label><input type="text" class="form-control" id="fourn-notes" placeholder="Infos utiles..."></div>
+                <div class="form-group"><label class="form-label">Spécialité</label><input type="text" class="form-control" id="fourn-type" placeholder="Ex: Plombier..."></div>
+                <div class="form-group"><label class="form-label">Nom / Société</label><input type="text" class="form-control" id="fourn-nom" placeholder="Ex: Mohamed"></div>
+                <div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-control" id="fourn-tel" placeholder="06 XX XX XX XX"></div>
+                <div class="form-group"><label class="form-label">Notes</label><input type="text" class="form-control" id="fourn-notes" placeholder="Infos..."></div>
             </div>
             <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalFournisseur')">Annuler</button><button class="btn btn-primary" onclick="saveFournisseur()">Enregistrer</button></div>
         </div>
@@ -490,7 +509,7 @@
         let currentYear = new Date().getFullYear();
         let chartBar, chartPie;
         
-        // AUTO LOCK TIMER (5 minutes d'inactivité)
+        // AUTO LOCK TIMER
         let inactivityTimer;
         const INACTIVITY_LIMIT = 5 * 60 * 1000;
 
@@ -505,6 +524,12 @@
             clearTimeout(inactivityTimer);
             if (document.getElementById('pinScreen').style.display !== 'none') return;
             inactivityTimer = setTimeout(showLockScreen, INACTIVITY_LIMIT);
+        }
+
+        // MOBILE SIDEBAR TOGGLE
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
         }
 
         // THEME INIT
@@ -543,36 +568,24 @@
             populateYearSelector();
         }
 
-        // ================= SÉCURITÉ (CODE PIN) =================
+        // ================= SÉCURITÉ =================
         function verifyPin() {
             const input = document.getElementById('pinInput').value;
             if(input === db.settings.pin) {
                 document.getElementById('pinScreen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('pinScreen').style.display = 'none';
-                    resetInactivityTimer();
-                }, 300);
+                setTimeout(() => { document.getElementById('pinScreen').style.display = 'none'; resetInactivityTimer(); }, 300);
             } else {
-                document.getElementById('pinError').style.display = 'block';
-                document.getElementById('pinInput').value = '';
+                document.getElementById('pinError').style.display = 'block'; document.getElementById('pinInput').value = '';
             }
         }
         
         document.getElementById('pinInput').addEventListener('keypress', function (e) { if (e.key === 'Enter') verifyPin(); });
 
         function updatePin() {
-            const oldPin = document.getElementById('oldPin').value;
-            const newPin = document.getElementById('newPin').value;
-
-            if(oldPin !== db.settings.pin) return toast('Le code PIN actuel est incorrect', 'error');
-            if(newPin.length !== 4) return toast('Le nouveau code PIN doit faire 4 chiffres', 'error');
-
-            db.settings.pin = newPin; 
-            saveDB(); 
-            
-            document.getElementById('oldPin').value = '';
-            document.getElementById('newPin').value = '';
-            toast('Code PIN mis à jour avec succès !');
+            const oldPin = document.getElementById('oldPin').value; const newPin = document.getElementById('newPin').value;
+            if(oldPin !== db.settings.pin) return toast('Code PIN actuel incorrect', 'error');
+            if(newPin.length !== 4) return toast('Le nouveau code doit faire 4 chiffres', 'error');
+            db.settings.pin = newPin; saveDB(); document.getElementById('oldPin').value = ''; document.getElementById('newPin').value = ''; toast('Code mis à jour !');
         }
 
         // ================= GESTION DES ANNÉES =================
@@ -590,7 +603,7 @@
             select.innerHTML = Array.from(years).sort().reverse().map(y => `<option value="${y}" ${y === currentYear ? 'selected' : ''}>Exercice ${y}</option>`).join('');
         }
 
-        function changeYear(y) { currentYear = parseInt(y); refreshUI(); toast(`Année comptable : ${currentYear}`, 'info'); }
+        function changeYear(y) { currentYear = parseInt(y); refreshUI(); toast(`Année : ${currentYear}`, 'info'); }
 
         // ================= NAVIGATION =================
         function switchPage(pageId) {
@@ -601,13 +614,17 @@
             
             const titles = { 'dashboard': 'Tableau de bord financier', 'apartments': 'Vue d\'ensemble des Lots', 'cotisations': 'Suivi des Recettes', 'annexes': 'Cotisations Annexes', 'charges': 'Suivi des Dépenses', 'rapport': 'Rapport & Relances', 'fournisseurs': 'Annuaire Fournisseurs', 'parametres': 'Paramètres Système' };
             document.getElementById('page-title').innerText = titles[pageId];
+            
+            // Close mobile menu if open
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
             refreshUI();
         }
 
         function toggleTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('themeIcon');
-            const currentTheme = html.getAttribute('data-theme');
+            const html = document.documentElement; const icon = document.getElementById('themeIcon'); const currentTheme = html.getAttribute('data-theme');
             if (currentTheme === 'light') { html.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); icon.className = 'fa-solid fa-sun'; } 
             else { html.setAttribute('data-theme', 'light'); localStorage.setItem('theme', 'light'); icon.className = 'fa-solid fa-moon'; }
             if(chartBar) { Chart.defaults.color = html.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b'; chartBar.update(); chartPie.update(); }
@@ -617,7 +634,6 @@
         function refreshUI() {
             document.getElementById('rapport-title-year').innerText = `Bilan Annuel Complet - ${currentYear}`;
             
-            // Calculs
             const recettesAnnee = db.cotisations.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0);
             const sortiesAnnee = db.charges.filter(c => getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.filter(d => getYearOf(d) === currentYear).reduce((s, d) => s + parseFloat(d.montant), 0);
             
@@ -665,8 +681,7 @@
 
             db.apartments.forEach(apt => {
                 let paye = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0);
-                let du = COTISATION_MENSUELLE * 12;
-                let statusCls = 'status-bad';
+                let du = COTISATION_MENSUELLE * 12; let statusCls = 'status-bad';
                 if(paye >= du) { statusCls = 'status-ok'; ok++; } else if(paye > 0) { statusCls = 'status-partial'; prt++; } else { bad++; }
 
                 grid.innerHTML += `<div class="apt-card ${statusCls}" onclick="showAptDetails(${apt.id})"><div class="apt-num">${apt.number}</div><div class="apt-owner">${apt.owner}</div><div style="font-size:0.75rem; font-weight:600; margin-top:8px; color:var(--text-main)">${paye} / ${du}</div></div>`;
@@ -718,8 +733,8 @@
                 let stat = reste === 0 ? '<span class="badge badge-success">À jour</span>' : (paye > 0 ? '<span class="badge badge-warning">Partiel</span>' : '<span class="badge badge-danger">Impayé</span>');
                 let rowClass = reste === 0 ? 'print-row-ok' : (paye > 0 ? 'print-row-partial' : 'print-row-bad');
                 
-                let actionBtn = ''; if(reste > 0) actionBtn += `<button class="btn btn-outline" style="color:#25D366; border-color:#25D366; padding:4px 8px; font-size:0.8rem; margin-right:5px;" onclick="relanceWA(${apt.id}, ${reste})"><i class="fa-brands fa-whatsapp"></i> Relancer</button>`;
-                actionBtn += `<button class="btn btn-outline" style="color:var(--primary); border-color:var(--primary); padding:4px 8px; font-size:0.8rem; margin-right:5px;" onclick="shareReceiptWA(${apt.id})"><i class="fa-solid fa-comment-sms"></i> Reçu WA</button><button class="btn btn-outline" style="padding:4px 8px; font-size:0.8rem;" onclick="generatePDF(${apt.id})"><i class="fa-solid fa-file-pdf"></i> PDF</button>`;
+                let actionBtn = ''; if(reste > 0) actionBtn += `<button class="btn btn-outline" style="color:#25D366; border-color:#25D366; padding:4px 8px; font-size:0.8rem; margin-right:5px; margin-bottom:5px;" onclick="relanceWA(${apt.id}, ${reste})"><i class="fa-brands fa-whatsapp"></i></button>`;
+                actionBtn += `<button class="btn btn-outline" style="color:var(--primary); border-color:var(--primary); padding:4px 8px; font-size:0.8rem; margin-right:5px; margin-bottom:5px;" onclick="shareReceiptWA(${apt.id})"><i class="fa-solid fa-comment-sms"></i></button><button class="btn btn-outline" style="padding:4px 8px; font-size:0.8rem; margin-bottom:5px;" onclick="generatePDF(${apt.id})"><i class="fa-solid fa-file-pdf"></i></button>`;
                 
                 return `<tr class="${rowClass}">
                             <td><strong>Apt ${apt.number}</strong></td>
@@ -760,7 +775,6 @@
                     <div style="color:#ef4444;">Total Dépenses (${year}) : -${formatMoney.format(totalDepensesAnnee)}</div>
                     <div style="color:${soldeGlobal >= 0 ? '#4f46e5' : '#ef4444'};">Solde Trésorerie Actuel : ${formatMoney.format(soldeGlobal)}</div>
                 </div>
-
                 <div style="display: flex; gap: 20px; align-items: flex-start;">
                     <div style="flex: 1;">
                         <h3 style="margin-bottom:10px; color:#10b981;">Détail des Recettes (Cotisations & Travaux)</h3>
@@ -790,9 +804,7 @@
             document.getElementById('print-global-container').innerHTML = html;
             document.body.classList.add('print-global-mode');
             window.print();
-            setTimeout(() => {
-                document.body.classList.remove('print-global-mode');
-            }, 500);
+            setTimeout(() => { document.body.classList.remove('print-global-mode'); }, 500);
         }
 
         // ================= ACTIONS WHATSAPP & PDF =================
@@ -821,11 +833,11 @@
 
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dlElem = document.getElementById('downloadAnchorElem');
-            dlElem.setAttribute("href", dataStr); dlElem.setAttribute("download", `Sauvegarde_Copro_${new Date().toISOString().slice(0,10)}.json`); dlElem.click(); toast('Sauvegarde effectuée avec succès !', 'success');
+            dlElem.setAttribute("href", dataStr); dlElem.setAttribute("download", `Sauvegarde_Copro_${new Date().toISOString().slice(0,10)}.json`); dlElem.click(); toast('Sauvegarde effectuée !');
         }
         function importJSON(event) {
             const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
-            reader.onload = function(e) { try { let imported = JSON.parse(e.target.result); if(imported.apartments && imported.cotisations) { db = imported; saveDB(); window.location.reload(); } else toast('Fichier invalide', 'error'); } catch(err) { toast('Erreur de lecture du fichier', 'error'); } };
+            reader.onload = function(e) { try { let imported = JSON.parse(e.target.result); if(imported.apartments && imported.cotisations) { db = imported; saveDB(); window.location.reload(); } else toast('Fichier invalide', 'error'); } catch(err) { toast('Erreur fichier', 'error'); } };
             reader.readAsText(file);
         }
 
@@ -854,42 +866,26 @@
         function updateTotalModalPaiement() { document.getElementById('form-total').innerText = (document.querySelectorAll('#form-months input:checked').length * COTISATION_MENSUELLE) + ' DH'; }
 
         function onChargeTypeChange() {
-            const type = document.getElementById('charge-type').value;
-            const montantInput = document.getElementById('charge-montant');
-            const moisSection = document.getElementById('charge-mois-section');
-            const descSection = document.getElementById('charge-desc-section');
+            const type = document.getElementById('charge-type').value; const montantInput = document.getElementById('charge-montant');
+            const moisSection = document.getElementById('charge-mois-section'); const descSection = document.getElementById('charge-desc-section');
             const label = document.getElementById('charge-montant-label');
 
-            if(type === 'femme') {
-                montantInput.value = 500; montantInput.readOnly = true; montantInput.style.background = '#f1f5f9';
-                moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)';
-            } else if(type === 'ascenseur') {
-                montantInput.value = 150; montantInput.readOnly = true; montantInput.style.background = '#f1f5f9';
-                moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)';
-            } else if(type === 'electricite') {
-                montantInput.value = ''; montantInput.readOnly = false; montantInput.style.background = 'white';
-                moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)';
-            } else if(type === 'custom') {
-                montantInput.value = ''; montantInput.readOnly = false; montantInput.style.background = 'white';
-                moisSection.style.display = 'none'; descSection.style.display = 'block'; label.innerText = 'Montant Total (DH)';
-            }
+            if(type === 'femme') { montantInput.value = 500; montantInput.readOnly = true; montantInput.style.background = '#f1f5f9'; moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)'; }
+            else if(type === 'ascenseur') { montantInput.value = 150; montantInput.readOnly = true; montantInput.style.background = '#f1f5f9'; moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)'; }
+            else if(type === 'electricite') { montantInput.value = ''; montantInput.readOnly = false; montantInput.style.background = 'white'; moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)'; }
+            else if(type === 'custom') { montantInput.value = ''; montantInput.readOnly = false; montantInput.style.background = 'white'; moisSection.style.display = 'none'; descSection.style.display = 'block'; label.innerText = 'Montant Total (DH)'; }
             updateChargeTotal();
         }
 
         function updateChargeTotal() {
-            const type = document.getElementById('charge-type').value;
-            const checked = document.querySelectorAll('#charge-months input:checked').length;
+            const type = document.getElementById('charge-type').value; const checked = document.querySelectorAll('#charge-months input:checked').length;
             const montant = parseFloat(document.getElementById('charge-montant').value) || 0;
-            let total = type !== 'custom' ? (checked * montant) : montant;
-            document.getElementById('charge-total-display').innerText = total + ' DH';
+            let total = type !== 'custom' ? (checked * montant) : montant; document.getElementById('charge-total-display').innerText = total + ' DH';
         }
 
         function savePaiement() {
-            const aptId = document.querySelector('#modalPaiement .form-apt').value;
-            const mode = document.getElementById('form-mode').value;
-            const date = document.getElementById('form-date').value;
-            const boxes = document.querySelectorAll('#form-months input:checked');
-            if(boxes.length === 0) return toast('Cochez au moins un mois', 'error');
+            const aptId = document.querySelector('#modalPaiement .form-apt').value; const mode = document.getElementById('form-mode').value; const date = document.getElementById('form-date').value;
+            const boxes = document.querySelectorAll('#form-months input:checked'); if(boxes.length === 0) return toast('Cochez au moins un mois', 'error');
             let moisNames = []; boxes.forEach(b => moisNames.push(MOIS_NOMS[b.value - 1]));
             db.cotisations.push({ id: Date.now(), aptId: parseInt(aptId), date: date, mode: mode, montant: boxes.length * COTISATION_MENSUELLE, moisStr: moisNames.join(', ') });
             saveDB(); refreshUI(); closeModal('modalPaiement'); toast('Paiement enregistré !');
@@ -903,33 +899,21 @@
         }
 
         function saveCharge() {
-            const type = document.getElementById('charge-type').value;
-            const date = document.getElementById('charge-date').value;
-            const montantParMois = parseFloat(document.getElementById('charge-montant').value) || 0;
-            
+            const type = document.getElementById('charge-type').value; const date = document.getElementById('charge-date').value; const montantParMois = parseFloat(document.getElementById('charge-montant').value) || 0;
             if(!montantParMois || montantParMois <= 0) return toast('Montant invalide', 'error');
 
             let cat, descBase;
             if(type === 'femme') { cat = 'Femme de ménage'; descBase = 'Ménage'; }
             else if(type === 'ascenseur') { cat = 'Ascenseur'; descBase = 'Entretien Ascenseur'; }
             else if(type === 'electricite') { cat = 'Électricité (ONE)'; descBase = 'Facture Électricité'; }
-            else {
-                cat = 'Autre Dépense'; descBase = document.getElementById('charge-desc').value;
-                if(!descBase) return toast('Description requise', 'error');
-            }
+            else { cat = 'Autre Dépense'; descBase = document.getElementById('charge-desc').value; if(!descBase) return toast('Description requise', 'error'); }
 
             const boxes = document.querySelectorAll('#charge-months input:checked');
             if(type !== 'custom' && boxes.length === 0) return toast('Cochez au moins un mois', 'error');
 
             const baseId = Date.now();
-            if(type === 'custom') {
-                db.charges.push({ id: baseId, cat: cat, date: date, desc: descBase, montant: montantParMois });
-            } else {
-                boxes.forEach(b => {
-                    let moisIndex = parseInt(b.value) - 1;
-                    db.charges.push({ id: baseId + moisIndex, cat: cat, date: date, desc: descBase + ' - ' + MOIS_NOMS[moisIndex], montant: montantParMois });
-                });
-            }
+            if(type === 'custom') { db.charges.push({ id: baseId, cat: cat, date: date, desc: descBase, montant: montantParMois }); }
+            else { boxes.forEach(b => { let moisIndex = parseInt(b.value) - 1; db.charges.push({ id: baseId + moisIndex, cat: cat, date: date, desc: descBase + ' - ' + MOIS_NOMS[moisIndex], montant: montantParMois }); }); }
             saveDB(); refreshUI(); closeModal('modalCharge'); toast('Dépense enregistrée !');
         }
 
@@ -940,9 +924,7 @@
             saveDB(); refreshUI(); closeModal('modalFournisseur'); toast('Fournisseur ajouté !');
         }
 
-        function deleteEntry(table, id) {
-            if(confirm('Supprimer cette ligne ?')) { db[table] = db[table].filter(row => row.id !== id); saveDB(); refreshUI(); toast('Supprimé avec succès'); }
-        }
+        function deleteEntry(table, id) { if(confirm('Supprimer cette ligne ?')) { db[table] = db[table].filter(row => row.id !== id); saveDB(); refreshUI(); toast('Supprimé avec succès'); } }
 
         function toast(msg, type = 'success') {
             const box = document.getElementById('toastBox'); const el = document.createElement('div'); el.className = `toast ${type}`;
@@ -950,7 +932,6 @@
             el.innerHTML = `<i class="fa-solid ${iconClass}"></i> <div>${msg}</div>`; box.appendChild(el); setTimeout(() => el.remove(), 4000);
         }
 
-        // DÉTECTION D'ACTIVITÉ POUR VERROUILLAGE AUTOMATIQUE
         window.onload = function() {
             ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => document.addEventListener(evt, resetInactivityTimer, true));
             resetInactivityTimer();
