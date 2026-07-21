@@ -537,7 +537,7 @@
             initCharts(); renderApartments(); renderAnnexes(); renderTables(); renderTechnique(); renderEnergie();
         }
 
-        // CORRECTION INTÉGRALE : LES CHARGES (ORANGE) ET LES DÉPENSES S'AJOUTENT MAINTENANT DANS LE GRAPHIQUE
+        // CORRECTION AMÉLIORÉE : DÉTECTION PRÉCISE DES MOIS (ABRÉVIATIONS ET MOIS COMPLETS)
         function initCharts() {
             Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b';
             let recMensuelles = Array(12).fill(0), depMensuelles = Array(12).fill(0);
@@ -548,12 +548,20 @@
                 recMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
-            // Charges (Orange - Incluses désormais dans le graphique des dépenses)
+            // Charges (Analyse rigoureuse de la description pour trouver le mois exact)
             db.charges.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = new Date(c.date).getMonth();
                 if (c.desc) {
+                    let descLower = c.desc.toLowerCase();
+                    const moisComplets = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+                    
+                    // Recherche par abréviation standard (ex: " - Jan", " - Fév")
                     MOIS_NOMS.forEach((m, idx) => {
-                        if (c.desc.toLowerCase().includes(m.toLowerCase())) moisIndex = idx;
+                        if (descLower.includes(m.toLowerCase())) moisIndex = idx;
+                    });
+                    // Recherche par nom complet si présent dans le texte
+                    moisComplets.forEach((mFull, idx) => {
+                        if (descLower.includes(mFull)) moisIndex = idx;
                     });
                 }
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
@@ -562,10 +570,16 @@
             // Dépenses diverses
             db.depenses.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = new Date(c.date).getMonth();
-                if (c.description || c.beneficiaire) {
-                    let texte = (c.description || '') + ' ' + (c.beneficiaire || '');
+                if (c.description || c.beneficiaire || c.typeDepense) {
+                    let texte = (c.description || '') + ' ' + (c.beneficiaire || '') + ' ' + (c.typeDepense || '');
+                    let texteLower = texte.toLowerCase();
+                    const moisComplets = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+                    
                     MOIS_NOMS.forEach((m, idx) => {
-                        if (texte.toLowerCase().includes(m.toLowerCase())) moisIndex = idx;
+                        if (texteLower.includes(m.toLowerCase())) moisIndex = idx;
+                    });
+                    moisComplets.forEach((mFull, idx) => {
+                        if (texteLower.includes(mFull)) moisIndex = idx;
                     });
                 }
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
