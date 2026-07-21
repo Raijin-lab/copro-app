@@ -462,6 +462,43 @@
         const MOIS_NOMS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
         const formatMoney = new Intl.NumberFormat('fr-MA', { style: 'currency', currency: 'MAD' });
         
+        function saveConsommation() {
+    // 1. Récupération des valeurs
+    const type = document.getElementById('conso-type').value;
+    const mois = document.getElementById('conso-mois').value;
+    const montant = document.getElementById('conso-montant').value;
+    const index = document.getElementById('conso-index').value;
+
+    // 2. Vérification
+    if (!montant || montant <= 0) {
+        alert("Veuillez saisir un montant valide.");
+        return; 
+    }
+
+    // 3. Préparation des données
+    const donneeFacture = {
+        typeFluide: type,
+        mois: parseInt(mois),
+        montant: parseFloat(montant),
+        indexConsommation: index,
+        dateSaisie: new Date().toISOString()
+    };
+
+    // 4. Envoi vers Firebase Firestore
+    dbCloud.collection('factures_energie').add(donneeFacture)
+        .then(() => {
+            console.log("Facture enregistrée avec succès !");
+            closeModal('modalConso'); // Ferme la fenêtre
+            
+            // On vide les champs pour la prochaine saisie
+            document.getElementById('conso-montant').value = '';
+            document.getElementById('conso-index').value = '';
+        })
+        .catch((error) => {
+            console.error("Erreur lors de l'enregistrement : ", error);
+            alert("Une erreur est survenue lors de l'enregistrement.");
+        });
+}
         let currentYear = new Date().getFullYear();
         let chartBar, chartPie, chartConso;
         let inactivityTimer; const INACTIVITY_LIMIT = 5 * 60 * 1000;
