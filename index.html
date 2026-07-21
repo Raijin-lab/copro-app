@@ -461,14 +461,49 @@
         const NB_APPARTEMENTS = 26;
         const MOIS_NOMS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
         const formatMoney = new Intl.NumberFormat('fr-MA', { style: 'currency', currency: 'MAD' });
+
         
-        function saveConsommation() {
-    // 1. Récupération des valeurs
+function saveConsommation() {
     const type = document.getElementById('conso-type').value;
     const mois = document.getElementById('conso-mois').value;
     const montant = document.getElementById('conso-montant').value;
     const index = document.getElementById('conso-index').value;
 
+    if (!montant || montant <= 0) {
+        alert("Veuillez saisir un montant valide.");
+        return; 
+    }
+
+    const donneeFacture = {
+        typeFluide: type,
+        mois: parseInt(mois),
+        montant: parseFloat(montant),
+        indexConsommation: index,
+        dateSaisie: new Date().toISOString()
+    };
+
+    dbCloud.collection('factures_energie').add(donneeFacture)
+        .then(() => {
+            closeModal('modalConso');
+            
+            document.getElementById('conso-montant').value = '';
+            document.getElementById('conso-index').value = '';
+
+            // On ajoute la donnée au tableau local des dépenses pour que le graphique la voie
+            if (!db.depenses) db.depenses = [];
+            db.depenses.push({
+                montant: parseFloat(montant),
+                date: new Date().toISOString(),
+                mois: parseInt(mois)
+            });
+
+            // On redessine le graphique avec la nouvelle donnée
+            initCharts(); 
+        })
+        .catch((error) => {
+            console.error("Erreur lors de l'enregistrement : ", error);
+        });
+}
     // 2. Vérification
     if (!montant || montant <= 0) {
         alert("Veuillez saisir un montant valide.");
