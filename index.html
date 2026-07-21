@@ -537,26 +537,37 @@
             initCharts(); renderApartments(); renderAnnexes(); renderTables(); renderTechnique(); renderEnergie();
         }
 
-        // CORRECTION DE LA FONCTION : RÉPARTITION CORRECTE SUR LES MOIS D'ORIGINE
+        // CORRECTION COMPLÈTE DES GRAPHIQUES ET RÉPARTITION MENSUELLE
         function initCharts() {
             Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b';
             let recMensuelles = Array(12).fill(0), depMensuelles = Array(12).fill(0);
 
-            // Recettes : Utilise le mois stocké en priorité, sinon déduit de la date
+            // Recettes : Utilise le mois stocké ou déduit de la date
             db.cotisations.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = c.mois ? (c.mois - 1) : (c.date ? new Date(c.date).getMonth() : 0);
                 recMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
-            // Charges : Utilise le mois stocké en priorité, sinon déduit de la date
+            // Charges : Détection intelligente du mois par la description ou la date
             db.charges.filter(c => getYearOf(c) === currentYear).forEach(c => { 
-                let moisIndex = c.mois ? (c.mois - 1) : (c.date ? new Date(c.date).getMonth() : 0);
+                let moisIndex = new Date(c.date).getMonth();
+                if (c.desc) {
+                    MOIS_NOMS.forEach((m, idx) => {
+                        if (c.desc.toLowerCase().includes(m.toLowerCase())) moisIndex = idx;
+                    });
+                }
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
-            // Dépenses : Utilise le mois stocké en priorité, sinon déduit de la date
+            // Dépenses : Détection intelligente du mois par la description ou la date
             db.depenses.filter(c => getYearOf(c) === currentYear).forEach(c => { 
-                let moisIndex = c.mois ? (c.mois - 1) : (c.date ? new Date(c.date).getMonth() : 0);
+                let moisIndex = new Date(c.date).getMonth();
+                if (c.description || c.beneficiaire) {
+                    let texte = (c.description || '') + ' ' + (c.beneficiaire || '');
+                    MOIS_NOMS.forEach((m, idx) => {
+                        if (texte.toLowerCase().includes(m.toLowerCase())) moisIndex = idx;
+                    });
+                }
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
@@ -603,7 +614,7 @@
             document.getElementById('table-cotisations').innerHTML = [...db.cotisations].filter(c => getYearOf(c) === currentYear).sort((a,b) => new Date(b.date||0) - new Date(a.date||0)).map(c => `<tr><td>${c.date ? new Date(c.date).toLocaleDateString() : ('01/'+(c.mois||1).toString().padStart(2,'0')+'/'+c.annee)}</td><td><span class="badge badge-success">Apt ${c.aptId}</span></td><td>${db.apartments.find(a=>a.id==c.aptId)?.owner || '-'}</td><td>${c.moisStr || (MOIS_NOMS[(c.mois||1)-1])}</td><td>${c.mode || 'Espèces'}</td><td class="text-right font-mono text-success">+${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisations', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
 
             const tbodyCharges = document.getElementById('table-charges'); tbodyCharges.innerHTML = '';
-            db.charges.forEach(c => { if(getYearOf(c) === currentYear) tbodyCharges.innerHTML += `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td><span class="badge badge-warning">${c.cat}</span></td><td>${c.desc}</td><td class="text-right font-mono text-danger">-${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" title="Imprimer Reçu PDF" onclick="generateChargePDF(${c.id}, 'charges')"><i class="fa-solid fa-file-pdf" style="color:var(--info);"></i></button><button class="btn-icon" onclick="deleteEntry('charges', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`; });
+            db.charges.forEach(c => { if(getYearOf(c) === currentYear) tbodyCharges.innerHTML += `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td><span class="badge badge-warning">${c.cat || 'Charge'}</span></td><td>${c.desc}</td><td class="text-right font-mono text-danger">-${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" title="Imprimer Reçu PDF" onclick="generateChargePDF(${c.id}, 'charges')"><i class="fa-solid fa-file-pdf" style="color:var(--info);"></i></button><button class="btn-icon" onclick="deleteEntry('charges', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`; });
             db.depenses.forEach(d => { if(getYearOf(d) === currentYear) tbodyCharges.innerHTML += `<tr><td>${new Date(d.date).toLocaleDateString()}</td><td><span class="badge badge-danger">${d.typeDepense || 'Dépense'}</span></td><td>${d.beneficiaire || d.description}</td><td class="text-right font-mono text-danger">-${formatMoney.format(d.montant)}</td><td class="text-right no-print"><button class="btn-icon" title="Imprimer Reçu PDF" onclick="generateChargePDF(${d.id}, 'depenses')"><i class="fa-solid fa-file-pdf" style="color:var(--info);"></i></button><button class="btn-icon" onclick="deleteEntry('depenses', ${d.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`; });
 
             document.getElementById('table-fournisseurs').innerHTML = db.fournisseurs.map(f => `<tr><td><span class="badge badge-info">${f.type}</span></td><td><strong>${f.nom}</strong></td><td><a href="tel:${f.tel}" style="color:var(--info); text-decoration:none;">${f.tel}</a></td><td>${f.notes}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('fournisseurs', ${f.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
