@@ -184,7 +184,8 @@
 
     <div id="print-global-container" class="no-screen"></div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-<!-- SIDEBAR -->
+    
+    <!-- SIDEBAR -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <i class="fa-solid fa-building"></i>
@@ -209,7 +210,6 @@
             <div class="nav-item" data-target="technique" onclick="switchPage('technique')">
                 <i class="fa-solid fa-wrench"></i> Pôle Technique
             </div>
-            <!-- NOUVEL ONGLET ÉNERGIE (PHASE 2) -->
             <div class="nav-item" data-target="energie" onclick="switchPage('energie')">
                 <i class="fa-solid fa-bolt"></i> Énergie & Compteurs
             </div>
@@ -318,7 +318,7 @@
                 </div>
             </div>
 
-            <!-- PAGE: ENERGIE & COMPTEURS (NOUVEAU) -->
+            <!-- PAGE: ENERGIE & COMPTEURS -->
             <div id="page-energie" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
@@ -334,7 +334,8 @@
                     </div>
                 </div>
             </div>
-<!-- PAGE: RAPPORT & RELANCES -->
+
+            <!-- PAGE: RAPPORT & RELANCES -->
             <div id="page-rapport" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header" style="flex-direction: column; align-items: flex-start;">
@@ -395,8 +396,8 @@
     
     <div class="modal-overlay" id="modalMaintenance"><div class="modal-content"><div class="modal-header"><h3>Rapport de Maintenance</h3><button class="btn-icon" onclick="closeModal('modalMaintenance')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Équipement</label><select class="form-control" id="maint-equip"><option value="Ascenseur">Ascenseur</option><option value="Porte Automatique">Porte de garage</option><option value="Surpresseur Eau">Surpresseur d'eau</option><option value="Extincteurs">Extincteurs</option></select></div><div class="form-group"><label class="form-label">Date</label><input type="date" class="form-control" id="maint-date"></div><div class="form-group"><label class="form-label">Observations</label><textarea class="form-control" id="maint-obs" rows="4" placeholder="État des pièces..."></textarea></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalMaintenance')">Annuler</button><button class="btn btn-primary" onclick="saveMaintenance()">Sauvegarder</button></div></div></div>
 
-<!-- MODAL ÉNERGIE (PHASE 2) -->
-<div class="modal-overlay" id="modalConso">
+    <!-- MODAL ÉNERGIE -->
+    <div class="modal-overlay" id="modalConso">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Saisir une Facture Énergie</h3>
@@ -420,7 +421,7 @@
                         <option value="5">Mai</option>
                         <option value="6">Juin</option>
                         <option value="7">Juillet</option>
-                        <option value="8">août</option>
+                        <option value="8">Août</option>
                         <option value="9">Septembre</option>
                         <option value="10">Octobre</option>
                         <option value="11">Novembre</option>
@@ -443,6 +444,9 @@
         </div>
     </div>
 
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastBox"></div>
+
     <script>
         // CONFIGURATION FIREBASE
         const firebaseConfig = {
@@ -462,49 +466,6 @@
         const MOIS_NOMS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
         const formatMoney = new Intl.NumberFormat('fr-MA', { style: 'currency', currency: 'MAD' });
 
-        
-function saveConsommation() {
-    const type = document.getElementById('conso-type').value;
-    const mois = document.getElementById('conso-mois').value;
-    const montant = document.getElementById('conso-montant').value;
-    const index = document.getElementById('conso-index').value;
-
-    if (!montant || montant <= 0) {
-        alert("Veuillez saisir un montant valide.");
-        return; 
-    }
-
-    const donneeFacture = {
-        typeFluide: type,
-        mois: parseInt(mois),
-        montant: parseFloat(montant),
-        indexConsommation: index,
-        dateSaisie: new Date().toISOString()
-    };
-
-    dbCloud.collection('factures_energie').add(donneeFacture)
-        .then(() => {
-            closeModal('modalConso');
-            
-            document.getElementById('conso-montant').value = '';
-            document.getElementById('conso-index').value = '';
-
-            // On ajoute la donnée au tableau local des dépenses pour que le graphique la voie
-            if (!db.depenses) db.depenses = [];
-            db.depenses.push({
-                montant: parseFloat(montant),
-                date: new Date().toISOString(),
-                mois: parseInt(mois)
-            });
-
-            // On redessine le graphique avec la nouvelle donnée
-            initCharts(); 
-        })
-        .catch((error) => {
-            console.error("Erreur lors de l'enregistrement : ", error);
-        });
-}
-
         let currentYear = new Date().getFullYear();
         let chartBar, chartPie, chartConso;
         let inactivityTimer; const INACTIVITY_LIMIT = 5 * 60 * 1000;
@@ -516,7 +477,7 @@ function saveConsommation() {
         const savedTheme = localStorage.getItem('theme') || 'light'; document.documentElement.setAttribute('data-theme', savedTheme);
         window.addEventListener('DOMContentLoaded', () => { document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon'; });
 
-        // STRUCTURE DB AVEC CONSOMMATIONS (PHASE 2)
+        // STRUCTURE DB
         let db = {
             settings: { pin: '0000' }, apartments: [], cotisations: [], charges: [], depenses: [], cotisationsAnnexes: [], fournisseurs: [], incidents: [], maintenance: [], consommations: []
         };
@@ -649,7 +610,7 @@ function saveConsommation() {
             document.getElementById('table-maintenance').innerHTML = db.maintenance.map(m => `<tr><td>${new Date(m.date).toLocaleDateString()}</td><td><strong>${m.equip}</strong></td><td><span style="font-size:0.75rem; color:var(--text-main);">${m.obs}</span></td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('maintenance', ${m.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
         }
 
-        // FONCTIONS ÉNERGIE (PHASE 2)
+        // FONCTIONS ÉNERGIE
         function renderEnergie() {
             if(!db.consommations) db.consommations = [];
             document.getElementById('table-conso').innerHTML = db.consommations.sort((a,b) => b.mois - a.mois).map(c => `
@@ -681,14 +642,35 @@ function saveConsommation() {
             });
         }
 
-        function saveConso() {
+        function saveConsommation() {
             const type = document.getElementById('conso-type').value;
             const mois = parseInt(document.getElementById('conso-mois').value);
             const montant = parseFloat(document.getElementById('conso-montant').value);
-            if(!montant || montant <= 0) return toast('Montant invalide', 'error');
+            const index = document.getElementById('conso-index').value;
+
+            if (!montant || montant <= 0) {
+                alert("Veuillez saisir un montant valide.");
+                return; 
+            }
+
             if(!db.consommations) db.consommations = [];
-            db.consommations.push({ id: Date.now(), type, mois, montant });
-            saveDB(); refreshUI(); closeModal('modalConso'); toast('Facture enregistrée !');
+            db.consommations.push({
+                id: Date.now(),
+                type: type,
+                mois: mois,
+                montant: montant,
+                indexConsommation: index,
+                dateSaisie: new Date().toISOString()
+            });
+
+            saveDB();
+            closeModal('modalConso');
+            
+            document.getElementById('conso-montant').value = '';
+            document.getElementById('conso-index').value = '';
+
+            refreshUI();
+            toast('Facture d\'énergie enregistrée avec succès !');
         }
 
         function printBilanGlobal() {
