@@ -503,12 +503,7 @@ function saveConsommation() {
         .catch((error) => {
             console.error("Erreur lors de l'enregistrement : ", error);
         });
-}
-    // 2. Vérification
-    if (!montant || montant <= 0) {
-        alert("Veuillez saisir un montant valide.");
-        return; 
-    }
+
 
     // 3. Préparation des données
     const donneeFacture = {
