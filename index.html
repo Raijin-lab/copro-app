@@ -537,18 +537,18 @@
             initCharts(); renderApartments(); renderAnnexes(); renderTables(); renderTechnique(); renderEnergie();
         }
 
-        // CORRECTION COMPLÈTE DES GRAPHIQUES ET RÉPARTITION MENSUELLE
+        // CORRECTION INTÉGRALE : LES CHARGES (ORANGE) ET LES DÉPENSES S'AJOUTENT MAINTENANT DANS LE GRAPHIQUE
         function initCharts() {
             Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b';
             let recMensuelles = Array(12).fill(0), depMensuelles = Array(12).fill(0);
 
-            // Recettes : Utilise le mois stocké ou déduit de la date
+            // Recettes (Cotisations)
             db.cotisations.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = c.mois ? (c.mois - 1) : (c.date ? new Date(c.date).getMonth() : 0);
                 recMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
-            // Charges : Détection intelligente du mois par la description ou la date
+            // Charges (Orange - Incluses désormais dans le graphique des dépenses)
             db.charges.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = new Date(c.date).getMonth();
                 if (c.desc) {
@@ -559,7 +559,7 @@
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
-            // Dépenses : Détection intelligente du mois par la description ou la date
+            // Dépenses diverses
             db.depenses.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = new Date(c.date).getMonth();
                 if (c.description || c.beneficiaire) {
@@ -572,7 +572,7 @@
             });
 
             if(chartBar) chartBar.destroy(); if(chartPie) chartPie.destroy();
-            chartBar = new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: MOIS_NOMS, datasets: [{ label: 'Recettes', data: recMensuelles, backgroundColor: '#10b981', borderRadius:4 }, { label: 'Dépenses', data: depMensuelles, backgroundColor: '#ef4444', borderRadius:4 }] }, options: { responsive: true, maintainAspectRatio: false } });
+            chartBar = new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: MOIS_NOMS, datasets: [{ label: 'Recettes', data: recMensuelles, backgroundColor: '#10b981', borderRadius:4 }, { label: 'Dépenses & Charges', data: depMensuelles, backgroundColor: '#ef4444', borderRadius:4 }] }, options: { responsive: true, maintainAspectRatio: false } });
             
             let aJour = 0, partiel = 0, retard = 0;
             db.apartments.forEach(apt => { let paye = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0); if(paye >= COTISATION_MENSUELLE * 12) aJour++; else if(paye > 0) partiel++; else retard++; });
