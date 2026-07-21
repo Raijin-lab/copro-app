@@ -290,8 +290,8 @@
                     <div class="card"><div class="stat-header"><div><div class="stat-title">Projets Actifs</div><div class="stat-value" id="annexes-nb-projets">0</div></div><div class="stat-icon bg-blue-100"><i class="fa-solid fa-folder-open"></i></div></div></div>
                 </div>
                 <div class="table-container">
-                    <div class="table-header"><div class="table-title">Travaux Exceptionnels</div><button class="btn btn-primary" onclick="openModal('modalAnnexe')"><i class="fa-solid fa-plus"></i> Participation</button></div>
-                    <table><thead><tr><th>Date</th><th>Projet</th><th>Apt</th><th>Mode</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead><tbody id="table-annexes"></tbody></table>
+                    <div class="table-header"><div class="table-title">Travaux Exceptionnels & Reliquats</div><button class="btn btn-primary" onclick="openModal('modalAnnexe')"><i class="fa-solid fa-plus"></i> Participation</button></div>
+                    <table><thead><tr><th>Date</th><th>Projet / Rubrique</th><th>Apt</th><th>Mode</th><th class="text-right">Montant</th><th class="text-right no-print">Action</th></tr></thead><tbody id="table-annexes"></tbody></table>
                 </div>
                 <div class="grid-2" id="annexes-projects-container" style="margin-top: 24px;"></div>
             </div>
@@ -386,7 +386,54 @@
     
     <div class="modal-overlay" id="modalPaiement"><div class="modal-content"><div class="modal-header"><h3>Nouveau paiement</h3><button class="btn-icon" onclick="closeModal('modalPaiement')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Appartement</label><select class="form-control form-apt"></select></div><div class="form-group"><label class="form-label">Mois payés</label><div class="month-grid" id="form-months"></div></div><div style="display:flex; gap:16px;"><div class="form-group" style="flex:1;"><label class="form-label">Mode</label><select class="form-control" id="form-mode"><option>Espèces</option><option>Virement</option><option>Chèque</option></select></div><div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="form-date"></div></div><div class="text-right" style="margin-top:10px;"><strong style="font-size:1.25rem; color:var(--success);" id="form-total">0 DH</strong></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-success" onclick="savePaiement()">Valider</button></div></div></div>
     
-    <div class="modal-overlay" id="modalAnnexe"><div class="modal-content"><div class="modal-header"><h3>Participation Travaux</h3><button class="btn-icon" onclick="closeModal('modalAnnexe')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Nom du Projet</label><input type="text" class="form-control" id="annexe-projet" placeholder="Ex: Ascenseur..."></div><div class="form-group"><label class="form-label">Appartement</label><select class="form-control form-apt" id="annexe-apt"></select></div><div class="form-group"><label class="form-label">Montant (DH)</label><input type="number" class="form-control" id="annexe-montant"></div><div style="display:flex; gap:16px;"><div class="form-group" style="flex:1;"><label class="form-label">Mode</label><select class="form-control" id="annexe-mode"><option>Espèces</option><option>Virement</option></select></div><div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="annexe-date"></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAnnexe')">Annuler</button><button class="btn btn-primary" onclick="saveAnnexe()">Valider</button></div></div></div>
+    <!-- MODAL ANNEXES & RELIQUAT MIS À JOUR -->
+    <div class="modal-overlay" id="modalAnnexe">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Participation Travaux ou Reliquat</h3>
+                <button class="btn-icon" onclick="closeModal('modalAnnexe')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Type de Recette / Projet</label>
+                    <select class="form-control" id="annexe-projet-select" onchange="onAnnexeTypeChange()">
+                        <option value="custom_projet">Autre Projet / Travaux (Ex: Ascenseur)</option>
+                        <option value="Reste année 2025">Reste année 2025 (Reliquat Trésorerie)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="annexe-projet-custom-section">
+                    <label class="form-label">Nom du Projet</label>
+                    <input type="text" class="form-control" id="annexe-projet" placeholder="Ex: Ascenseur...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Appartement (Optionnel ou Global)</label>
+                    <select class="form-control form-apt" id="annexe-apt"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Montant (DH)</label>
+                    <input type="number" class="form-control" id="annexe-montant">
+                </div>
+                <div style="display:flex; gap:16px;">
+                    <div class="form-group" style="flex:1;">
+                        <label class="form-label">Mode</label>
+                        <select class="form-control" id="annexe-mode">
+                            <option>Espèces</option>
+                            <option>Virement</option>
+                            <option>Chèque</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" id="annexe-date">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modalAnnexe')">Annuler</button>
+                <button class="btn btn-primary" onclick="saveAnnexe()">Valider</button>
+            </div>
+        </div>
+    </div>
     
     <div class="modal-overlay" id="modalCharge"><div class="modal-content"><div class="modal-header"><h3>Ajouter une dépense</h3><button class="btn-icon" onclick="closeModal('modalCharge')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Type de Dépense</label><select class="form-control" id="charge-type" onchange="onChargeTypeChange()"><option value="femme">Ménage (500 DH/mois)</option><option value="ascenseur">Entretien Ascenseur (150 DH/mois)</option><option value="electricite">Électricité (Variable)</option><option value="custom">Autre dépense unique</option></select></div><div class="form-group" id="charge-mois-section"><label class="form-label">Mois concernés</label><div class="month-grid" id="charge-months"></div></div><div class="form-group" id="charge-desc-section" style="display:none;"><label class="form-label">Motif / Bénéficiaire</label><input type="text" class="form-control" id="charge-desc" placeholder="Ex: Plombier..."></div><div style="display:flex; gap:16px;"><div class="form-group" style="flex:1;"><label class="form-label" id="charge-montant-label">Montant (DH)</label><input type="number" class="form-control" id="charge-montant" value="500" readonly style="background:#f1f5f9;" oninput="updateChargeTotal()"></div><div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="charge-date"></div></div><div class="text-right" style="margin-top:10px;"><span style="font-size:0.875rem; color:var(--text-muted);">Total : </span><strong style="font-size:1.25rem; color:var(--danger);" id="charge-total-display">500 DH</strong></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalCharge')">Annuler</button><button class="btn btn-danger" onclick="saveCharge()">Valider</button></div></div></div>
     
@@ -525,44 +572,40 @@
 
         function refreshUI() {
             document.getElementById('rapport-title-year').innerText = `Bilan Annuel Complet - ${currentYear}`;
-            const recettesAnnee = db.cotisations.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0);
+            const recettesAnnee = db.cotisations.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.cotisationsAnnexes.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0);
             const sortiesAnnee = db.charges.filter(c => getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.filter(d => getYearOf(d) === currentYear).reduce((s, d) => s + parseFloat(d.montant), 0);
             const totalRecettesGlobal = db.cotisations.reduce((s, c) => s + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((s, c) => s + parseFloat(c.montant), 0);
             const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0);
             const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
             
             document.getElementById('dash-recettes').innerText = formatMoney.format(recettesAnnee); document.getElementById('dash-depenses').innerText = formatMoney.format(sortiesAnnee);
-            document.getElementById('dash-solde').innerText = formatMoney.format(soldeGlobal); document.getElementById('dash-taux').innerText = Math.round((recettesAnnee/(NB_APPARTEMENTS * COTISATION_MENSUELLE * 12))*100) + '%';
+            document.getElementById('dash-solde').innerText = formatMoney.format(soldeGlobal); document.getElementById('dash-taux').innerText = Math.round((db.cotisations.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0)/(NB_APPARTEMENTS * COTISATION_MENSUELLE * 12))*100) + '%';
 
             initCharts(); renderApartments(); renderAnnexes(); renderTables(); renderTechnique(); renderEnergie();
         }
 
-        // CORRECTION AMÉLIORÉE : DÉTECTION PRÉCISE DES MOIS (ABRÉVIATIONS ET MOIS COMPLETS)
         function initCharts() {
             Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b';
             let recMensuelles = Array(12).fill(0), depMensuelles = Array(12).fill(0);
 
-            // Recettes (Cotisations)
+            // Recettes (Cotisations + Annexes/Reliquats)
             db.cotisations.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = c.mois ? (c.mois - 1) : (c.date ? new Date(c.date).getMonth() : 0);
                 recMensuelles[moisIndex] += parseFloat(c.montant); 
             });
+            db.cotisationsAnnexes.filter(c => getYearOf(c) === currentYear).forEach(c => { 
+                let moisIndex = c.date ? new Date(c.date).getMonth() : 0;
+                recMensuelles[moisIndex] += parseFloat(c.montant); 
+            });
 
-            // Charges (Analyse rigoureuse de la description pour trouver le mois exact)
+            // Charges
             db.charges.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = new Date(c.date).getMonth();
                 if (c.desc) {
                     let descLower = c.desc.toLowerCase();
                     const moisComplets = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-                    
-                    // Recherche par abréviation standard (ex: " - Jan", " - Fév")
-                    MOIS_NOMS.forEach((m, idx) => {
-                        if (descLower.includes(m.toLowerCase())) moisIndex = idx;
-                    });
-                    // Recherche par nom complet si présent dans le texte
-                    moisComplets.forEach((mFull, idx) => {
-                        if (descLower.includes(mFull)) moisIndex = idx;
-                    });
+                    MOIS_NOMS.forEach((m, idx) => { if (descLower.includes(m.toLowerCase())) moisIndex = idx; });
+                    moisComplets.forEach((mFull, idx) => { if (descLower.includes(mFull)) moisIndex = idx; });
                 }
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
             });
@@ -574,13 +617,8 @@
                     let texte = (c.description || '') + ' ' + (c.beneficiaire || '') + ' ' + (c.typeDepense || '');
                     let texteLower = texte.toLowerCase();
                     const moisComplets = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-                    
-                    MOIS_NOMS.forEach((m, idx) => {
-                        if (texteLower.includes(m.toLowerCase())) moisIndex = idx;
-                    });
-                    moisComplets.forEach((mFull, idx) => {
-                        if (texteLower.includes(mFull)) moisIndex = idx;
-                    });
+                    MOIS_NOMS.forEach((m, idx) => { if (texteLower.includes(m.toLowerCase())) moisIndex = idx; });
+                    moisComplets.forEach((mFull, idx) => { if (texteLower.includes(mFull)) moisIndex = idx; });
                 }
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
             });
@@ -612,9 +650,15 @@
         }
 
         function renderAnnexes() {
-            document.getElementById('table-annexes').innerHTML = [...db.cotisationsAnnexes].filter(c => getYearOf(c) === currentYear).map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td><strong>${c.projet}</strong></td><td>Apt ${c.aptId}</td><td>${c.mode}</td><td class="text-right font-mono text-success">+${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisationsAnnexes', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
+            document.getElementById('table-annexes').innerHTML = [...db.cotisationsAnnexes].filter(c => getYearOf(c) === currentYear).map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td><strong>${c.projet}</strong></td><td>${c.aptId ? 'Apt ' + c.aptId : 'Global / Trésorerie'}</td><td>${c.mode}</td><td class="text-right font-mono text-success">+${formatMoney.format(c.montant)}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisationsAnnexes', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
             let projetsData = {}; let totalCollecteAnnexes = 0;
-            db.cotisationsAnnexes.forEach(c => { totalCollecteAnnexes += parseFloat(c.montant); let nomProj = c.projet.trim().toUpperCase(); if(!projetsData[nomProj]) projetsData[nomProj] = { nom: c.projet, montantApt: parseFloat(c.montantTotal || c.montant), payeurs: [] }; if(!projetsData[nomProj].payeurs.includes(c.aptId)) projetsData[nomProj].payeurs.push(c.aptId); });
+            db.cotisationsAnnexes.forEach(c => { 
+                totalCollecteAnnexes += parseFloat(c.montant); 
+                let nomProj = c.projet.trim().toUpperCase(); 
+                if (nomProj.includes('RESTE ANNÉE 2025')) return; // Ignore le reliquat des calculs de chantiers par apt
+                if(!projetsData[nomProj]) projetsData[nomProj] = { nom: c.projet, montantApt: parseFloat(c.montantTotal || c.montant), payeurs: [] }; 
+                if(c.aptId && !projetsData[nomProj].payeurs.includes(c.aptId)) projetsData[nomProj].payeurs.push(c.aptId); 
+            });
             let totalAttenduAnnexes = 0; const cardsContainer = document.getElementById('annexes-projects-container'); cardsContainer.innerHTML = '';
             Object.values(projetsData).forEach(p => { let prevu = p.montantApt * NB_APPARTEMENTS; totalAttenduAnnexes += prevu; let collecteProjet = p.payeurs.length * p.montantApt; let pct = Math.min((collecteProjet / prevu) * 100, 100); cardsContainer.innerHTML += `<div class="card"><div class="stat-header"><div class="table-title" style="color:var(--primary);">${p.nom}</div><span class="badge badge-info">${p.payeurs.length}/${NB_APPARTEMENTS} payé</span></div><div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.875rem;"><span style="color:var(--text-muted)">Montant par Apt :</span><strong>${formatMoney.format(p.montantApt)}</strong></div><div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:0.875rem;"><span style="color:var(--text-muted)">Réuni :</span><strong class="text-success">${formatMoney.format(collecteProjet)} / ${formatMoney.format(prevu)}</strong></div><div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${pct}%"></div></div><div class="text-right" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">${pct.toFixed(1)}% achevé</div></div>`; });
             document.getElementById('annexes-total-collecte').innerText = formatMoney.format(totalCollecteAnnexes); document.getElementById('annexes-total-impayes').innerText = formatMoney.format(Math.max(totalAttenduAnnexes - totalCollecteAnnexes, 0)); document.getElementById('annexes-nb-projets').innerText = Object.keys(projetsData).length;
@@ -721,7 +765,7 @@
             const totalRecettesGlobal = db.cotisations.reduce((s, c) => s + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((s, c) => s + parseFloat(c.montant), 0); const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0); const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
             const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))].sort((a,b) => new Date(a.date) - new Date(b.date));
 
-            let html = `<h1>BILAN FINANCIER GLOBAL - GH5-SN8 Immeuble (${year})</h1><div class="print-summary-box"><div style="color:#10b981;">Total Recettes (${year}) : +${formatMoney.format(totalRecettesAnnee)}</div><div style="color:#ef4444;">Total Dépenses (${year}) : -${formatMoney.format(totalDepensesAnnee)}</div><div style="color:${soldeGlobal >= 0 ? '#4f46e5' : '#ef4444'};">Solde Trésorerie Actuel : ${formatMoney.format(soldeGlobal)}</div></div><div style="display: flex; gap: 20px; align-items: flex-start;"><div style="flex: 1;"><h3 style="margin-bottom:10px; color:#10b981;">Détail des Recettes</h3><table><thead><tr><th>Date</th><th>Apt</th><th>Mois / Projet</th><th>Montant</th></tr></thead><tbody>${cots.map(c => `<tr><td>${c.date ? new Date(c.date).toLocaleDateString() : ('01/'+(c.mois||1).toString().padStart(2,'0')+'/'+c.annee)}</td><td>${c.aptId}</td><td>${c.moisStr || MOIS_NOMS[(c.mois||1)-1]}</td><td>${c.montant} DH</td></tr>`).join('')}${anns.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.aptId}</td><td>${c.projet} (Annexe)</td><td>${c.montant} DH</td></tr>`).join('')}</tbody></table></div><div style="flex: 1;"><h3 style="margin-bottom:10px; color:#ef4444;">Détail des Dépenses</h3><table><thead><tr><th>Date</th><th>Catégorie</th><th>Description</th><th>Montant</th></tr></thead><tbody>${allSorties.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.type}</td><td>${c.desc}</td><td>${c.montant} DH</td></tr>`).join('')}</tbody></table></div></div><div style="margin-top: 30px; text-align: right; font-weight: bold; font-size: 12pt;">Fait le ${new Date().toLocaleDateString('fr-FR')} - Le Syndic</div>`;
+            let html = `<h1>BILAN FINANCIER GLOBAL - GH5-SN8 Immeuble (${year})</h1><div class="print-summary-box"><div style="color:#10b981;">Total Recettes (${year}) : +${formatMoney.format(totalRecettesAnnee)}</div><div style="color:#ef4444;">Total Dépenses (${year}) : -${formatMoney.format(totalDepensesAnnee)}</div><div style="color:${soldeGlobal >= 0 ? '#4f46e5' : '#ef4444'};">Solde Trésorerie Actuel : ${formatMoney.format(soldeGlobal)}</div></div><div style="display: flex; gap: 20px; align-items: flex-start;"><div style="flex: 1;"><h3 style="margin-bottom:10px; color:#10b981;">Détail des Recettes</h3><table><thead><tr><th>Date</th><th>Apt</th><th>Mois / Projet</th><th>Montant</th></tr></thead><tbody>${cots.map(c => `<tr><td>${c.date ? new Date(c.date).toLocaleDateString() : ('01/'+(c.mois||1).toString().padStart(2,'0')+'/'+c.annee)}</td><td>${c.aptId}</td><td>${c.moisStr || MOIS_NOMS[(c.mois||1)-1]}</td><td>${c.montant} DH</td></tr>`).join('')}${anns.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.aptId || '-'}</td><td>${c.projet}</td><td>${c.montant} DH</td></tr>`).join('')}</tbody></table></div><div style="flex: 1;"><h3 style="margin-bottom:10px; color:#ef4444;">Détail des Dépenses</h3><table><thead><tr><th>Date</th><th>Catégorie</th><th>Description</th><th>Montant</th></tr></thead><tbody>${allSorties.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.type}</td><td>${c.desc}</td><td>${c.montant} DH</td></tr>`).join('')}</tbody></table></div></div><div style="margin-top: 30px; text-align: right; font-weight: bold; font-size: 12pt;">Fait le ${new Date().toLocaleDateString('fr-FR')} - Le Syndic</div>`;
             document.getElementById('print-global-container').innerHTML = html; document.body.classList.add('print-global-mode'); window.print(); setTimeout(() => { document.body.classList.remove('print-global-mode'); }, 500);
         }
 
@@ -754,6 +798,18 @@
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
         
         function updateTotalModalPaiement() { document.getElementById('form-total').innerText = (document.querySelectorAll('#form-months input:checked').length * COTISATION_MENSUELLE) + ' DH'; }
+        function onAnnexeTypeChange() {
+            const val = document.getElementById('annexe-projet-select').value;
+            const customSection = document.getElementById('annexe-projet-custom-section');
+            if(val === 'Reste année 2025') {
+                customSection.style.display = 'none';
+                document.getElementById('annexe-montant').value = '1717';
+            } else {
+                customSection.style.display = 'block';
+                document.getElementById('annexe-montant').value = '';
+            }
+        }
+
         function onChargeTypeChange() {
             const type = document.getElementById('charge-type').value; const montantInput = document.getElementById('charge-montant'); const moisSection = document.getElementById('charge-mois-section'); const descSection = document.getElementById('charge-desc-section'); const label = document.getElementById('charge-montant-label');
             if(type === 'femme') { montantInput.value = 500; montantInput.readOnly = true; montantInput.style.background = '#f1f5f9'; moisSection.style.display = 'block'; descSection.style.display = 'none'; label.innerText = 'Montant par mois (DH)'; }
@@ -769,8 +825,12 @@
             let moisNames = []; boxes.forEach(b => moisNames.push(MOIS_NOMS[b.value - 1])); db.cotisations.push({ id: Date.now(), aptId: parseInt(aptId), date: date, mode: mode, montant: boxes.length * COTISATION_MENSUELLE, moisStr: moisNames.join(', ') }); saveDB(); refreshUI(); closeModal('modalPaiement'); toast('Paiement enregistré !');
         }
         function saveAnnexe() {
-            const projet = document.getElementById('annexe-projet').value; const aptId = document.getElementById('annexe-apt').value; const montant = document.getElementById('annexe-montant').value; if(!projet.trim() || !montant) return toast('Vérifiez les champs', 'error');
-            db.cotisationsAnnexes.push({ id: Date.now(), projet: projet, aptId: parseInt(aptId), montant: parseFloat(montant), mode: document.getElementById('annexe-mode').value, date: document.getElementById('annexe-date').value }); saveDB(); refreshUI(); closeModal('modalAnnexe'); toast('Participation enregistrée !');
+            const selectVal = document.getElementById('annexe-projet-select').value;
+            const projet = selectVal === 'Reste année 2025' ? 'Reste année 2025' : document.getElementById('annexe-projet').value; 
+            const aptId = document.getElementById('annexe-apt').value; 
+            const montant = document.getElementById('annexe-montant').value; 
+            if(!projet.trim() || !montant) return toast('Vérifiez les champs', 'error');
+            db.cotisationsAnnexes.push({ id: Date.now(), projet: projet, aptId: selectVal === 'Reste année 2025' ? null : parseInt(aptId), montant: parseFloat(montant), mode: document.getElementById('annexe-mode').value, date: document.getElementById('annexe-date').value }); saveDB(); refreshUI(); closeModal('modalAnnexe'); toast('Participation / Reliquat enregistré !');
         }
         function saveCharge() {
             const type = document.getElementById('charge-type').value; const date = document.getElementById('charge-date').value; const montantParMois = parseFloat(document.getElementById('charge-montant').value) || 0; if(!montantParMois || montantParMois <= 0) return toast('Montant invalide', 'error');
