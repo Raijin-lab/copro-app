@@ -73,7 +73,7 @@
         /* ===== CARDS & TABLES ===== */
         .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-bottom: 24px; }
         .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px; }
-        .card { background: var(--bg-card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-md); border: 1px solid var(--border); }
+        .card { background: var(--bg-card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-md); border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; }
         .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
         .stat-title { font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
         .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; }
@@ -245,10 +245,22 @@
             <!-- PAGE: DASHBOARD -->
             <div id="page-dashboard" class="page-view">
                 <div class="grid-4">
-                    <div class="card"><div class="stat-header"><div><div class="stat-title">Recettes Annuelles</div><div class="stat-value text-success" id="dash-recettes">0 DH</div></div><div class="stat-icon bg-green-100"><i class="fa-solid fa-arrow-trend-up"></i></div></div></div>
-                    <div class="card"><div class="stat-header"><div><div class="stat-title">Dépenses Annuelles</div><div class="stat-value text-danger" id="dash-depenses">0 DH</div></div><div class="stat-icon bg-red-100"><i class="fa-solid fa-arrow-trend-down"></i></div></div></div>
-                    <div class="card"><div class="stat-header"><div><div class="stat-title">Solde Trésorerie</div><div class="stat-value" id="dash-solde">0 DH</div></div><div class="stat-icon bg-indigo-100"><i class="fa-solid fa-vault"></i></div></div><div style="font-size:0.75rem; color:var(--text-muted);">Réel en banque</div></div>
-                    <div class="card"><div class="stat-header"><div><div class="stat-title">Recouvrement</div><div class="stat-value text-warning" id="dash-taux">0%</div></div><div class="stat-icon bg-yellow-100"><i class="fa-solid fa-percent"></i></div></div></div>
+                    <div class="card">
+                        <div class="stat-header"><div><div class="stat-title">Recettes Annuelles</div><div class="stat-value text-success" id="dash-recettes">0 DH</div></div><div class="stat-icon bg-green-100"><i class="fa-solid fa-arrow-trend-up"></i></div></div>
+                        <div id="dash-recettes-mois" style="font-size:0.85rem; color:var(--text-muted); border-top:1px solid var(--border); padding-top:8px; margin-top:8px;">Ce mois : <strong class="text-success">0 DH</strong></div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-header"><div><div class="stat-title">Dépenses Annuelles</div><div class="stat-value text-danger" id="dash-depenses">0 DH</div></div><div class="stat-icon bg-red-100"><i class="fa-solid fa-arrow-trend-down"></i></div></div>
+                        <div id="dash-depenses-mois" style="font-size:0.85rem; color:var(--text-muted); border-top:1px solid var(--border); padding-top:8px; margin-top:8px;">Ce mois : <strong class="text-danger">0 DH</strong></div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-header"><div><div class="stat-title">Solde Trésorerie</div><div class="stat-value" id="dash-solde">0 DH</div></div><div class="stat-icon bg-indigo-100"><i class="fa-solid fa-vault"></i></div></div>
+                        <div style="font-size:0.85rem; color:var(--text-muted); border-top:1px solid var(--border); padding-top:8px; margin-top:8px;">Réel en banque</div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-header"><div><div class="stat-title">Recouvrement</div><div class="stat-value text-warning" id="dash-taux">0%</div></div><div class="stat-icon bg-yellow-100"><i class="fa-solid fa-percent"></i></div></div>
+                        <div style="font-size:0.85rem; color:var(--text-muted); border-top:1px solid var(--border); padding-top:8px; margin-top:8px;">Taux global de l'année</div>
+                    </div>
                 </div>
                 <div class="grid-2">
                     <div class="card"><div class="stat-header"><div class="stat-title">Bilan Mensuel</div></div><div style="position:relative; height:250px;"><canvas id="barChart"></canvas></div></div>
@@ -388,6 +400,7 @@
     
     <div class="modal-overlay" id="modalPaiement"><div class="modal-content"><div class="modal-header"><h3>Nouveau paiement</h3><button class="btn-icon" onclick="closeModal('modalPaiement')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Appartement</label><select class="form-control form-apt"></select></div><div class="form-group"><label class="form-label">Mois payés</label><div class="month-grid" id="form-months"></div></div><div style="display:flex; gap:16px;"><div class="form-group" style="flex:1;"><label class="form-label">Mode</label><select class="form-control" id="form-mode"><option>Espèces</option><option>Virement</option><option>Chèque</option></select></div><div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="form-date"></div></div><div class="text-right" style="margin-top:10px;"><strong style="font-size:1.25rem; color:var(--success);" id="form-total">0 DH</strong></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-success" onclick="savePaiement()">Valider</button></div></div></div>
     
+    <!-- MODAL ANNEXES & RELIQUAT MIS À JOUR -->
     <div class="modal-overlay" id="modalAnnexe">
         <div class="modal-content">
             <div class="modal-header">
@@ -624,6 +637,11 @@
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
+            // NOUVEAU : MISE A JOUR DES STATS DU MOIS COURANT SUR LE DASHBOARD
+            let actualMonth = new Date().getMonth();
+            document.getElementById('dash-recettes-mois').innerHTML = `Ce mois (${MOIS_NOMS[actualMonth]}) : <strong class="text-success">${formatMoney.format(recMensuelles[actualMonth])}</strong>`;
+            document.getElementById('dash-depenses-mois').innerHTML = `Ce mois (${MOIS_NOMS[actualMonth]}) : <strong class="text-danger">${formatMoney.format(depMensuelles[actualMonth])}</strong>`;
+
             if(chartBar) chartBar.destroy(); if(chartPie) chartPie.destroy();
             chartBar = new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: MOIS_NOMS, datasets: [{ label: 'Recettes', data: recMensuelles, backgroundColor: '#10b981', borderRadius:4 }, { label: 'Dépenses & Charges', data: depMensuelles, backgroundColor: '#ef4444', borderRadius:4 }] }, options: { responsive: true, maintainAspectRatio: false } });
             
@@ -770,7 +788,36 @@
             document.getElementById('print-global-container').innerHTML = html; document.body.classList.add('print-global-mode'); window.print(); setTimeout(() => { document.body.classList.remove('print-global-mode'); }, 500);
         }
 
-        function relanceWA(aptId, reste) { const apt = db.apartments.find(a => a.id === aptId); let actualYear = new Date().getFullYear(); let currentM = (currentYear < actualYear) ? 11 : new Date().getMonth(); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear); let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' '); let unpaidMonths = []; let unpaidAmount = 0; for(let i = 0; i <= currentM; i++) { if(!paidStr.includes(MOIS_NOMS[i].toLowerCase())) { unpaidMonths.push(MOIS_NOMS[i]); unpaidAmount += COTISATION_MENSUELLE; } } if(unpaidMonths.length === 0) { alert("Cet appartement est à jour jusqu'au mois en cours !"); return; } let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1); window.open(`https://wa.me/${tel}?text=Bonjour ${apt.owner},%0A%0ASauf erreur de notre part, nous constatons que la cotisation syndicale de l'Appartement ${apt.number} pour le(s) mois de *${unpaidMonths.join(', ')}* n'a pas encore été réglée (Montant exigible : *${unpaidAmount} DH*).%0A%0AMerci d'avance pour votre régularisation.%0A%0ABien cordialement,%0ALe Syndic.`, '_blank'); }
+        function relanceWA(aptId, reste) { 
+            const apt = db.apartments.find(a => a.id === aptId); 
+            let actualYear = new Date().getFullYear(); 
+            let currentM = (currentYear < actualYear) ? 11 : new Date().getMonth(); 
+            const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear); 
+            
+            // Reconstruire la liste des mois payés
+            let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' '); 
+            let unpaidMonths = []; 
+            let unpaidAmount = 0; 
+            
+            // Boucle de janvier jusqu'au mois actuel inclus
+            for(let i = 0; i <= currentM; i++) { 
+                if(!paidStr.includes(MOIS_NOMS[i].toLowerCase())) { 
+                    unpaidMonths.push(MOIS_NOMS[i]); 
+                    unpaidAmount += COTISATION_MENSUELLE; 
+                } 
+            } 
+            
+            if(unpaidMonths.length === 0) { 
+                alert("Cet appartement est à jour jusqu'au mois en cours !"); 
+                return; 
+            } 
+            
+            let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; 
+            if(tel.startsWith('0')) tel = '212' + tel.substring(1); 
+            
+            // Nouveau texte ciblant uniquement le ou les mois en retard passés et actuels, sans le futur
+            window.open(`https://wa.me/${tel}?text=السلام عليكم،%0A%0Aكنذكركم بلي واجبات السنديك ديال الشقة ${apt.number} بالنسبة للشهر (أو الأشهر): *${unpaidMonths.join(', ')}* مزال ما تخلصاتش (المبلغ: *${unpaidAmount} درهم*).%0A%0Aالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت.%0A%0Aشكرا، السنديك.`, '_blank'); 
+        }
         
         function relanceGroupeWA() {
             let currentM = new Date().getMonth();
