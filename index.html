@@ -398,6 +398,7 @@
     
     <div class="modal-overlay" id="modalPaiement"><div class="modal-content"><div class="modal-header"><h3>Nouveau paiement</h3><button class="btn-icon" onclick="closeModal('modalPaiement')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Appartement</label><select class="form-control form-apt"></select></div><div class="form-group"><label class="form-label">Mois payés</label><div class="month-grid" id="form-months"></div></div><div style="display:flex; gap:16px;"><div class="form-group" style="flex:1;"><label class="form-label">Mode</label><select class="form-control" id="form-mode"><option>Espèces</option><option>Virement</option><option>Chèque</option></select></div><div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="form-date"></div></div><div class="text-right" style="margin-top:10px;"><strong style="font-size:1.25rem; color:var(--success);" id="form-total">0 DH</strong></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-success" onclick="savePaiement()">Valider</button></div></div></div>
     
+    <!-- MODAL ANNEXES & RELIQUAT MIS À JOUR -->
     <div class="modal-overlay" id="modalAnnexe">
         <div class="modal-content">
             <div class="modal-header">
@@ -446,6 +447,7 @@
         </div>
     </div>
     
+    <!-- MODAL DÉPENSE TOTALEMENT DÉBLOQUÉ -->
     <div class="modal-overlay" id="modalCharge">
         <div class="modal-content">
             <div class="modal-header">
@@ -651,7 +653,7 @@
             Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b';
             let recMensuelles = Array(12).fill(0), depMensuelles = Array(12).fill(0);
 
-            // Recettes (Cotisations UNIQUEMENT pour le graphique)
+            // Recettes (Cotisations PURES UNIQUEMENT pour le graphique et le mois en cours)
             db.cotisations.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = c.mois ? (c.mois - 1) : (c.date ? new Date(c.date).getMonth() : 0);
                 recMensuelles[moisIndex] += parseFloat(c.montant); 
