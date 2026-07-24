@@ -145,7 +145,7 @@
 
         @media print {
             @page { size: A3 landscape; margin: 15mm; }
-            body { background: white !important; color: black !important; display: block; overflow: visible; height: auto; }
+            body { background: white !important; color: black !important; display: block; overflow: visible; height: auto; font-family: 'Inter', sans-serif !important; }
             .sidebar, .topbar, .btn, .no-print, .toast-container, .modal-overlay, .mobile-menu-btn, .sidebar-overlay { display: none !important; }
             .hide-on-print { display: none !important; }
             body:not(.print-global-mode) .main-wrapper { display: block; overflow: visible; width: 100%; }
@@ -153,9 +153,9 @@
             body:not(.print-global-mode) .page-view.hidden { display: none !important; }
             body:not(.print-global-mode) .page-view { display: block !important; }
             .card, .table-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; margin-bottom: 20px;}
-            table { width: 100%; border-collapse: collapse; font-size: 10pt; border: 2px solid #000 !important; }
-            th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; border: 1px solid #000 !important; font-size: 11pt !important; color: #000 !important; }
-            td { border: 1px solid #000 !important; font-size: 11pt !important; color: #000 !important; }
+            table { width: 100%; border-collapse: collapse; font-size: 10pt; border: 1px solid #000 !important; }
+            th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; border: 1px solid #000 !important; font-size: 11pt !important; color: #000 !important; padding: 10px; }
+            td { border: 1px solid #000 !important; font-size: 11pt !important; color: #000 !important; padding: 10px; }
             .grid-4, .grid-2 { display: grid; gap: 15px; grid-template-columns: repeat(4, 1fr); }
             #page-rapport tr.print-row-ok td { background-color: #d1fae5 !important; color: #065f46 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             #page-rapport tr.print-row-partial td { background-color: #fef3c7 !important; color: #92400e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -163,8 +163,6 @@
             #page-rapport .badge { border: none !important; font-weight: bold; background: transparent !important; }
             body.print-global-mode .main-wrapper, body.print-global-mode .sidebar { display: none !important; }
             body.print-global-mode #print-global-container { display: block !important; width: 100%; }
-            #print-global-container h1 { text-align: center; margin-bottom: 20px; font-size: 18pt; }
-            .print-summary-box { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 15px; border: 2px solid #000; font-size: 14pt; font-weight: bold; border-radius: 8px; }
         }
     </style>
 </head>
@@ -637,7 +635,7 @@
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
-            // NOUVEAU : MISE A JOUR DES STATS DU MOIS COURANT SUR LE DASHBOARD
+            // MISE A JOUR DES STATS DU MOIS COURANT SUR LE DASHBOARD
             let actualMonth = new Date().getMonth();
             document.getElementById('dash-recettes-mois').innerHTML = `Ce mois (${MOIS_NOMS[actualMonth]}) : <strong class="text-success">${formatMoney.format(recMensuelles[actualMonth])}</strong>`;
             document.getElementById('dash-depenses-mois').innerHTML = `Ce mois (${MOIS_NOMS[actualMonth]}) : <strong class="text-danger">${formatMoney.format(depMensuelles[actualMonth])}</strong>`;
@@ -778,14 +776,120 @@
             toast('Facture d\'énergie enregistrée avec succès !');
         }
 
+        // NOUVELLE FONCTION D'IMPRESSION DU BILAN GLOBAL CROISÉ
         function printBilanGlobal() {
-            const year = currentYear; const cots = db.cotisations.filter(c => getYearOf(c) === year).sort((a,b) => new Date(a.date||0) - new Date(b.date||0)); const anns = db.cotisationsAnnexes.filter(c => getYearOf(c) === year); const chgs = db.charges.filter(c => getYearOf(c) === year).sort((a,b) => new Date(a.date||0) - new Date(b.date||0)); const deps = db.depenses.filter(c => getYearOf(c) === year).sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
-            const totalRecettesAnnee = cots.reduce((s, c) => s + parseFloat(c.montant), 0) + anns.reduce((s, c) => s + parseFloat(c.montant), 0); const totalDepensesAnnee = chgs.reduce((s, c) => s + parseFloat(c.montant), 0) + deps.reduce((s, c) => s + parseFloat(c.montant), 0);
-            const totalRecettesGlobal = db.cotisations.reduce((s, c) => s + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((s, c) => s + parseFloat(c.montant), 0); const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0); const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
-            const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))].sort((a,b) => new Date(a.date) - new Date(b.date));
+            const year = currentYear; 
+            const cots = db.cotisations.filter(c => getYearOf(c) === year); 
+            const anns = db.cotisationsAnnexes.filter(c => getYearOf(c) === year); 
+            const chgs = db.charges.filter(c => getYearOf(c) === year); 
+            const deps = db.depenses.filter(c => getYearOf(c) === year);
+            
+            // Calculs globaux pour le résumé
+            const totalRecettesAnnee = cots.reduce((s, c) => s + parseFloat(c.montant), 0) + anns.reduce((s, c) => s + parseFloat(c.montant), 0); 
+            const totalDepensesAnnee = chgs.reduce((s, c) => s + parseFloat(c.montant), 0) + deps.reduce((s, c) => s + parseFloat(c.montant), 0);
+            
+            const totalRecettesGlobal = db.cotisations.reduce((s, c) => s + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((s, c) => s + parseFloat(c.montant), 0); 
+            const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0); 
+            const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
 
-            let html = `<h1>BILAN FINANCIER GLOBAL - GH5-SN8 Immeuble (${year})</h1><div class="print-summary-box"><div style="color:#10b981;">Total Recettes (${year}) : +${formatMoney.format(totalRecettesAnnee)}</div><div style="color:#ef4444;">Total Dépenses (${year}) : -${formatMoney.format(totalDepensesAnnee)}</div><div style="color:${soldeGlobal >= 0 ? '#4f46e5' : '#ef4444'};">Solde Trésorerie Actuel : ${formatMoney.format(soldeGlobal)}</div></div><div style="display: flex; gap: 20px; align-items: flex-start;"><div style="flex: 1;"><h3 style="margin-bottom:10px; color:#10b981;">Détail des Recettes</h3><table><thead><tr><th>Date</th><th>Apt</th><th>Mois / Projet</th><th>Montant</th></tr></thead><tbody>${cots.map(c => `<tr><td>${c.date ? new Date(c.date).toLocaleDateString() : ('01/'+(c.mois||1).toString().padStart(2,'0')+'/'+c.annee)}</td><td>${c.aptId}</td><td>${c.moisStr || MOIS_NOMS[(c.mois||1)-1]}</td><td>${c.montant} DH</td></tr>`).join('')}${anns.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.aptId || '-'}</td><td>${c.projet}</td><td>${c.montant} DH</td></tr>`).join('')}</tbody></table></div><div style="flex: 1;"><h3 style="margin-bottom:10px; color:#ef4444;">Détail des Dépenses</h3><table><thead><tr><th>Date</th><th>Catégorie</th><th>Description</th><th>Montant</th></tr></thead><tbody>${allSorties.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.type}</td><td>${c.desc}</td><td>${c.montant} DH</td></tr>`).join('')}</tbody></table></div></div><div style="margin-top: 30px; text-align: right; font-weight: bold; font-size: 12pt;">Fait le ${new Date().toLocaleDateString('fr-FR')} - Le Syndic</div>`;
-            document.getElementById('print-global-container').innerHTML = html; document.body.classList.add('print-global-mode'); window.print(); setTimeout(() => { document.body.classList.remove('print-global-mode'); }, 500);
+            // Structure du tableau des dépenses par mois
+            let depensesParMois = Array(12).fill(null).map(() => ({ menage: 0, ascenseur: 0, electricite: 0, autres: 0, total: 0 }));
+            
+            const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))];
+            
+            // Remplissage des données
+            allSorties.forEach(c => {
+                let moisIndex = new Date(c.date).getMonth();
+                if (c.desc) {
+                    let dLower = c.desc.toLowerCase();
+                    const moisComplets = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+                    MOIS_NOMS.forEach((m, idx) => { if (dLower.includes(m.toLowerCase())) moisIndex = idx; });
+                    moisComplets.forEach((mFull, idx) => { if (dLower.includes(mFull)) moisIndex = idx; });
+                }
+                
+                let montant = parseFloat(c.montant);
+                let catLower = (c.type || '').toLowerCase();
+                let descLower = (c.desc || '').toLowerCase();
+                
+                if (catLower.includes('ménage') || catLower.includes('femme') || descLower.includes('ménage')) {
+                    depensesParMois[moisIndex].menage += montant;
+                } else if (catLower.includes('ascenseur') || descLower.includes('ascenseur')) {
+                    depensesParMois[moisIndex].ascenseur += montant;
+                } else if (catLower.includes('élec') || catLower.includes('elec') || descLower.includes('élec') || descLower.includes('one')) {
+                    depensesParMois[moisIndex].electricite += montant;
+                } else {
+                    depensesParMois[moisIndex].autres += montant;
+                }
+                depensesParMois[moisIndex].total += montant;
+            });
+
+            // Construction HTML des lignes du tableau
+            let tbodyHTML = '';
+            depensesParMois.forEach((m, idx) => {
+                tbodyHTML += `<tr>
+                    <td style="text-align:left;"><strong>${MOIS_NOMS[idx]}</strong></td>
+                    <td class="text-right">${m.menage > 0 ? formatMoney.format(m.menage) : '-'}</td>
+                    <td class="text-right">${m.ascenseur > 0 ? formatMoney.format(m.ascenseur) : '-'}</td>
+                    <td class="text-right">${m.electricite > 0 ? formatMoney.format(m.electricite) : '-'}</td>
+                    <td class="text-right">${m.autres > 0 ? formatMoney.format(m.autres) : '-'}</td>
+                    <td class="text-right font-mono" style="color:#ef4444; font-weight:bold;">${m.total > 0 ? formatMoney.format(m.total) : '-'}</td>
+                </tr>`;
+            });
+
+            // Assemblage de la page complète
+            let html = `
+                <h1 style="text-align:center; font-size:22pt; margin-bottom: 20px;">BILAN ANNUEL DES DÉPENSES - GH5-SN8 (${year})</h1>
+                
+                <div style="margin-bottom: 30px;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                        <thead>
+                            <tr style="background-color: #f1f5f9;">
+                                <th style="text-align:left;">Mois</th>
+                                <th class="text-right">Ménage</th>
+                                <th class="text-right">Ascenseur</th>
+                                <th class="text-right">Électricité</th>
+                                <th class="text-right">Autres Divers</th>
+                                <th class="text-right">Total Mensuel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tbodyHTML}
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: #f1f5f9; font-weight: bold;">
+                                <td style="text-align:left;">TOTAL ANNÉE</td>
+                                <td class="text-right">${formatMoney.format(depensesParMois.reduce((s, m) => s + m.menage, 0))}</td>
+                                <td class="text-right">${formatMoney.format(depensesParMois.reduce((s, m) => s + m.ascenseur, 0))}</td>
+                                <td class="text-right">${formatMoney.format(depensesParMois.reduce((s, m) => s + m.electricite, 0))}</td>
+                                <td class="text-right">${formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0))}</td>
+                                <td class="text-right" style="color:#ef4444;">${formatMoney.format(totalDepensesAnnee)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="print-summary-box" style="display:flex; flex-direction:column; align-items:center; width:60%; margin: 0 auto; gap:10px; border: 2px solid #333; padding: 20px; border-radius: 12px; background-color:#fafafa;">
+                    <h3 style="margin-bottom: 10px; text-transform:uppercase; color:#333;">Synthèse Financière - Exercice ${year}</h3>
+                    <div style="display:flex; justify-content:space-between; width:100%; font-size:16pt; color:#10b981;">
+                        <span>Total Recettes Collectées :</span>
+                        <strong>+${formatMoney.format(totalRecettesAnnee)}</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; width:100%; font-size:16pt; color:#ef4444; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+                        <span>Total Dépenses de l'année :</span>
+                        <strong>-${formatMoney.format(totalDepensesAnnee)}</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; width:100%; font-size:18pt; color:${soldeGlobal >= 0 ? '#4f46e5' : '#ef4444'}; padding-top: 10px;">
+                        <span>Reliquat (Base pour ${year + 1}) :</span>
+                        <strong>${formatMoney.format(soldeGlobal)}</strong>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 40px; text-align: right; font-weight: bold; font-size: 12pt;">Fait le ${new Date().toLocaleDateString('fr-FR')} - Le Syndic</div>
+            `;
+            document.getElementById('print-global-container').innerHTML = html; 
+            document.body.classList.add('print-global-mode'); 
+            window.print(); 
+            setTimeout(() => { document.body.classList.remove('print-global-mode'); }, 500);
         }
 
         function relanceWA(aptId, reste) { 
@@ -794,12 +898,10 @@
             let currentM = (currentYear < actualYear) ? 11 : new Date().getMonth(); 
             const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear); 
             
-            // Reconstruire la liste des mois payés
             let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' '); 
             let unpaidMonths = []; 
             let unpaidAmount = 0; 
             
-            // Boucle de janvier jusqu'au mois actuel inclus
             for(let i = 0; i <= currentM; i++) { 
                 if(!paidStr.includes(MOIS_NOMS[i].toLowerCase())) { 
                     unpaidMonths.push(MOIS_NOMS[i]); 
@@ -815,7 +917,6 @@
             let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; 
             if(tel.startsWith('0')) tel = '212' + tel.substring(1); 
             
-            // Nouveau texte ciblant uniquement le ou les mois en retard passés et actuels, sans le futur
             window.open(`https://wa.me/${tel}?text=السلام عليكم،%0A%0Aكنذكركم بلي واجبات السنديك ديال الشقة ${apt.number} بالنسبة للشهر (أو الأشهر): *${unpaidMonths.join(', ')}* مزال ما تخلصاتش (المبلغ: *${unpaidAmount} درهم*).%0A%0Aالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت.%0A%0Aشكرا، السنديك.`, '_blank'); 
         }
         
