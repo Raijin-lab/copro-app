@@ -353,6 +353,7 @@
                         <div style="display:flex; gap:10px; flex-wrap: wrap;">
                             <button class="btn btn-primary" onclick="printBilanGlobal()"><i class="fa-solid fa-file-invoice-dollar"></i> Imprimer Bilan (A3)</button>
                             <button class="btn btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> Tableau</button>
+                            <!-- NOUVEAU BOUTON RELANCE GROUPE -->
                             <button class="btn btn-success" onclick="relanceGroupeWA()"><i class="fa-brands fa-whatsapp"></i> Relance Groupe (Ce mois)</button>
                         </div>
                     </div>
@@ -445,7 +446,6 @@
         </div>
     </div>
     
-    <!-- MODAL DÉPENSE TOTALEMENT DÉBLOQUÉ -->
     <div class="modal-overlay" id="modalCharge">
         <div class="modal-content">
             <div class="modal-header">
@@ -473,7 +473,6 @@
                 <div style="display:flex; gap:16px;">
                     <div class="form-group" style="flex:1;">
                         <label class="form-label" id="charge-montant-label">Montant (par mois coché)</label>
-                        <!-- Champs montant totalement modifiable pour toutes les options -->
                         <input type="number" class="form-control" id="charge-montant" value="500" oninput="updateChargeTotal()">
                     </div>
                     <div class="form-group" style="flex:1;">
@@ -628,14 +627,22 @@
 
         function refreshUI() {
             document.getElementById('rapport-title-year').innerText = `Bilan Annuel Complet - ${currentYear}`;
-            const recettesAnnee = db.cotisations.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.cotisationsAnnexes.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0);
+            
+            // Recettes standard UNIQUEMENT (pour affichage dashboard)
+            const recettesAnnee = db.cotisations.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0);
+            
+            // Dépenses standard
             const sortiesAnnee = db.charges.filter(c => getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.filter(d => getYearOf(d) === currentYear).reduce((s, d) => s + parseFloat(d.montant), 0);
+            
+            // Trésorerie Globale (INCLUT LES ANNEXES ET RELIQUATS) pour le solde final réel
             const totalRecettesGlobal = db.cotisations.reduce((s, c) => s + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((s, c) => s + parseFloat(c.montant), 0);
             const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0);
             const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
             
-            document.getElementById('dash-recettes').innerText = formatMoney.format(recettesAnnee); document.getElementById('dash-depenses').innerText = formatMoney.format(sortiesAnnee);
-            document.getElementById('dash-solde').innerText = formatMoney.format(soldeGlobal); document.getElementById('dash-taux').innerText = Math.round((db.cotisations.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0)/(NB_APPARTEMENTS * COTISATION_MENSUELLE * 12))*100) + '%';
+            document.getElementById('dash-recettes').innerText = formatMoney.format(recettesAnnee); 
+            document.getElementById('dash-depenses').innerText = formatMoney.format(sortiesAnnee);
+            document.getElementById('dash-solde').innerText = formatMoney.format(soldeGlobal); 
+            document.getElementById('dash-taux').innerText = Math.round((recettesAnnee/(NB_APPARTEMENTS * COTISATION_MENSUELLE * 12))*100) + '%';
 
             initCharts(); renderApartments(); renderAnnexes(); renderTables(); renderTechnique(); renderEnergie();
         }
@@ -644,13 +651,9 @@
             Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b';
             let recMensuelles = Array(12).fill(0), depMensuelles = Array(12).fill(0);
 
-            // Recettes (Cotisations + Annexes/Reliquats)
+            // Recettes (Cotisations UNIQUEMENT pour le graphique)
             db.cotisations.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = c.mois ? (c.mois - 1) : (c.date ? new Date(c.date).getMonth() : 0);
-                recMensuelles[moisIndex] += parseFloat(c.montant); 
-            });
-            db.cotisationsAnnexes.filter(c => getYearOf(c) === currentYear).forEach(c => { 
-                let moisIndex = c.date ? new Date(c.date).getMonth() : 0;
                 recMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
@@ -1032,7 +1035,6 @@
             }
         }
 
-        // NOUVEAU: ON DÉBLOQUE TOUS LES CHAMPS MÊME POUR LE MÉNAGE ET L'ASCENSEUR
         function onChargeTypeChange() {
             const type = document.getElementById('charge-type').value; 
             const montantInput = document.getElementById('charge-montant'); 
@@ -1040,9 +1042,9 @@
             const descSection = document.getElementById('charge-desc-section'); 
             const label = document.getElementById('charge-montant-label');
             
-            montantInput.readOnly = false; // DÉBLOQUÉ
+            montantInput.readOnly = false; 
             montantInput.style.background = 'white'; 
-            moisSection.style.display = 'block'; // OBLIGATOIRE POUR TOUT LE MONDE
+            moisSection.style.display = 'block'; 
 
             if(type === 'femme') { 
                 montantInput.value = 500; 
@@ -1100,11 +1102,10 @@
             }
             
             const boxes = document.querySelectorAll('#charge-months input:checked'); 
-            if(boxes.length === 0) return toast('Cochez au moins un mois', 'error'); // C'est maintenant obligatoire
+            if(boxes.length === 0) return toast('Cochez au moins un mois', 'error');
             
             const baseId = Date.now();
             
-            // Le mois est obligatoirement rajouté à la description, ce qui répartit le graphique et le PDF !
             boxes.forEach(b => { 
                 let moisIndex = parseInt(b.value) - 1; 
                 db.charges.push({ 
