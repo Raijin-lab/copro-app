@@ -61,6 +61,7 @@
         .btn-success { background: var(--success); color: white; } .btn-danger { background: var(--danger); color: white; }
         .btn-warning { background: var(--warning); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-info { background: var(--info); color: white; } .btn-info:hover { background: #2563eb; }
         .btn-icon { padding: 8px; border-radius: 50%; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
         .btn-icon:hover { color: var(--primary); background: var(--bg-body); }
         
@@ -353,7 +354,7 @@
                         <div style="display:flex; gap:10px; flex-wrap: wrap;">
                             <button class="btn btn-primary" onclick="printBilanGlobal()"><i class="fa-solid fa-file-invoice-dollar"></i> Imprimer Bilan (A3)</button>
                             <button class="btn btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> Tableau</button>
-                            <!-- NOUVEAU BOUTON RELANCE GROUPE -->
+                            <button class="btn btn-info" onclick="bilanGroupeWA()"><i class="fa-solid fa-bullhorn"></i> Bilan Mensuel (Groupe)</button>
                             <button class="btn btn-success" onclick="relanceGroupeWA()"><i class="fa-brands fa-whatsapp"></i> Relance Groupe (Ce mois)</button>
                         </div>
                     </div>
@@ -398,7 +399,6 @@
     
     <div class="modal-overlay" id="modalPaiement"><div class="modal-content"><div class="modal-header"><h3>Nouveau paiement</h3><button class="btn-icon" onclick="closeModal('modalPaiement')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Appartement</label><select class="form-control form-apt"></select></div><div class="form-group"><label class="form-label">Mois payés</label><div class="month-grid" id="form-months"></div></div><div style="display:flex; gap:16px;"><div class="form-group" style="flex:1;"><label class="form-label">Mode</label><select class="form-control" id="form-mode"><option>Espèces</option><option>Virement</option><option>Chèque</option></select></div><div class="form-group" style="flex:1;"><label class="form-label">Date</label><input type="date" class="form-control" id="form-date"></div></div><div class="text-right" style="margin-top:10px;"><strong style="font-size:1.25rem; color:var(--success);" id="form-total">0 DH</strong></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-success" onclick="savePaiement()">Valider</button></div></div></div>
     
-    <!-- MODAL ANNEXES & RELIQUAT MIS À JOUR -->
     <div class="modal-overlay" id="modalAnnexe">
         <div class="modal-content">
             <div class="modal-header">
@@ -447,7 +447,6 @@
         </div>
     </div>
     
-    <!-- MODAL DÉPENSE TOTALEMENT DÉBLOQUÉ -->
     <div class="modal-overlay" id="modalCharge">
         <div class="modal-content">
             <div class="modal-header">
@@ -500,7 +499,6 @@
     
     <div class="modal-overlay" id="modalMaintenance"><div class="modal-content"><div class="modal-header"><h3>Rapport de Maintenance</h3><button class="btn-icon" onclick="closeModal('modalMaintenance')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Équipement</label><select class="form-control" id="maint-equip"><option value="Ascenseur">Ascenseur</option><option value="Porte Automatique">Porte de garage</option><option value="Surpresseur Eau">Surpresseur d'eau</option><option value="Extincteurs">Extincteurs</option></select></div><div class="form-group"><label class="form-label">Date</label><input type="date" class="form-control" id="maint-date"></div><div class="form-group"><label class="form-label">Observations</label><textarea class="form-control" id="maint-obs" rows="4" placeholder="État des pièces..."></textarea></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalMaintenance')">Annuler</button><button class="btn btn-primary" onclick="saveMaintenance()">Sauvegarder</button></div></div></div>
 
-    <!-- MODAL ÉNERGIE -->
     <div class="modal-overlay" id="modalConso">
         <div class="modal-content">
             <div class="modal-header">
@@ -594,6 +592,13 @@
             populateYearSelector();
         }
 
+        // NOUVELLE FONCTION RAPPEL DE SAUVEGARDE
+        function promptBackupReminder() {
+            if(confirm("⚠️ SÉCURITÉ\nVous venez de modifier les données.\n\nVoulez-vous télécharger une copie de sauvegarde (JSON) sur votre appareil maintenant ?")) {
+                exportJSON();
+            }
+        }
+
         function verifyPin() { const input = document.getElementById('pinInput').value; if(input === db.settings.pin) { document.getElementById('pinScreen').style.opacity = '0'; setTimeout(() => { document.getElementById('pinScreen').style.display = 'none'; resetInactivityTimer(); }, 300); } else { document.getElementById('pinError').style.display = 'block'; document.getElementById('pinInput').value = ''; } }
         document.getElementById('pinInput').addEventListener('keypress', function (e) { if (e.key === 'Enter') verifyPin(); });
 
@@ -630,13 +635,8 @@
         function refreshUI() {
             document.getElementById('rapport-title-year').innerText = `Bilan Annuel Complet - ${currentYear}`;
             
-            // Recettes standard UNIQUEMENT (pour affichage dashboard)
             const recettesAnnee = db.cotisations.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0);
-            
-            // Dépenses standard
             const sortiesAnnee = db.charges.filter(c => getYearOf(c) === currentYear).reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.filter(d => getYearOf(d) === currentYear).reduce((s, d) => s + parseFloat(d.montant), 0);
-            
-            // Trésorerie Globale (INCLUT LES ANNEXES ET RELIQUATS) pour le solde final réel
             const totalRecettesGlobal = db.cotisations.reduce((s, c) => s + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((s, c) => s + parseFloat(c.montant), 0);
             const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0);
             const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
@@ -653,13 +653,11 @@
             Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b';
             let recMensuelles = Array(12).fill(0), depMensuelles = Array(12).fill(0);
 
-            // Recettes (Cotisations PURES UNIQUEMENT pour le graphique et le mois en cours)
             db.cotisations.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = c.mois ? (c.mois - 1) : (c.date ? new Date(c.date).getMonth() : 0);
                 recMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
-            // Charges
             db.charges.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = new Date(c.date).getMonth();
                 if (c.desc) {
@@ -671,7 +669,6 @@
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
-            // Dépenses diverses
             db.depenses.filter(c => getYearOf(c) === currentYear).forEach(c => { 
                 let moisIndex = new Date(c.date).getMonth();
                 if (c.description || c.beneficiaire || c.typeDepense) {
@@ -684,7 +681,6 @@
                 depMensuelles[moisIndex] += parseFloat(c.montant); 
             });
 
-            // MISE A JOUR DES STATS DU MOIS COURANT SUR LE DASHBOARD
             let actualMonth = new Date().getMonth();
             document.getElementById('dash-recettes-mois').innerHTML = `Ce mois (${MOIS_NOMS[actualMonth]}) : <strong class="text-success">${formatMoney.format(recMensuelles[actualMonth])}</strong>`;
             document.getElementById('dash-depenses-mois').innerHTML = `Ce mois (${MOIS_NOMS[actualMonth]}) : <strong class="text-danger">${formatMoney.format(depMensuelles[actualMonth])}</strong>`;
@@ -702,7 +698,7 @@
         }
         function saveAptEdit() {
             const id = parseInt(document.getElementById('edit-apt-id').value); const owner = document.getElementById('edit-apt-owner').value; const phone = document.getElementById('edit-apt-phone').value; const apt = db.apartments.find(a => a.id === id);
-            if(apt) { apt.owner = owner; apt.phone = phone; saveDB(); refreshUI(); closeModal('modalEditApt'); toast('Propriétaire mis à jour !'); }
+            if(apt) { apt.owner = owner; apt.phone = phone; saveDB(); refreshUI(); closeModal('modalEditApt'); toast('Propriétaire mis à jour !'); setTimeout(promptBackupReminder, 500); }
         }
 
         function renderApartments() {
@@ -762,7 +758,6 @@
             document.getElementById('table-maintenance').innerHTML = db.maintenance.map(m => `<tr><td>${new Date(m.date).toLocaleDateString()}</td><td><strong>${m.equip}</strong></td><td><span style="font-size:0.75rem; color:var(--text-main);">${m.obs}</span></td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('maintenance', ${m.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
         }
 
-        // FONCTIONS ÉNERGIE
         function renderEnergie() {
             if(!db.consommations) db.consommations = [];
             document.getElementById('table-conso').innerHTML = db.consommations.sort((a,b) => b.mois - a.mois).map(c => `
@@ -823,9 +818,9 @@
 
             refreshUI();
             toast('Facture d\'énergie enregistrée avec succès !');
+            setTimeout(promptBackupReminder, 500);
         }
 
-        // NOUVELLE FONCTION D'IMPRESSION DU BILAN GLOBAL CROISÉ
         function printBilanGlobal() {
             const year = currentYear; 
             const cots = db.cotisations.filter(c => getYearOf(c) === year); 
@@ -833,7 +828,6 @@
             const chgs = db.charges.filter(c => getYearOf(c) === year); 
             const deps = db.depenses.filter(c => getYearOf(c) === year);
             
-            // Calculs globaux pour le résumé
             const totalRecettesAnnee = cots.reduce((s, c) => s + parseFloat(c.montant), 0) + anns.reduce((s, c) => s + parseFloat(c.montant), 0); 
             const totalDepensesAnnee = chgs.reduce((s, c) => s + parseFloat(c.montant), 0) + deps.reduce((s, c) => s + parseFloat(c.montant), 0);
             
@@ -841,12 +835,9 @@
             const totalSortiesGlobal = db.charges.reduce((s, c) => s + parseFloat(c.montant), 0) + db.depenses.reduce((s, c) => s + parseFloat(c.montant), 0); 
             const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
 
-            // Structure du tableau des dépenses par mois
             let depensesParMois = Array(12).fill(null).map(() => ({ menage: 0, ascenseur: 0, electricite: 0, autres: 0, total: 0 }));
-            
             const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))];
             
-            // Remplissage des données
             allSorties.forEach(c => {
                 let moisIndex = new Date(c.date).getMonth();
                 if (c.desc) {
@@ -872,7 +863,6 @@
                 depensesParMois[moisIndex].total += montant;
             });
 
-            // Construction HTML des lignes du tableau
             let tbodyHTML = '';
             depensesParMois.forEach((m, idx) => {
                 tbodyHTML += `<tr>
@@ -885,7 +875,6 @@
                 </tr>`;
             });
 
-            // Assemblage de la page complète
             let html = `
                 <h1 style="text-align:center; font-size:22pt; margin-bottom: 20px;">BILAN ANNUEL DES DÉPENSES - GH5-SN8 (${year})</h1>
                 
@@ -968,6 +957,31 @@
             
             window.open(`https://wa.me/${tel}?text=السلام عليكم،%0A%0Aكنذكركم بلي واجبات السنديك ديال الشقة ${apt.number} بالنسبة للشهر (أو الأشهر): *${unpaidMonths.join(', ')}* مزال ما تخلصاتش (المبلغ: *${unpaidAmount} درهم*).%0A%0Aالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت.%0A%0Aشكرا، السنديك.`, '_blank'); 
         }
+
+        function bilanGroupeWA() {
+            let currentM = new Date().getMonth();
+            let currentMonthName = MOIS_NOMS[currentM];
+            let aptsAJour = [];
+            let aptsEnRetard = [];
+
+            db.apartments.forEach(apt => {
+                const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear);
+                let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
+                
+                if (paidStr.includes(currentMonthName.toLowerCase())) {
+                    aptsAJour.push(apt.number);
+                } else {
+                    aptsEnRetard.push(apt.number);
+                }
+            });
+
+            let listeAJour = aptsAJour.length > 0 ? aptsAJour.map(num => "• الشقة " + num).join('\n') : "لا أحد";
+            let listeEnRetard = aptsEnRetard.length > 0 ? aptsEnRetard.map(num => "• الشقة " + num).join('\n') : "لا أحد";
+
+            let text = `السلام عليكم الجيران،\n\nهادا تقرير بخصوص واجبات السنديك ديال هاد الشهر (*${currentMonthName}*).\n\n✅ *الشقق لي خلصو هاد الشهر:*\n${listeAJour}\n\n❌ *الشقق لي مزال ما خلصوش هاد الشهر:*\n${listeEnRetard}\n\nشكرا للناس لي خلصو، والله يجازيكم بخير لي مزال ما خلصش يكمل الواجب ديالو باش نقدرو نغطيو مصاريف العمارة.`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
         
         function relanceGroupeWA() {
             let currentM = new Date().getMonth();
@@ -1014,7 +1028,30 @@
         }
 
         function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dlElem = document.getElementById('downloadAnchorElem'); dlElem.setAttribute("href", dataStr); dlElem.setAttribute("download", `Sauvegarde_${new Date().toISOString().slice(0,10)}.json`); dlElem.click(); toast('Export réussi !'); }
-        function importJSON(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { let imported = JSON.parse(e.target.result); if(imported.apartments && imported.cotisations) { db = imported; saveDB(); window.location.reload(); } else toast('Invalide', 'error'); } catch(err) { toast('Erreur', 'error'); } }; reader.readAsText(file); }
+        
+        function importJSON(event) { 
+            const file = event.target.files[0]; 
+            if(!file) return; 
+            const reader = new FileReader(); 
+            reader.onload = function(e) { 
+                try { 
+                    let imported = JSON.parse(e.target.result); 
+                    if(imported.apartments && imported.cotisations) { 
+                        db = imported; 
+                        localStorage.setItem('syndic_fallback', JSON.stringify(db));
+                        toast("Envoi des données vers le Cloud...", "info");
+                        
+                        dbCloud.collection("syndic_data").doc("main_database").set({
+                            settings: db.settings, apartments: db.apartments, cotisations: db.cotisations, charges: db.charges, depenses: db.depenses || [], cotisationsAnnexes: db.cotisationsAnnexes || [], fournisseurs: db.fournisseurs || [], incidents: db.incidents || [], maintenance: db.maintenance || [], consommations: db.consommations || []
+                        }).then(() => {
+                            toast("Restauration réussie ! Redémarrage...", "success");
+                            setTimeout(() => { window.location.reload(); }, 2000); 
+                        }).catch((e) => toast("Erreur d'envoi Cloud", "error"));
+                    } else toast('Fichier Invalide', 'error'); 
+                } catch(err) { toast('Erreur de lecture', 'error'); } 
+            }; 
+            reader.readAsText(file); 
+        }
 
         function openModal(id) {
             document.getElementById(id).classList.add('active'); let aptOptions = db.apartments.map(a => `<option value="${a.id}">Apt ${a.number} - ${a.owner}</option>`).join(''); document.querySelectorAll('.form-apt').forEach(select => select.innerHTML = aptOptions); let today = new Date().toISOString().split('T')[0];
@@ -1075,7 +1112,7 @@
 
         function savePaiement() {
             const aptId = document.querySelector('#modalPaiement .form-apt').value; const mode = document.getElementById('form-mode').value; const date = document.getElementById('form-date').value; const boxes = document.querySelectorAll('#form-months input:checked'); if(boxes.length === 0) return toast('Cochez au moins un mois', 'error');
-            let moisNames = []; boxes.forEach(b => moisNames.push(MOIS_NOMS[b.value - 1])); db.cotisations.push({ id: Date.now(), aptId: parseInt(aptId), date: date, mode: mode, montant: boxes.length * COTISATION_MENSUELLE, moisStr: moisNames.join(', ') }); saveDB(); refreshUI(); closeModal('modalPaiement'); toast('Paiement enregistré !');
+            let moisNames = []; boxes.forEach(b => moisNames.push(MOIS_NOMS[b.value - 1])); db.cotisations.push({ id: Date.now(), aptId: parseInt(aptId), date: date, mode: mode, montant: boxes.length * COTISATION_MENSUELLE, moisStr: moisNames.join(', ') }); saveDB(); refreshUI(); closeModal('modalPaiement'); toast('Paiement enregistré !'); setTimeout(promptBackupReminder, 500);
         }
         function saveAnnexe() {
             const selectVal = document.getElementById('annexe-projet-select').value;
@@ -1083,7 +1120,7 @@
             const aptId = document.getElementById('annexe-apt').value; 
             const montant = document.getElementById('annexe-montant').value; 
             if(!projet.trim() || !montant) return toast('Vérifiez les champs', 'error');
-            db.cotisationsAnnexes.push({ id: Date.now(), projet: projet, aptId: selectVal === 'Reste année 2025' ? null : parseInt(aptId), montant: parseFloat(montant), mode: document.getElementById('annexe-mode').value, date: document.getElementById('annexe-date').value }); saveDB(); refreshUI(); closeModal('modalAnnexe'); toast('Participation / Reliquat enregistré !');
+            db.cotisationsAnnexes.push({ id: Date.now(), projet: projet, aptId: selectVal === 'Reste année 2025' ? null : parseInt(aptId), montant: parseFloat(montant), mode: document.getElementById('annexe-mode').value, date: document.getElementById('annexe-date').value }); saveDB(); refreshUI(); closeModal('modalAnnexe'); toast('Participation / Reliquat enregistré !'); setTimeout(promptBackupReminder, 500);
         }
         
         function saveCharge() {
@@ -1119,41 +1156,78 @@
                 }); 
             });
             
-            saveDB(); refreshUI(); closeModal('modalCharge'); toast('Dépense enregistrée !');
+            saveDB(); refreshUI(); closeModal('modalCharge'); toast('Dépense enregistrée !'); setTimeout(promptBackupReminder, 500);
         }
         
-        function deleteEntry(table, id) { if(confirm('Supprimer cette ligne ?')) { db[table] = db[table].filter(row => row.id !== id); saveDB(); refreshUI(); toast('Supprimé'); } }
+        function deleteEntry(table, id) { if(confirm('Supprimer cette ligne ?')) { db[table] = db[table].filter(row => row.id !== id); saveDB(); refreshUI(); toast('Supprimé'); setTimeout(promptBackupReminder, 500); } }
         function saveFournisseur() {
             const type = document.getElementById('fourn-type').value; const nom = document.getElementById('fourn-nom').value; if(!nom) return toast('Nom requis', 'error');
-            db.fournisseurs.push({ id: Date.now(), type: type, nom: nom, tel: document.getElementById('fourn-tel').value, notes: document.getElementById('fourn-notes').value }); saveDB(); refreshUI(); closeModal('modalFournisseur'); toast('Fournisseur ajouté !');
+            db.fournisseurs.push({ id: Date.now(), type: type, nom: nom, tel: document.getElementById('fourn-tel').value, notes: document.getElementById('fourn-notes').value }); saveDB(); refreshUI(); closeModal('modalFournisseur'); toast('Fournisseur ajouté !'); setTimeout(promptBackupReminder, 500);
         }
         function saveIncident() {
             const titre = document.getElementById('incident-titre').value; const desc = document.getElementById('incident-desc').value; const date = document.getElementById('incident-date').value; const prio = document.getElementById('incident-prio').value;
             if(!titre) return toast('Titre requis', 'error');
             if(!db.incidents) db.incidents = [];
             db.incidents.push({ id: Date.now(), titre, desc, date, prio, statut: 'En attente' });
-            saveDB(); refreshUI(); closeModal('modalIncident'); toast('Incident signalé !');
+            saveDB(); refreshUI(); closeModal('modalIncident'); toast('Incident signalé !'); setTimeout(promptBackupReminder, 500);
         }
-        function resolveIncident(id) { let inc = db.incidents.find(i => i.id === id); if(inc) { inc.statut = 'Résolu'; saveDB(); refreshUI(); toast('Résolu !'); } }
+        function resolveIncident(id) { let inc = db.incidents.find(i => i.id === id); if(inc) { inc.statut = 'Résolu'; saveDB(); refreshUI(); toast('Résolu !'); setTimeout(promptBackupReminder, 500); } }
         function saveMaintenance() {
             const equip = document.getElementById('maint-equip').value; const date = document.getElementById('maint-date').value; const obs = document.getElementById('maint-obs').value;
             if(!obs) return toast('Observation requise', 'error');
             if(!db.maintenance) db.maintenance = [];
             db.maintenance.push({ id: Date.now(), equip, date, obs });
-            saveDB(); refreshUI(); closeModal('modalMaintenance'); toast('Rapport sauvegardé !');
+            saveDB(); refreshUI(); closeModal('modalMaintenance'); toast('Rapport sauvegardé !'); setTimeout(promptBackupReminder, 500);
         }
 
         function toast(msg, type = 'success') { const box = document.getElementById('toastBox'); const el = document.createElement('div'); el.className = `toast ${type}`; let iconClass = type === 'success' ? 'fa-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-info-circle'; el.innerHTML = `<i class="fa-solid ${iconClass}"></i> <div>${msg}</div>`; box.appendChild(el); setTimeout(() => el.remove(), 4000); }
 
         function initDB() {
+            // 1. SÉCURITÉ : On charge la mémoire locale en priorité
+            let localData = localStorage.getItem('syndic_fallback');
+            if (localData) {
+                try {
+                    let parsed = JSON.parse(localData);
+                    if (parsed.apartments && parsed.apartments.length > 0) {
+                        db = parsed;
+                        refreshUI();
+                    }
+                } catch(e) { console.error("Erreur lecture locale"); }
+            }
+
+            // 2. Écoute du Cloud Firebase
             dbCloud.collection("syndic_data").doc("main_database").onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
-                    db.settings = data.settings || { pin: '0000' }; db.apartments = data.apartments || []; db.cotisations = data.cotisations || []; db.charges = data.charges || []; db.depenses = data.depenses || []; db.cotisationsAnnexes = data.cotisationsAnnexes || []; db.fournisseurs = data.fournisseurs || []; db.incidents = data.incidents || []; db.maintenance = data.maintenance || []; db.consommations = data.consommations || [];
+                    // SÉCURITÉ MAXIMALE : On n'écrase la base QUE si le Cloud contient réellement des données
+                    if (data.apartments && data.apartments.length > 0) {
+                        db.settings = data.settings || { pin: '0000' }; 
+                        db.apartments = data.apartments || []; 
+                        db.cotisations = data.cotisations || []; 
+                        db.charges = data.charges || []; 
+                        db.depenses = data.depenses || []; 
+                        db.cotisationsAnnexes = data.cotisationsAnnexes || []; 
+                        db.fournisseurs = data.fournisseurs || []; 
+                        db.incidents = data.incidents || []; 
+                        db.maintenance = data.maintenance || []; 
+                        db.consommations = data.consommations || [];
+                        // Mise à jour de la sauvegarde locale
+                        localStorage.setItem('syndic_fallback', JSON.stringify(db));
+                    }
+                } else {
+                    // C'est une vraie première installation sur un Cloud totalement vierge
+                    if (db.apartments.length === 0) { 
+                        for (let i = 1; i <= NB_APPARTEMENTS; i++) { 
+                            db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}`, phone: '' }); 
+                        } 
+                        saveDB(); 
+                    }
                 }
-                if (db.apartments.length === 0) { for (let i = 1; i <= NB_APPARTEMENTS; i++) { db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}`, phone: '' }); } saveDB(); }
                 populateYearSelector(); refreshUI();
-            }, (error) => { console.error("Erreur Cloud", error); });
+            }, (error) => { 
+                console.error("Erreur Cloud", error); 
+                toast("Mode hors-ligne : utilisation de la mémoire locale", "warning");
+            });
         }
 
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').then(reg => { reg.update(); }).catch(err => console.log('SW Error:', err)); }); }
