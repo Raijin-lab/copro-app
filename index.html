@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="icon-192.png">
 
+    <!-- Fonts: Inter pour le texte, Roboto Mono pour les données numériques industrielles -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -38,7 +39,7 @@
         .pin-input { background: #000 !important; color: var(--primary) !important; border: 1px solid var(--border) !important; font-size: 2rem; letter-spacing: 8px; text-align: center; padding: 15px; border-radius: 12px; width: 100%; margin: 20px auto; font-family: 'Roboto Mono', monospace; outline: none; box-shadow: inset 0 0 15px rgba(0,229,255,0.1);}
         .pin-input:focus { border-color: var(--primary) !important; box-shadow: 0 0 20px rgba(0, 229, 255, 0.3), inset 0 0 10px rgba(0,0,0,0.8); }
 
-        /* ===== LAYOUT PC (Desktop par défaut) ===== */
+        /* ===== LAYOUT PC ===== */
         .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); color: var(--sidebar-text); display: flex; flex-direction: column; z-index: 100; flex-shrink: 0; }
         .sidebar-brand { padding: 24px; font-size: 1.1rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); text-shadow: 0 0 10px rgba(0, 229, 255, 0.4); }
         .sidebar-nav { flex: 1; padding: 20px 0; overflow-y: auto; }
@@ -160,35 +161,21 @@
             .b-nav-item:active { transform: scale(0.9); }
 
             .topbar h2 { font-size: 1rem; }
-            .page-content { padding: 16px; padding-bottom: 95px; } /* Espace pour Bottom Nav */
+            .page-content { padding: 16px; padding-bottom: 95px; } 
             .grid-4, .grid-2 { grid-template-columns: 1fr; gap: 16px; }
             .apt-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 16px; }
             .month-grid { grid-template-columns: repeat(3, 1fr); }
             
-            /* Transformation Modals en Bottom Sheet (Tiroir du bas) */
             .modal-overlay { align-items: flex-end; padding: 0; }
             .modal-content { border-radius: 24px 24px 0 0; max-height: 90vh; transform: translateY(100%); width: 100%; border-bottom: none; }
             .modal-overlay.active .modal-content { transform: translateY(0); }
             .hub-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
         }
 
-        /* ===== IMPRESSION A3 ===== */
+        /* ===== IMPRESSION ===== */
         @media print { 
-            @page { size: A3 landscape; margin: 15mm; }
             .no-print, .bottom-nav, .sidebar, .topbar, .toast-container, .modal-overlay { display: none !important; } 
-            body { background: #fff !important; color: #000 !important; display: block; overflow: visible; height: auto; } 
-            body:not(.print-global-mode) .main-wrapper { display: block; overflow: visible; width: 100%; }
-            body:not(.print-global-mode) .page-content { padding: 0; overflow: visible; }
-            body:not(.print-global-mode) .page-view.hidden { display: none !important; }
-            body:not(.print-global-mode) .page-view { display: block !important; }
-            .card, .table-container { box-shadow: none; border: 1px solid #ccc; background: #fff !important; color: #000 !important;}
-            table { width: 100%; border-collapse: collapse; font-size: 10pt; border: 1px solid #000 !important; }
-            th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; border: 1px solid #000 !important; font-size: 11pt !important; color: #000 !important; padding: 10px; }
-            td { border: 1px solid #000 !important; font-size: 11pt !important; color: #000 !important; padding: 10px; }
-            body.print-global-mode .main-wrapper, body.print-global-mode .sidebar { display: none !important; }
-            body.print-global-mode #print-global-container { display: block !important; width: 100%; }
-            .text-success, .text-danger, .text-warning, .text-info { text-shadow: none !important; color: #000 !important;}
-            #print-global-container table { margin-top: 20px; }
+            body { background: #fff !important; color: #000 !important; } 
         }
     </style>
 </head>
@@ -228,8 +215,6 @@
             </div>
         </header>
 
-        <div id="print-global-container" class="no-screen"></div>
-
         <div class="page-content">
             <!-- PAGE: DASHBOARD -->
             <div id="page-dashboard" class="page-view">
@@ -257,7 +242,7 @@
                 </div>
             </div>
 
-            <!-- PAGE: HUB (Menu pour accéder aux sous-fonctions) -->
+            <!-- PAGE: HUB -->
             <div id="page-hub" class="page-view hidden">
                 <h3 style="margin-bottom: 20px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; color: var(--primary);">Modules du Système</h3>
                 <div class="hub-grid">
@@ -352,7 +337,7 @@
                     <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 15px;">
                         <div class="table-title" id="rapport-title-year">Bilan Annuel</div>
                         <div style="display:flex; gap:10px; flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="printBilanGlobal()"><i class="fa-solid fa-file-pdf"></i> Imprimer Bilan (A3)</button>
+                            <button class="btn btn-primary" onclick="printBilanGlobal()"><i class="fa-solid fa-file-pdf"></i> Export Bilan A3 (PDF)</button>
                             <button class="btn btn-info" onclick="bilanGroupeWA()"><i class="fa-solid fa-bullhorn"></i> Transmettre (Groupe)</button>
                             <button class="btn btn-warning" onclick="relanceGroupeWA()"><i class="fa-brands fa-whatsapp"></i> Relances Auto</button>
                         </div>
@@ -612,7 +597,7 @@
 
         function saveConsommation() { const ty = document.getElementById('conso-type').value; const mo = parseInt(document.getElementById('conso-mois').value); const mt = parseFloat(document.getElementById('conso-montant').value); if (!mt || mt <= 0) return toast("Valeur nulle", "error"); if(!db.consommations) db.consommations = []; db.consommations.push({ id: Date.now(), type: ty, mois: mo, montant: mt, indexConsommation: document.getElementById('conso-index').value, dateSaisie: new Date().toISOString() }); saveDB(); closeModal('modalConso'); document.getElementById('conso-montant').value = ''; document.getElementById('conso-index').value = ''; refreshUI(); toast('Télémétrie MÀJ !'); }
 
-        /* ===== IMPRESSION BILAN A3 RÉTABLIE ===== */
+        /* ===== FIX: IMPRESSION BILAN A3 VIA JSPDF ===== */
         function printBilanGlobal() {
             const year = currentYear; 
             const cots = db.cotisations.filter(c => getYearOf(c) === year); 
@@ -647,23 +632,60 @@
                 depensesParMois[moisIndex].total += montant;
             });
 
-            let tbodyHTML = '';
-            depensesParMois.forEach((m, idx) => {
-                tbodyHTML += `<tr><td style="text-align:left;"><strong>${MOIS_NOMS[idx]}</strong></td><td class="text-right">${m.menage > 0 ? formatMoney.format(m.menage) : '-'}</td><td class="text-right">${m.ascenseur > 0 ? formatMoney.format(m.ascenseur) : '-'}</td><td class="text-right">${m.electricite > 0 ? formatMoney.format(m.electricite) : '-'}</td><td class="text-right">${m.autres > 0 ? formatMoney.format(m.autres) : '-'}</td><td class="text-right font-mono" style="color:#ef4444; font-weight:bold;">${m.total > 0 ? formatMoney.format(m.total) : '-'}</td></tr>`;
+            // Generation PDF
+            const doc = new jsPDF('landscape');
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text(`BILAN ANNUEL DES DEPENSES - GH5-SN8 (${year})`, 148, 20, { align: "center" });
+
+            let bodyData = depensesParMois.map((m, idx) => [
+                MOIS_NOMS[idx],
+                m.menage > 0 ? formatMoney.format(m.menage) : '-',
+                m.ascenseur > 0 ? formatMoney.format(m.ascenseur) : '-',
+                m.electricite > 0 ? formatMoney.format(m.electricite) : '-',
+                m.autres > 0 ? formatMoney.format(m.autres) : '-',
+                m.total > 0 ? formatMoney.format(m.total) : '-'
+            ]);
+
+            doc.autoTable({
+                startY: 35,
+                head: [['Mois', 'Menage', 'Ascenseur', 'Electricite', 'Autres Divers', 'Total Mensuel']],
+                body: bodyData,
+                foot: [['TOTAL ANNEE',
+                    formatMoney.format(depensesParMois.reduce((s, m) => s + m.menage, 0)),
+                    formatMoney.format(depensesParMois.reduce((s, m) => s + m.ascenseur, 0)),
+                    formatMoney.format(depensesParMois.reduce((s, m) => s + m.electricite, 0)),
+                    formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0)),
+                    formatMoney.format(totalDepensesAnnee)
+                ]],
+                theme: 'striped',
+                headStyles: { fillColor: [0, 229, 255], textColor: 0, fontStyle: 'bold' },
+                footStyles: { fillColor: [10, 14, 23], textColor: 255, fontStyle: 'bold' }
             });
 
-            let html = `
-                <h1 style="text-align:center; font-size:22pt; margin-bottom: 20px;">BILAN ANNUEL DES DÉPENSES - GH5-SN8 (${year})</h1>
-                <div style="margin-bottom: 30px;"><table style="width: 100%; border-collapse: collapse; text-align: center;"><thead><tr style="background-color: #f1f5f9;"><th style="text-align:left;">Mois</th><th class="text-right">Ménage</th><th class="text-right">Ascenseur</th><th class="text-right">Électricité</th><th class="text-right">Autres Divers</th><th class="text-right">Total Mensuel</th></tr></thead><tbody>${tbodyHTML}</tbody><tfoot><tr style="background-color: #f1f5f9; font-weight: bold;"><td style="text-align:left;">TOTAL ANNÉE</td><td class="text-right">${formatMoney.format(depensesParMois.reduce((s, m) => s + m.menage, 0))}</td><td class="text-right">${formatMoney.format(depensesParMois.reduce((s, m) => s + m.ascenseur, 0))}</td><td class="text-right">${formatMoney.format(depensesParMois.reduce((s, m) => s + m.electricite, 0))}</td><td class="text-right">${formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0))}</td><td class="text-right" style="color:#ef4444;">${formatMoney.format(totalDepensesAnnee)}</td></tr></tfoot></table></div>
-                <div class="print-summary-box" style="display:flex; flex-direction:column; align-items:center; width:60%; margin: 0 auto; gap:10px; border: 2px solid #333; padding: 20px; border-radius: 12px; background-color:#fafafa;">
-                    <h3 style="margin-bottom: 10px; text-transform:uppercase; color:#333;">Synthèse Financière - Exercice ${year}</h3>
-                    <div style="display:flex; justify-content:space-between; width:100%; font-size:16pt; color:#10b981;"><span>Total Recettes Collectées :</span><strong>+${formatMoney.format(totalRecettesAnnee)}</strong></div>
-                    <div style="display:flex; justify-content:space-between; width:100%; font-size:16pt; color:#ef4444; border-bottom: 1px solid #ccc; padding-bottom: 10px;"><span>Total Dépenses de l'année :</span><strong>-${formatMoney.format(totalDepensesAnnee)}</strong></div>
-                    <div style="display:flex; justify-content:space-between; width:100%; font-size:18pt; color:${soldeGlobal >= 0 ? '#4f46e5' : '#ef4444'}; padding-top: 10px;"><span>Reliquat Trésorerie :</span><strong>${formatMoney.format(soldeGlobal)}</strong></div>
-                </div>
-                <div style="margin-top: 40px; text-align: right; font-weight: bold; font-size: 12pt;">Fait le ${new Date().toLocaleDateString('fr-FR')} - Le Bureau du Syndicat</div>
-            `;
-            document.getElementById('print-global-container').innerHTML = html; document.body.classList.add('print-global-mode'); window.print(); setTimeout(() => { document.body.classList.remove('print-global-mode'); }, 500);
+            let finalY = doc.lastAutoTable.finalY + 20;
+
+            doc.setFontSize(16);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Synthese Financiere - Exercice ${year}`, 14, finalY);
+
+            doc.setFontSize(14);
+            doc.setTextColor(16, 185, 129); // Vert
+            doc.text(`Total Recettes Collectees : +${formatMoney.format(totalRecettesAnnee)}`, 14, finalY + 10);
+
+            doc.setTextColor(239, 68, 68); // Rouge
+            doc.text(`Total Depenses de l'annee : -${formatMoney.format(totalDepensesAnnee)}`, 14, finalY + 20);
+
+            if(soldeGlobal >= 0) { doc.setTextColor(0, 229, 255); } else { doc.setTextColor(239, 68, 68); }
+            doc.text(`Reliquat Tresorerie : ${formatMoney.format(soldeGlobal)}`, 14, finalY + 30);
+
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "italic");
+            doc.text(`Genere le ${new Date().toLocaleDateString('fr-FR')} - Syndicat GH5-SN8`, 280, finalY + 40, { align: "right" });
+
+            doc.save(`Bilan_Annuel_${year}.pdf`);
+            toast("Export PDF reussi !", "success");
         }
 
         function relanceWA(aptId, reste) { const apt = db.apartments.find(a => a.id === aptId); let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1); window.open(`https://wa.me/${tel}?text=Système Syndic : Déficit constaté sur le lot ${apt.number}. Reste : ${reste} DH. Merci de régulariser.`, '_blank'); }
