@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="icon-192.png">
 
+    <!-- Fonts: Inter pour le texte, Roboto Mono pour les données numériques industrielles -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -333,7 +334,7 @@
                     <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 15px;">
                         <div class="table-title" id="rapport-title-year">Bilan Annuel</div>
                         <div style="display:flex; gap:10px; flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="printBilanGlobal()"><i class="fa-solid fa-file-pdf"></i> Générer Bilan A3 (PDF)</button>
+                            <button class="btn btn-primary" onclick="printBilanGlobal()"><i class="fa-solid fa-file-pdf"></i> Exporter PDF A3</button>
                             <button class="btn btn-info" onclick="bilanGroupeWA()"><i class="fa-solid fa-bullhorn"></i> Transmettre (Groupe)</button>
                             <button class="btn btn-warning" onclick="relanceGroupeWA()"><i class="fa-brands fa-whatsapp"></i> Relances Auto</button>
                         </div>
@@ -419,7 +420,7 @@
         let chartBar, chartPie, chartConso;
         let inactivityTimer; const INACTIVITY_LIMIT = 5 * 60 * 1000;
 
-        // Fonction anti-XSS de sécurisation des inputs textes
+        // Faille XSS corrigée via cette fonction s()
         function s(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, function(m) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m]; }); }
 
         function showLockScreen() { document.getElementById('pinScreen').style.display = 'flex'; setTimeout(() => document.getElementById('pinScreen').style.opacity = '1', 10); document.getElementById('pinInput').value = ''; document.getElementById('pinError').style.display = 'none'; }
@@ -526,7 +527,14 @@
 
         function renderAnnexes() {
             document.getElementById('table-annexes').innerHTML = [...db.cotisationsAnnexes].filter(c => getYearOf(c) === currentYear).map(c => `<tr><td class="font-mono">${new Date(c.date).toLocaleDateString()}</td><td>${s(c.projet)}</td><td class="font-mono text-success">+${c.montant}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisationsAnnexes', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
-            let data = {}; let collect = 0; db.cotisationsAnnexes.forEach(c => { collect += parseFloat(c.montant); let np = c.projet.trim().toUpperCase(); if(!data[np]) data[np] = { nom: c.projet, mt: parseFloat(c.montantTotal || c.montant), payeurs: [] }; if(c.aptId && !data[np].payeurs.includes(c.aptId)) data[np].payeurs.push(c.aptId); });
+            let data = {}; let collect = 0; 
+            db.cotisationsAnnexes.forEach(c => { 
+                collect += parseFloat(c.montant); 
+                let np = c.projet.trim().toUpperCase(); 
+                if (np.includes('RESTE ANNÉE') || np.includes('REPORT EXERCICE')) return; 
+                if(!data[np]) data[np] = { nom: c.projet, mt: parseFloat(c.montantTotal || c.montant), payeurs: [] }; 
+                if(c.aptId && !data[np].payeurs.includes(c.aptId)) data[np].payeurs.push(c.aptId); 
+            });
             let att = 0; const cont = document.getElementById('annexes-projects-container'); cont.innerHTML = '';
             Object.values(data).forEach(p => { let pr = p.mt * NB_APPARTEMENTS; att += pr; let col = p.payeurs.length * p.mt; let pct = Math.min((col / pr) * 100, 100); cont.innerHTML += `<div class="card"><div class="stat-header"><div class="stat-title text-primary">${s(p.nom)}</div><span class="badge badge-info">${p.payeurs.length}/${NB_APPARTEMENTS}</span></div><div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:10px;"><span style="color:var(--text-muted)">Avancement :</span><strong class="font-mono text-success">${formatMoney.format(col)}</strong></div><div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${pct}%"></div></div></div>`; });
             document.getElementById('annexes-total-collecte').innerText = formatMoney.format(collect); document.getElementById('annexes-total-impayes').innerText = formatMoney.format(Math.max(att - collect, 0));
@@ -556,9 +564,9 @@
 
         function saveConsommation() { const ty = document.getElementById('conso-type').value; const mo = parseInt(document.getElementById('conso-mois').value); const mt = parseFloat(document.getElementById('conso-montant').value); if (!mt || mt <= 0) return toast("Valeur nulle", "error"); if(!db.consommations) db.consommations = []; db.consommations.push({ id: Date.now(), type: ty, mois: mo, montant: mt, indexConsommation: document.getElementById('conso-index').value, dateSaisie: new Date().toISOString() }); saveDB(); closeModal('modalConso'); document.getElementById('conso-montant').value = ''; document.getElementById('conso-index').value = ''; refreshUI(); toast('Télémétrie MÀJ !'); }
 
-        // Génération de PDF natif avec jsPDF pour le bilan global A3 (Ne bloque plus l'écran !)
+        // Génération PDF Silencieuse (jsPDF) pour Bilan A3
         function printBilanGlobal() {
-            toast("Génération du rapport PDF en cours...", "info");
+            toast("Génération du PDF en cours...", "info");
             setTimeout(() => {
                 const year = currentYear; 
                 const cots = db.cotisations.filter(c => getYearOf(c) === year); 
@@ -580,9 +588,7 @@
                     let moisIndex = new Date(c.date).getMonth();
                     if (c.desc) {
                         let dLower = c.desc.toLowerCase();
-                        const moisComplets = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
                         MOIS_NOMS.forEach((m, idx) => { if (dLower.includes(m.toLowerCase())) moisIndex = idx; });
-                        moisComplets.forEach((mFull, idx) => { if (dLower.includes(mFull)) moisIndex = idx; });
                     }
                     let montant = parseFloat(c.montant);
                     let catLower = (c.type || '').toLowerCase(); let descLower = (c.desc || '').toLowerCase();
@@ -616,7 +622,7 @@
 
                 doc.save(`Bilan_Annuel_${year}.pdf`);
                 toast("Export PDF réussi !", "success");
-            }, 500); // Petit délai pour laisser le temps au Toast de s'afficher
+            }, 500); 
         }
 
         function relanceWA(aptId, reste) { const apt = db.apartments.find(a => a.id === aptId); let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1); window.open(`https://wa.me/${tel}?text=Système Syndic : Déficit constaté sur le lot ${apt.number}. Reste : ${reste} DH. Merci de régulariser.`, '_blank'); }
