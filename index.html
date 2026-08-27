@@ -145,6 +145,7 @@
 
         .hidden { display: none !important; }
         .text-right { text-align: right; }
+        .cursor-pointer { cursor: pointer; }
         .progress-bar-container { width: 100%; background: #000; border-radius: 10px; height: 8px; overflow: hidden; margin-top: 8px; }
         .progress-bar-fill { height: 100%; background: var(--primary); transition: width 0.5s ease; box-shadow: 0 0 10px var(--primary); }
 
@@ -168,6 +169,9 @@
             .modal-content { border-radius: 24px 24px 0 0; max-height: 90vh; transform: translateY(100%); width: 100%; border-bottom: none; }
             .modal-overlay.active .modal-content { transform: translateY(0); }
             .hub-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+            
+            #aptTableContainer table { font-size: 0.75rem; }
+            #aptTableContainer th, #aptTableContainer td { padding: 10px 8px; }
         }
 
         /* ===== IMPRESSION ===== */
@@ -179,6 +183,7 @@
 </head>
 <body>
 
+    <!-- LOCK SCREEN -->
     <div id="pinScreen">
         <div class="pin-box">
             <i class="fa-solid fa-fingerprint" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px; filter: drop-shadow(0 0 15px var(--primary));"></i>
@@ -257,17 +262,27 @@
             <div id="page-apartments" class="page-view hidden">
                 <div class="table-container" style="background: transparent; border: none; padding: 0;">
                     <div class="table-header" style="background: var(--bg-card); border-radius: var(--radius) var(--radius) 0 0;">
-                        <div>
-                            <div class="table-title">État du Réseau</div>
-                            <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:4px;">Sélectionner un lot pour les détails</span>
+                        <div style="width: 100%; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <div class="table-title">État du Réseau</div>
+                                <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:4px;">Matrice de paiement globale</span>
+                            </div>
+                            <button class="btn btn-outline" style="padding: 8px 12px; font-size: 0.8rem;" onclick="toggleAptView()" id="btnToggleAptView"><i class="fa-solid fa-list-check"></i> Vue Globale</button>
                         </div>
-                        <div style="display:flex; gap:8px; flex-wrap: wrap; margin-top: 10px;">
+                        <div style="display:flex; gap:8px; flex-wrap: wrap; margin-top: 15px; width: 100%;">
                             <span class="badge badge-success" id="count-ok">0 OK</span>
                             <span class="badge badge-warning" id="count-partial">0 Partiel</span>
                             <span class="badge badge-danger" id="count-bad">0 Retard</span>
                         </div>
                     </div>
+                    
+                    <!-- VUE GRILLE (Défaut) -->
                     <div class="apt-grid" id="aptGridContainer" style="background: rgba(10,14,23,0.5); border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius);"></div>
+                    
+                    <!-- VUE TABLEAU GLOBAL (Cachée par défaut) -->
+                    <div class="table-container hidden" id="aptTableContainer" style="margin-top: 0; background: #000; border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius);">
+                        <table id="apt-global-table" style="font-size: 0.85rem; min-width: 800px;"></table>
+                    </div>
                 </div>
             </div>
 
@@ -419,6 +434,7 @@
         let currentYear = new Date().getFullYear();
         let chartBar, chartPie, chartConso;
         let inactivityTimer; const INACTIVITY_LIMIT = 5 * 60 * 1000;
+        let isAptTableView = false; // Variable pour tracker la vue globale
 
         // Faille XSS corrigée via cette fonction s()
         function s(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, function(m) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m]; }); }
@@ -504,13 +520,50 @@
         function openEditApt(aptId) { const apt = db.apartments.find(a => a.id === aptId); document.getElementById('edit-apt-id').value = apt.id; document.getElementById('edit-apt-num').value = 'APT_' + apt.number.toString().padStart(2,'0'); document.getElementById('edit-apt-owner').value = apt.owner; document.getElementById('edit-apt-phone').value = apt.phone || ''; closeModal('modalAptDetails'); openModal('modalEditApt'); }
         function saveAptEdit() { const id = parseInt(document.getElementById('edit-apt-id').value); const apt = db.apartments.find(a => a.id === id); if(apt) { apt.owner = document.getElementById('edit-apt-owner').value; apt.phone = document.getElementById('edit-apt-phone').value; saveDB(); refreshUI(); closeModal('modalEditApt'); toast('Données MÀJ'); } }
 
+        function toggleAptView() {
+            isAptTableView = !isAptTableView;
+            document.getElementById('aptGridContainer').classList.toggle('hidden', isAptTableView);
+            document.getElementById('aptTableContainer').classList.toggle('hidden', !isAptTableView);
+            document.getElementById('btnToggleAptView').innerHTML = isAptTableView ? '<i class="fa-solid fa-border-all"></i> Vue Grille' : '<i class="fa-solid fa-list-check"></i> Vue Globale';
+            triggerHaptic('success');
+        }
+
         function renderApartments() {
-            const grid = document.getElementById('aptGridContainer'); grid.innerHTML = ''; let ok=0, prt=0, bad=0;
+            const grid = document.getElementById('aptGridContainer'); grid.innerHTML = ''; 
+            
+            // Construction de l'entête du tableau global
+            let tableHTML = `<thead><tr><th style="position:sticky; left:0; background:var(--bg-card); z-index:2;">Lot</th>`;
+            MOIS_NOMS.forEach(m => tableHTML += `<th style="text-align:center; padding: 15px 5px;">${m}</th>`);
+            tableHTML += `<th class="text-right">Payé</th><th class="text-right">Reste</th></tr></thead><tbody>`;
+
+            let ok=0, prt=0, bad=0;
             db.apartments.forEach(apt => {
-                let paye = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0); let du = COTISATION_MENSUELLE * 12; let cls = 'status-bad';
+                const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear);
+                let paye = paiements.reduce((sum, c) => sum + parseFloat(c.montant), 0); 
+                let du = COTISATION_MENSUELLE * 12; 
+                let cls = 'status-bad';
                 if(paye >= du) { cls = 'status-ok'; ok++; } else if(paye > 0) { cls = 'status-partial'; prt++; } else { bad++; }
+                
+                // Rendu pour la Vue Grille
                 grid.innerHTML += `<div class="apt-card ${cls}" onclick="showAptDetails(${apt.id})"><div class="apt-num">${apt.number.toString().padStart(2,'0')}</div><div class="apt-owner">${s(apt.owner)}</div></div>`;
+
+                // Rendu pour la Vue Tableau
+                let pStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
+                tableHTML += `<tr><td style="position:sticky; left:0; background:var(--bg-card); z-index:1; border-right: 1px solid var(--border);"><strong class="text-primary font-mono cursor-pointer" onclick="showAptDetails(${apt.id})">#${apt.number.toString().padStart(2,'0')}</strong></td>`;
+                
+                MOIS_NOMS.forEach(m => {
+                    let isPaid = pStr.includes(m.toLowerCase());
+                    let icon = isPaid ? '<i class="fa-solid fa-check text-success"></i>' : '<i class="fa-solid fa-minus" style="color:var(--text-muted); opacity:0.3;"></i>';
+                    tableHTML += `<td style="text-align:center;">${icon}</td>`;
+                });
+                
+                let reste = Math.max(du - paye, 0);
+                tableHTML += `<td class="text-right font-mono text-success">${paye}</td><td class="text-right font-mono ${reste>0?'text-danger':'text-success'}">${reste}</td></tr>`;
             });
+
+            tableHTML += `</tbody>`;
+            document.getElementById('apt-global-table').innerHTML = tableHTML;
+
             document.getElementById('count-ok').innerText = ok + ' OK'; document.getElementById('count-partial').innerText = prt + ' PRT'; document.getElementById('count-bad').innerText = bad + ' ERR';
         }
 
