@@ -22,6 +22,7 @@
     <!-- FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -173,11 +174,11 @@
         <div class="pin-box">
             <i class="fa-solid fa-shield-halved" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
             <h2 style="margin-bottom: 10px;">Accès Sécurisé</h2>
-            <p style="color: #cbd5e1; font-size: 0.9rem;">Veuillez entrer le code PIN syndic.</p>
-            <input type="password" id="pinInput" class="pin-input" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="••••">
+            <p style="color: #cbd5e1; font-size: 0.9rem;">Veuillez entrer le code d'accès syndic (6 chiffres min).</p>
+            <input type="password" id="pinInput" class="pin-input" pattern="[0-9]*" inputmode="numeric" maxlength="12" placeholder="••••••">
             <br>
-            <button class="btn btn-primary" onclick="verifyPin()" style="width: 100%; justify-content: center; padding: 12px; font-size: 1.1rem;">Déverrouiller</button>
-            <p id="pinError" style="color: #ff6b6b; margin-top: 15px; font-size: 0.85rem; display: none;">Code incorrect.</p>
+            <button class="btn btn-primary" id="pinBtn" onclick="verifyPin()" style="width: 100%; justify-content: center; padding: 12px; font-size: 1.1rem;">Déverrouiller</button>
+            <p id="pinError" style="color: #ff6b6b; margin-top: 15px; font-size: 0.85rem; display: none;">Code incorrect ou connexion impossible.</p>
         </div>
     </div>
 
@@ -378,14 +379,14 @@
                 <div class="grid-2">
                     <div class="card">
                         <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-database"></i> Sauvegarde (Cloud Sync)</h3>
-                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">Vos données sont synchronisées en temps réel sur le Cloud.</p>
+                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">Vos données sont synchronisées en temps réel sur le Cloud, avec une copie de sécurité automatique et silencieuse générée chaque jour. Vous pouvez aussi exporter une copie manuelle à tout moment.</p>
                         <div style="display: flex; gap: 12px; flex-wrap: wrap;"><button class="btn btn-primary" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Exporter JSON</button><label class="btn btn-outline" style="cursor: pointer;"><i class="fa-solid fa-upload"></i> Importer<input type="file" id="importFile" accept=".json" onchange="importJSON(event)" style="display: none;"></label></div>
                         <a id="downloadAnchorElem" style="display:none"></a>
                     </div>
                     <div class="card">
                         <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-lock"></i> Code PIN</h3>
-                        <div class="form-group"><label class="form-label">Code Actuel</label><input type="password" id="oldPin" class="form-control" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="••••"></div>
-                        <div class="form-group"><label class="form-label">Nouveau Code (4 chiffres)</label><input type="password" id="newPin" class="form-control" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="Ex: 1234"></div>
+                        <div class="form-group"><label class="form-label">Code Actuel</label><input type="password" id="oldPin" class="form-control" pattern="[0-9]*" inputmode="numeric" maxlength="12" placeholder="••••••"></div>
+                        <div class="form-group"><label class="form-label">Nouveau Code (6 chiffres min)</label><input type="password" id="newPin" class="form-control" pattern="[0-9]*" inputmode="numeric" maxlength="12" placeholder="Ex: 123456"></div>
                         <button class="btn btn-success" onclick="updatePin()">Mettre à jour</button>
                     </div>
                 </div>
@@ -561,6 +562,12 @@
         };
         firebase.initializeApp(firebaseConfig);
         const dbCloud = firebase.firestore();
+        const dbAuth = firebase.auth();
+        // Persistance offline native : Firestore fusionne intelligemment au lieu d'écraser en cas de coupure réseau
+        dbCloud.enablePersistence({ synchronizeTabs: true }).catch((err) => console.warn("Persistance offline non activée :", err.code));
+        // Un seul compte admin sert de "verrou" réel côté serveur (les règles Firestore n'autorisent que ce compte)
+        const ADMIN_EMAIL = "admin@gh5-sn8-syndic.local";
+        let authReady = false;
 
         window.jsPDF = window.jspdf.jsPDF;
         const COTISATION_MENSUELLE = 50;
@@ -585,27 +592,83 @@
         };
 
         function saveDB() {
+            // GARDE ANTI-ÉCRASEMENT : on ne pousse JAMAIS un état vide vers le Cloud.
+            // C'est ce qui a causé la perte de données précédente (un db vide en mémoire écrasait le Cloud via .set()).
+            if (!db.apartments || db.apartments.length === 0) {
+                console.error("Sauvegarde bloquée : la base locale est vide, envoi vers le Cloud annulé pour éviter un écrasement.");
+                toast("Sauvegarde locale uniquement (protection anti-perte activée)", "warning");
+                return;
+            }
             localStorage.setItem('syndic_fallback', JSON.stringify(db));
-            dbCloud.collection("syndic_data").doc("main_database").set({
+            if (!authReady) return; // pas de session Cloud active, on reste en local uniquement
+
+            const payload = {
                 settings: db.settings, apartments: db.apartments, cotisations: db.cotisations, charges: db.charges, depenses: db.depenses, cotisationsAnnexes: db.cotisationsAnnexes, fournisseurs: db.fournisseurs, incidents: db.incidents || [], maintenance: db.maintenance || [], consommations: db.consommations || []
-            }).then(() => console.log("Synchronisé Cloud")).catch((e) => toast("Erreur de sauvegarde Cloud", "error"));
+            };
+            dbCloud.collection("syndic_data").doc("main_database").set(payload)
+                .then(() => console.log("Synchronisé Cloud"))
+                .catch((e) => toast("Erreur de sauvegarde Cloud", "error"));
+
+            silentDailyBackup(payload);
             populateYearSelector();
         }
 
-        // NOUVELLE FONCTION RAPPEL DE SAUVEGARDE
-        function promptBackupReminder() {
-            if(confirm("⚠️ SÉCURITÉ\nVous venez de modifier les données.\n\nVoulez-vous télécharger une copie de sauvegarde (JSON) sur votre appareil maintenant ?")) {
-                exportJSON();
-            }
+        // SAUVEGARDE AUTOMATIQUE ET SILENCIEUSE (1 copie par jour, aucune interruption pour toi)
+        function silentDailyBackup(payload) {
+            const todayKey = new Date().toISOString().slice(0, 10);
+            dbCloud.collection("syndic_backups").doc(todayKey).set({
+                ...payload,
+                savedAt: new Date().toISOString()
+            }).catch((e) => console.warn("Backup silencieux échoué :", e));
         }
 
-        function verifyPin() { const input = document.getElementById('pinInput').value; if(input === db.settings.pin) { document.getElementById('pinScreen').style.opacity = '0'; setTimeout(() => { document.getElementById('pinScreen').style.display = 'none'; resetInactivityTimer(); }, 300); } else { document.getElementById('pinError').style.display = 'block'; document.getElementById('pinInput').value = ''; } }
+        let sessionPin = null; // gardé en mémoire uniquement (jamais écrit sur disque) pour le re-verrouillage rapide après inactivité
+
+        function unlockUI() {
+            document.getElementById('pinScreen').style.opacity = '0';
+            setTimeout(() => { document.getElementById('pinScreen').style.display = 'none'; resetInactivityTimer(); }, 300);
+        }
+
+        function verifyPin() {
+            const input = document.getElementById('pinInput').value;
+            const btn = document.getElementById('pinBtn');
+            document.getElementById('pinError').style.display = 'none';
+
+            // Re-verrouillage après inactivité : session Firebase déjà active, on compare juste localement
+            if (authReady) {
+                if (input === sessionPin) { unlockUI(); }
+                else { document.getElementById('pinError').style.display = 'block'; document.getElementById('pinInput').value = ''; }
+                return;
+            }
+
+            // Premier accès : vraie authentification serveur via Firebase Auth
+            if (input.length < 6) { document.getElementById('pinError').innerText = 'Le code doit faire au moins 6 chiffres.'; document.getElementById('pinError').style.display = 'block'; return; }
+            btn.disabled = true; btn.innerText = 'Vérification...';
+            dbAuth.signInWithEmailAndPassword(ADMIN_EMAIL, input).then(() => {
+                sessionPin = input; authReady = true;
+                initDB();
+                unlockUI();
+            }).catch(() => {
+                document.getElementById('pinError').innerText = 'Code incorrect ou connexion impossible.';
+                document.getElementById('pinError').style.display = 'block';
+                document.getElementById('pinInput').value = '';
+            }).finally(() => { btn.disabled = false; btn.innerText = 'Déverrouiller'; });
+        }
         document.getElementById('pinInput').addEventListener('keypress', function (e) { if (e.key === 'Enter') verifyPin(); });
 
         function updatePin() {
             const oldPin = document.getElementById('oldPin').value; const newPin = document.getElementById('newPin').value;
-            if(oldPin !== db.settings.pin) return toast('Code PIN actuel incorrect', 'error'); if(newPin.length !== 4) return toast('Le nouveau code doit faire 4 chiffres', 'error');
-            db.settings.pin = newPin; saveDB(); document.getElementById('oldPin').value = ''; document.getElementById('newPin').value = ''; toast('Code mis à jour !');
+            if (newPin.length < 6) return toast('Le nouveau code doit faire au moins 6 chiffres', 'error');
+            const user = dbAuth.currentUser;
+            if (!user) return toast('Session expirée, reconnectez-vous', 'error');
+            const cred = firebase.auth.EmailAuthProvider.credential(ADMIN_EMAIL, oldPin);
+            user.reauthenticateWithCredential(cred).then(() => {
+                return user.updatePassword(newPin);
+            }).then(() => {
+                sessionPin = newPin;
+                document.getElementById('oldPin').value = ''; document.getElementById('newPin').value = '';
+                toast('Code mis à jour !');
+            }).catch(() => toast('Code actuel incorrect', 'error'));
         }
 
         function getYearOf(item) { if(item.annee) return parseInt(item.annee); if(item.date) return new Date(item.date).getFullYear(); return currentYear; }
@@ -698,7 +761,7 @@
         }
         function saveAptEdit() {
             const id = parseInt(document.getElementById('edit-apt-id').value); const owner = document.getElementById('edit-apt-owner').value; const phone = document.getElementById('edit-apt-phone').value; const apt = db.apartments.find(a => a.id === id);
-            if(apt) { apt.owner = owner; apt.phone = phone; saveDB(); refreshUI(); closeModal('modalEditApt'); toast('Propriétaire mis à jour !'); setTimeout(promptBackupReminder, 500); }
+            if(apt) { apt.owner = owner; apt.phone = phone; saveDB(); refreshUI(); closeModal('modalEditApt'); toast('Propriétaire mis à jour !'); }
         }
 
         function renderApartments() {
@@ -818,7 +881,7 @@
 
             refreshUI();
             toast('Facture d\'énergie enregistrée avec succès !');
-            setTimeout(promptBackupReminder, 500);
+           
         }
 
         function printBilanGlobal() {
@@ -1112,7 +1175,7 @@
 
         function savePaiement() {
             const aptId = document.querySelector('#modalPaiement .form-apt').value; const mode = document.getElementById('form-mode').value; const date = document.getElementById('form-date').value; const boxes = document.querySelectorAll('#form-months input:checked'); if(boxes.length === 0) return toast('Cochez au moins un mois', 'error');
-            let moisNames = []; boxes.forEach(b => moisNames.push(MOIS_NOMS[b.value - 1])); db.cotisations.push({ id: Date.now(), aptId: parseInt(aptId), date: date, mode: mode, montant: boxes.length * COTISATION_MENSUELLE, moisStr: moisNames.join(', ') }); saveDB(); refreshUI(); closeModal('modalPaiement'); toast('Paiement enregistré !'); setTimeout(promptBackupReminder, 500);
+            let moisNames = []; boxes.forEach(b => moisNames.push(MOIS_NOMS[b.value - 1])); db.cotisations.push({ id: Date.now(), aptId: parseInt(aptId), date: date, mode: mode, montant: boxes.length * COTISATION_MENSUELLE, moisStr: moisNames.join(', ') }); saveDB(); refreshUI(); closeModal('modalPaiement'); toast('Paiement enregistré !');
         }
         function saveAnnexe() {
             const selectVal = document.getElementById('annexe-projet-select').value;
@@ -1120,7 +1183,7 @@
             const aptId = document.getElementById('annexe-apt').value; 
             const montant = document.getElementById('annexe-montant').value; 
             if(!projet.trim() || !montant) return toast('Vérifiez les champs', 'error');
-            db.cotisationsAnnexes.push({ id: Date.now(), projet: projet, aptId: selectVal === 'Reste année 2025' ? null : parseInt(aptId), montant: parseFloat(montant), mode: document.getElementById('annexe-mode').value, date: document.getElementById('annexe-date').value }); saveDB(); refreshUI(); closeModal('modalAnnexe'); toast('Participation / Reliquat enregistré !'); setTimeout(promptBackupReminder, 500);
+            db.cotisationsAnnexes.push({ id: Date.now(), projet: projet, aptId: selectVal === 'Reste année 2025' ? null : parseInt(aptId), montant: parseFloat(montant), mode: document.getElementById('annexe-mode').value, date: document.getElementById('annexe-date').value }); saveDB(); refreshUI(); closeModal('modalAnnexe'); toast('Participation / Reliquat enregistré !');
         }
         
         function saveCharge() {
@@ -1156,28 +1219,28 @@
                 }); 
             });
             
-            saveDB(); refreshUI(); closeModal('modalCharge'); toast('Dépense enregistrée !'); setTimeout(promptBackupReminder, 500);
+            saveDB(); refreshUI(); closeModal('modalCharge'); toast('Dépense enregistrée !');
         }
         
-        function deleteEntry(table, id) { if(confirm('Supprimer cette ligne ?')) { db[table] = db[table].filter(row => row.id !== id); saveDB(); refreshUI(); toast('Supprimé'); setTimeout(promptBackupReminder, 500); } }
+        function deleteEntry(table, id) { if(confirm('Supprimer cette ligne ?')) { db[table] = db[table].filter(row => row.id !== id); saveDB(); refreshUI(); toast('Supprimé'); } }
         function saveFournisseur() {
             const type = document.getElementById('fourn-type').value; const nom = document.getElementById('fourn-nom').value; if(!nom) return toast('Nom requis', 'error');
-            db.fournisseurs.push({ id: Date.now(), type: type, nom: nom, tel: document.getElementById('fourn-tel').value, notes: document.getElementById('fourn-notes').value }); saveDB(); refreshUI(); closeModal('modalFournisseur'); toast('Fournisseur ajouté !'); setTimeout(promptBackupReminder, 500);
+            db.fournisseurs.push({ id: Date.now(), type: type, nom: nom, tel: document.getElementById('fourn-tel').value, notes: document.getElementById('fourn-notes').value }); saveDB(); refreshUI(); closeModal('modalFournisseur'); toast('Fournisseur ajouté !');
         }
         function saveIncident() {
             const titre = document.getElementById('incident-titre').value; const desc = document.getElementById('incident-desc').value; const date = document.getElementById('incident-date').value; const prio = document.getElementById('incident-prio').value;
             if(!titre) return toast('Titre requis', 'error');
             if(!db.incidents) db.incidents = [];
             db.incidents.push({ id: Date.now(), titre, desc, date, prio, statut: 'En attente' });
-            saveDB(); refreshUI(); closeModal('modalIncident'); toast('Incident signalé !'); setTimeout(promptBackupReminder, 500);
+            saveDB(); refreshUI(); closeModal('modalIncident'); toast('Incident signalé !');
         }
-        function resolveIncident(id) { let inc = db.incidents.find(i => i.id === id); if(inc) { inc.statut = 'Résolu'; saveDB(); refreshUI(); toast('Résolu !'); setTimeout(promptBackupReminder, 500); } }
+        function resolveIncident(id) { let inc = db.incidents.find(i => i.id === id); if(inc) { inc.statut = 'Résolu'; saveDB(); refreshUI(); toast('Résolu !'); } }
         function saveMaintenance() {
             const equip = document.getElementById('maint-equip').value; const date = document.getElementById('maint-date').value; const obs = document.getElementById('maint-obs').value;
             if(!obs) return toast('Observation requise', 'error');
             if(!db.maintenance) db.maintenance = [];
             db.maintenance.push({ id: Date.now(), equip, date, obs });
-            saveDB(); refreshUI(); closeModal('modalMaintenance'); toast('Rapport sauvegardé !'); setTimeout(promptBackupReminder, 500);
+            saveDB(); refreshUI(); closeModal('modalMaintenance'); toast('Rapport sauvegardé !');
         }
 
         function toast(msg, type = 'success') { const box = document.getElementById('toastBox'); const el = document.createElement('div'); el.className = `toast ${type}`; let iconClass = type === 'success' ? 'fa-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-info-circle'; el.innerHTML = `<i class="fa-solid ${iconClass}"></i> <div>${msg}</div>`; box.appendChild(el); setTimeout(() => el.remove(), 4000); }
@@ -1214,14 +1277,16 @@
                         // Mise à jour de la sauvegarde locale
                         localStorage.setItem('syndic_fallback', JSON.stringify(db));
                     }
-                } else {
-                    // C'est une vraie première installation sur un Cloud totalement vierge
+                } else if (!localData) {
+                    // Vraie première installation UNIQUEMENT : Cloud vierge ET aucune trace locale non plus
                     if (db.apartments.length === 0) { 
                         for (let i = 1; i <= NB_APPARTEMENTS; i++) { 
                             db.apartments.push({ id: i, number: i, owner: `Propriétaire ${i}`, phone: '' }); 
                         } 
                         saveDB(); 
                     }
+                } else {
+                    console.warn("Cloud vide mais sauvegarde locale trouvée : re-synchronisation manuelle recommandée, pas de recréation automatique.");
                 }
                 populateYearSelector(); refreshUI();
             }, (error) => { 
@@ -1231,9 +1296,10 @@
         }
 
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').then(reg => { reg.update(); }).catch(err => console.log('SW Error:', err)); }); }
-        window.onload = function() { ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => document.addEventListener(evt, resetInactivityTimer, true)); resetInactivityTimer(); };
+        window.onload = function() { ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => document.addEventListener(evt, resetInactivityTimer, true)); };
 
-        initDB();
+        // initDB() n'est plus appelée ici automatiquement : elle démarre uniquement après un login réussi (voir verifyPin),
+        // pour ne jamais interroger/écrire le Cloud avant qu'un accès légitime soit confirmé.
     </script>
 </body>
 </html>
