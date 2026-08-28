@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" href="icon-192.png">
 
     <!-- Fonts: Inter pour le texte, Roboto Mono pour les données numériques industrielles -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,15 +23,16 @@
 
     <style>
         :root {
-            --primary: #00e5ff; --primary-hover: #00b8cc; --secondary: #334155;
-            --success: #00ff87; --danger: #ff0055; --warning: #ffd500; --info: #00e5ff;
-            --bg-body: #000000; --bg-card: #0a0e17; --text-main: #f8fafc; --text-muted: #64748b;
-            --border: rgba(0, 229, 255, 0.15); --sidebar-bg: #050b14; --sidebar-text: #cbd5e1; --sidebar-hover: rgba(0, 229, 255, 0.1);
-            --shadow-glow: 0 0 15px rgba(0, 229, 255, 0.15); --radius: 16px;
+            --primary: #c9a227; --primary-hover: #a8871f; --secondary: #3a4557;
+            --success: #2f9e6b; --danger: #c0392b; --warning: #c9a227; --info: #5b8ba8;
+            --bg-body: #0d1219; --bg-card: #171f2b; --text-main: #ece8dd; --text-muted: #7c8494;
+            --border: rgba(201, 162, 39, 0.18); --sidebar-bg: #0a0e14; --sidebar-text: #a8afbd; --sidebar-hover: rgba(201, 162, 39, 0.08);
+            --shadow-glow: 0 4px 20px rgba(0,0,0,0.4); --radius: 10px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; overscroll-behavior-y: none; }
-        .font-mono { font-family: 'Roboto Mono', monospace; font-weight: 500; letter-spacing: -0.5px; }
+        body { font-family: 'Source Sans 3', sans-serif; background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; overscroll-behavior-y: none; background-image: repeating-linear-gradient(rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 28px); }
+        .font-mono { font-family: 'IBM Plex Mono', monospace; font-weight: 500; letter-spacing: -0.3px; }
+        h1, h2, h3, .table-title, .sidebar-brand, .stat-title, #page-title { font-family: 'Fraunces', serif !important; }
 
         /* ===== LOCK SCREEN ===== */
         #pinScreen { position: fixed; inset: 0; background: var(--bg-body); z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
@@ -41,11 +42,11 @@
 
         /* ===== LAYOUT PC ===== */
         .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); color: var(--sidebar-text); display: flex; flex-direction: column; z-index: 100; flex-shrink: 0; }
-        .sidebar-brand { padding: 24px; font-size: 1.1rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); text-shadow: 0 0 10px rgba(0, 229, 255, 0.4); }
+        .sidebar-brand { padding: 24px; font-size: 1.1rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); text-shadow: none; }
         .sidebar-nav { flex: 1; padding: 20px 0; overflow-y: auto; }
         .nav-item { padding: 14px 24px; display: flex; align-items: center; gap: 16px; cursor: pointer; font-weight: 500; transition: all 0.2s; border-left: 4px solid transparent; }
         .nav-item:hover, .nav-item.active { background-color: var(--sidebar-hover); color: var(--text-main); border-left-color: var(--primary); }
-        .nav-item.active { text-shadow: 0 0 8px rgba(255,255,255,0.3); }
+        .nav-item.active { text-shadow: none; }
         .nav-item i { width: 20px; text-align: center; color: var(--primary); }
         
         .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; width: 100%; position: relative; }
@@ -56,10 +57,10 @@
         .btn { padding: 12px 20px; border-radius: 12px; border: none; font-family: inherit; font-size: 0.875rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; position: relative; overflow: hidden; }
         .btn:active::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.2); animation: ripple 0.4s linear; }
         @keyframes ripple { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
-        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, #008b99 100%); color: #000; box-shadow: 0 4px 15px rgba(0, 229, 255, 0.2); } 
-        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #00b35e 100%); color: #000; box-shadow: 0 4px 15px rgba(0, 255, 135, 0.2); } 
-        .btn-danger { background: linear-gradient(135deg, var(--danger) 0%, #b3003c 100%); color: white; box-shadow: 0 4px 15px rgba(255, 0, 85, 0.2); }
-        .btn-warning { background: linear-gradient(135deg, var(--warning) 0%, #b39500 100%); color: #000; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, #8a6d1a 100%); color: #14100a; box-shadow: 0 4px 12px rgba(0,0,0,0.35); } 
+        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #1f7a51 100%); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.35); } 
+        .btn-danger { background: linear-gradient(135deg, var(--danger) 0%, #8e2c21 100%); color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.35); }
+        .btn-warning { background: linear-gradient(135deg, var(--warning) 0%, #8a6d1a 100%); color: #14100a; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--primary); }
         .btn-icon { padding: 10px; border-radius: 50%; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 1.2rem; }
         .btn-icon:active { transform: scale(0.9); }
@@ -80,24 +81,25 @@
         .stat-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; background: rgba(0,0,0,0.5); }
         .stat-value { font-size: 2.2rem; color: var(--text-main); line-height: 1.1; margin-top: 8px; }
         
-        .text-success { color: var(--success); text-shadow: 0 0 10px rgba(0,255,135,0.3); }
-        .text-danger { color: var(--danger); text-shadow: 0 0 10px rgba(255,0,85,0.3); }
-        .text-warning { color: var(--warning); text-shadow: 0 0 10px rgba(255,213,0,0.3); }
-        .text-info { color: var(--info); text-shadow: 0 0 10px rgba(0,229,255,0.3); }
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        .text-warning { color: var(--warning); }
+        .text-info { color: var(--info); }
 
         .table-container { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto; margin-bottom: 24px;}
         .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .table-title { font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); }
+        .table-title { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; color: var(--primary); }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { text-align: left; padding: 15px 24px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); background: #000; letter-spacing: 1px; }
-        td { padding: 18px 24px; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        tr:hover td { background: rgba(0, 229, 255, 0.02); }
+        th { text-align: left; padding: 15px 24px; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); letter-spacing: 1.2px; font-family: 'IBM Plex Mono', monospace; }
+        td { padding: 18px 24px; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        tr:hover td { background: rgba(201, 162, 39, 0.03); }
         
-        .badge { padding: 6px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .badge-success { background: rgba(0, 255, 135, 0.1); color: var(--success); border: 1px solid rgba(0, 255, 135, 0.3); }
-        .badge-danger { background: rgba(255, 0, 85, 0.1); color: var(--danger); border: 1px solid rgba(255, 0, 85, 0.3); }
-        .badge-warning { background: rgba(255, 213, 0, 0.1); color: var(--warning); border: 1px solid rgba(255, 213, 0, 0.3); }
-        .badge-info { background: rgba(0, 229, 255, 0.1); color: var(--info); border: 1px solid rgba(0, 229, 255, 0.3); }
+        /* Badges façon tampon encreur - signature du thème "Grand Livre" */
+        .badge { padding: 5px 12px; border-radius: 3px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'IBM Plex Mono', monospace; display: inline-block; transform: rotate(-2deg); border-width: 1.5px; border-style: dashed; }
+        .badge-success { background: rgba(47, 158, 107, 0.08); color: var(--success); border-color: var(--success); }
+        .badge-danger { background: rgba(192, 57, 43, 0.08); color: var(--danger); border-color: var(--danger); transform: rotate(2deg); }
+        .badge-warning { background: rgba(201, 162, 39, 0.08); color: var(--warning); border-color: var(--warning); }
+        .badge-info { background: rgba(91, 139, 168, 0.08); color: var(--info); border-color: var(--info); transform: rotate(1deg); }
 
         /* ===== HUB MENU ===== */
         .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
@@ -156,7 +158,7 @@
             .b-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); padding: 10px 0; transition: 0.2s; cursor: pointer; }
             .b-nav-item i { font-size: 1.4rem; margin-bottom: 6px; }
             .b-nav-item span { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-            .b-nav-item.active { color: var(--primary); text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
+            .b-nav-item.active { color: var(--primary); text-shadow: none; }
             .b-nav-item:active { transform: scale(0.9); }
 
             .topbar h2 { font-size: 1rem; }
@@ -723,7 +725,26 @@
         function relanceGroupeWA() { window.open(`https://wa.me/?text=Relance auto exécutée.`, '_blank'); }
 
         function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dlElem = document.getElementById('downloadAnchorElem'); dlElem.setAttribute("href", dataStr); dlElem.setAttribute("download", `DUMP_${new Date().toISOString().slice(0,10)}.json`); dlElem.click(); toast('Extraction Terminée'); }
-        function importJSON(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { let i = JSON.parse(e.target.result); if(i.apartments) { db = i; localStorage.setItem('syndic_fallback', JSON.stringify(db)); toast("Injection Cloud..."); dbCloud.collection("syndic_data").doc("main_database").set(db).then(() => { toast("OK ! Reboot...", "success"); setTimeout(() => window.location.reload(), 2000); }).catch(() => toast("Erreur Serveur", "error")); } } catch(err) { toast('Fichier corrompu', 'error'); } }; reader.readAsText(file); }
+        function importJSON(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    let i = JSON.parse(e.target.result);
+                    // Validation stricte : on refuse tout fichier qui ne ressemble pas à une vraie sauvegarde complète,
+                    // pour ne jamais pousser un import vide ou corrompu vers le Cloud (même faille que l'ancien saveDB()).
+                    const requiredArrays = ['apartments', 'cotisations', 'charges'];
+                    const isValid = requiredArrays.every(k => Array.isArray(i[k])) && i.apartments.length > 0;
+                    if (!isValid) { toast('Fichier invalide ou vide — import annulé pour éviter un écrasement', 'error'); return; }
+                    if (!confirm(`Ce fichier contient ${i.apartments.length} lots et ${i.cotisations.length} paiements. Il va REMPLACER toutes les données actuelles. Confirmer ?`)) return;
+                    db = i;
+                    saveDB(); // repasse par la garde anti-écrasement + sauvegarde silencieuse, au lieu d'un .set() direct
+                    toast("Import validé, synchronisation...", "success");
+                    setTimeout(() => window.location.reload(), 1500);
+                } catch (err) { toast('Fichier corrompu', 'error'); }
+            };
+            reader.readAsText(file);
+        }
 
         function openModal(id) { document.getElementById(id).classList.add('active'); let aptO = db.apartments.map(a => `<option value="${a.id}">L_${a.number.toString().padStart(2,'0')} - ${s(a.owner)}</option>`).join(''); document.querySelectorAll('.form-apt').forEach(sl => sl.innerHTML = aptO); let t = new Date().toISOString().split('T')[0]; ['form-date','charge-date','annexe-date','incident-date','maint-date'].forEach(i => { if(document.getElementById(i)) document.getElementById(i).value = t; }); if(id === 'modalPaiement') { document.getElementById('form-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateTotalModalPaiement()"><span class="month-btn">${m}</span></label>`).join(''); updateTotalModalPaiement(); } if(id === 'modalCharge') { document.getElementById('charge-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateChargeTotal()"><span class="month-btn">${m}</span></label>`).join(''); document.getElementById('charge-type').value = 'femme'; onChargeTypeChange(); } }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
