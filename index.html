@@ -9,8 +9,7 @@
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="icon-192.png">
 
-    <!-- Fonts: Inter pour le texte, Roboto Mono pour les données numériques industrielles -->
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,16 +22,15 @@
 
     <style>
         :root {
-            --primary: #c9a227; --primary-hover: #a8871f; --secondary: #3a4557;
-            --success: #2f9e6b; --danger: #c0392b; --warning: #c9a227; --info: #5b8ba8;
-            --bg-body: #0d1219; --bg-card: #171f2b; --text-main: #ece8dd; --text-muted: #7c8494;
-            --border: rgba(201, 162, 39, 0.18); --sidebar-bg: #0a0e14; --sidebar-text: #a8afbd; --sidebar-hover: rgba(201, 162, 39, 0.08);
-            --shadow-glow: 0 4px 20px rgba(0,0,0,0.4); --radius: 10px;
+            --primary: #00e5ff; --primary-hover: #00b8cc; --secondary: #334155;
+            --success: #00ff87; --danger: #ff0055; --warning: #ffd500; --info: #00e5ff;
+            --bg-body: #000000; --bg-card: #0a0e17; --text-main: #f8fafc; --text-muted: #64748b;
+            --border: rgba(0, 229, 255, 0.15); --sidebar-bg: #050b14; --sidebar-text: #cbd5e1; --sidebar-hover: rgba(0, 229, 255, 0.1);
+            --shadow-glow: 0 0 15px rgba(0, 229, 255, 0.15); --radius: 16px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Source Sans 3', sans-serif; background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; overscroll-behavior-y: none; background-image: repeating-linear-gradient(rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 28px); }
-        .font-mono { font-family: 'IBM Plex Mono', monospace; font-weight: 500; letter-spacing: -0.3px; }
-        h1, h2, h3, .table-title, .sidebar-brand, .stat-title, #page-title { font-family: 'Fraunces', serif !important; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; overscroll-behavior-y: none; }
+        .font-mono { font-family: 'Roboto Mono', monospace; font-weight: 500; letter-spacing: -0.5px; }
 
         /* ===== LOCK SCREEN ===== */
         #pinScreen { position: fixed; inset: 0; background: var(--bg-body); z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
@@ -42,11 +40,11 @@
 
         /* ===== LAYOUT PC ===== */
         .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); color: var(--sidebar-text); display: flex; flex-direction: column; z-index: 100; flex-shrink: 0; }
-        .sidebar-brand { padding: 24px; font-size: 1.1rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); text-shadow: none; }
+        .sidebar-brand { padding: 24px; font-size: 1.1rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); text-shadow: 0 0 10px rgba(0, 229, 255, 0.4); }
         .sidebar-nav { flex: 1; padding: 20px 0; overflow-y: auto; }
         .nav-item { padding: 14px 24px; display: flex; align-items: center; gap: 16px; cursor: pointer; font-weight: 500; transition: all 0.2s; border-left: 4px solid transparent; }
         .nav-item:hover, .nav-item.active { background-color: var(--sidebar-hover); color: var(--text-main); border-left-color: var(--primary); }
-        .nav-item.active { text-shadow: none; }
+        .nav-item.active { text-shadow: 0 0 8px rgba(255,255,255,0.3); }
         .nav-item i { width: 20px; text-align: center; color: var(--primary); }
         
         .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; width: 100%; position: relative; }
@@ -57,10 +55,10 @@
         .btn { padding: 12px 20px; border-radius: 12px; border: none; font-family: inherit; font-size: 0.875rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; position: relative; overflow: hidden; }
         .btn:active::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.2); animation: ripple 0.4s linear; }
         @keyframes ripple { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
-        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, #8a6d1a 100%); color: #14100a; box-shadow: 0 4px 12px rgba(0,0,0,0.35); } 
-        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #1f7a51 100%); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.35); } 
-        .btn-danger { background: linear-gradient(135deg, var(--danger) 0%, #8e2c21 100%); color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.35); }
-        .btn-warning { background: linear-gradient(135deg, var(--warning) 0%, #8a6d1a 100%); color: #14100a; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, #008b99 100%); color: #000; box-shadow: 0 4px 15px rgba(0, 229, 255, 0.2); } 
+        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #00b35e 100%); color: #000; box-shadow: 0 4px 15px rgba(0, 255, 135, 0.2); } 
+        .btn-danger { background: linear-gradient(135deg, var(--danger) 0%, #b3003c 100%); color: white; box-shadow: 0 4px 15px rgba(255, 0, 85, 0.2); }
+        .btn-warning { background: linear-gradient(135deg, var(--warning) 0%, #b39500 100%); color: #000; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--primary); }
         .btn-icon { padding: 10px; border-radius: 50%; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 1.2rem; }
         .btn-icon:active { transform: scale(0.9); }
@@ -81,25 +79,24 @@
         .stat-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; background: rgba(0,0,0,0.5); }
         .stat-value { font-size: 2.2rem; color: var(--text-main); line-height: 1.1; margin-top: 8px; }
         
-        .text-success { color: var(--success); }
-        .text-danger { color: var(--danger); }
-        .text-warning { color: var(--warning); }
-        .text-info { color: var(--info); }
+        .text-success { color: var(--success); text-shadow: 0 0 10px rgba(0,255,135,0.3); }
+        .text-danger { color: var(--danger); text-shadow: 0 0 10px rgba(255,0,85,0.3); }
+        .text-warning { color: var(--warning); text-shadow: 0 0 10px rgba(255,213,0,0.3); }
+        .text-info { color: var(--info); text-shadow: 0 0 10px rgba(0,229,255,0.3); }
 
         .table-container { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto; margin-bottom: 24px;}
         .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .table-title { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; color: var(--primary); }
+        .table-title { font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { text-align: left; padding: 15px 24px; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); letter-spacing: 1.2px; font-family: 'IBM Plex Mono', monospace; }
-        td { padding: 18px 24px; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        tr:hover td { background: rgba(201, 162, 39, 0.03); }
+        th { text-align: left; padding: 15px 24px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); background: #000; letter-spacing: 1px; }
+        td { padding: 18px 24px; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        tr:hover td { background: rgba(0, 229, 255, 0.02); }
         
-        /* Badges façon tampon encreur - signature du thème "Grand Livre" */
-        .badge { padding: 5px 12px; border-radius: 3px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'IBM Plex Mono', monospace; display: inline-block; transform: rotate(-2deg); border-width: 1.5px; border-style: dashed; }
-        .badge-success { background: rgba(47, 158, 107, 0.08); color: var(--success); border-color: var(--success); }
-        .badge-danger { background: rgba(192, 57, 43, 0.08); color: var(--danger); border-color: var(--danger); transform: rotate(2deg); }
-        .badge-warning { background: rgba(201, 162, 39, 0.08); color: var(--warning); border-color: var(--warning); }
-        .badge-info { background: rgba(91, 139, 168, 0.08); color: var(--info); border-color: var(--info); transform: rotate(1deg); }
+        .badge { padding: 6px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .badge-success { background: rgba(0, 255, 135, 0.1); color: var(--success); border: 1px solid rgba(0, 255, 135, 0.3); }
+        .badge-danger { background: rgba(255, 0, 85, 0.1); color: var(--danger); border: 1px solid rgba(255, 0, 85, 0.3); }
+        .badge-warning { background: rgba(255, 213, 0, 0.1); color: var(--warning); border: 1px solid rgba(255, 213, 0, 0.3); }
+        .badge-info { background: rgba(0, 229, 255, 0.1); color: var(--info); border: 1px solid rgba(0, 229, 255, 0.3); }
 
         /* ===== HUB MENU ===== */
         .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
@@ -126,7 +123,7 @@
         /* ===== BOTTOM NAV ===== */
         .bottom-nav { display: none; }
 
-        /* ===== MODALS (Centrés sur PC) ===== */
+        /* ===== MODALS ===== */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; justify-content: center; align-items: center; padding: 20px; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content { background: var(--bg-card); width: 100%; max-width: 600px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 15px 40px rgba(0,0,0,0.8); transform: scale(0.95); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; }
@@ -158,7 +155,7 @@
             .b-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); padding: 10px 0; transition: 0.2s; cursor: pointer; }
             .b-nav-item i { font-size: 1.4rem; margin-bottom: 6px; }
             .b-nav-item span { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-            .b-nav-item.active { color: var(--primary); text-shadow: none; }
+            .b-nav-item.active { color: var(--primary); text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
             .b-nav-item:active { transform: scale(0.9); }
 
             .topbar h2 { font-size: 1rem; }
@@ -177,11 +174,16 @@
             .header-buttons-mobile { display: flex; flex-direction: column; gap: 10px; align-items: stretch; width: 100%; }
             .header-buttons-mobile .btn { width: 100%; justify-content: center; }
         }
+
+        /* ===== IMPRESSION ===== */
+        @media print { 
+            .no-print, .bottom-nav, .sidebar, .topbar, .toast-container, .modal-overlay { display: none !important; } 
+            body { background: #fff !important; color: #000 !important; } 
+        }
     </style>
 </head>
 <body>
 
-    <!-- LOCK SCREEN -->
     <div id="pinScreen">
         <div class="pin-box">
             <i class="fa-solid fa-fingerprint" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px; filter: drop-shadow(0 0 15px var(--primary));"></i>
@@ -206,7 +208,7 @@
 
     <!-- MAIN LAYOUT -->
     <main class="main-wrapper">
-        <header class="topbar">
+        <header class="topbar no-print">
             <h2 id="page-title" style="font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-main);">Télémétrie Financière</h2>
             <div style="display: flex; gap: 12px; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 4px; background: #000; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--border);">
@@ -284,7 +286,7 @@
             <div id="page-cotisations" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Registre des Entrées</div><button class="btn btn-success" onclick="openModal('modalPaiement')"><i class="fa-solid fa-plus"></i> Saisir Paiement</button></div>
-                    <table><thead><tr><th>Date</th><th>Lot</th><th>Statut</th><th>Montant</th><th class="text-right">Act</th></tr></thead><tbody id="table-cotisations"></tbody></table>
+                    <table><thead><tr><th>Date</th><th>Lot</th><th>Statut</th><th>Montant</th><th class="text-right no-print">Act</th></tr></thead><tbody id="table-cotisations"></tbody></table>
                 </div>
             </div>
 
@@ -296,7 +298,7 @@
                 </div>
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Registre Interventions</div><button class="btn btn-primary" onclick="openModal('modalAnnexe')"><i class="fa-solid fa-plus"></i> Saisir</button></div>
-                    <table><thead><tr><th>Date</th><th>Projet</th><th>Montant</th><th class="text-right">Act</th></tr></thead><tbody id="table-annexes"></tbody></table>
+                    <table><thead><tr><th>Date</th><th>Projet</th><th>Montant</th><th class="text-right no-print">Act</th></tr></thead><tbody id="table-annexes"></tbody></table>
                 </div>
                 <div class="grid-2" id="annexes-projects-container" style="margin-top: 24px;"></div>
             </div>
@@ -311,7 +313,7 @@
                             <button class="btn btn-danger" onclick="openModal('modalCharge')"><i class="fa-solid fa-plus"></i> Nouvelle Sortie</button>
                         </div>
                     </div>
-                    <table><thead><tr><th>Date</th><th>Catégorie / Motif</th><th>Montant</th><th class="text-right">Act</th></tr></thead><tbody id="table-charges"></tbody></table>
+                    <table><thead><tr><th>Date</th><th>Catégorie / Motif</th><th>Montant</th><th class="text-right no-print">Act</th></tr></thead><tbody id="table-charges"></tbody></table>
                 </div>
             </div>
 
@@ -320,11 +322,11 @@
                 <div class="grid-2">
                     <div class="table-container">
                         <div class="table-header"><div class="table-title">Logs Incidents</div><button class="btn btn-outline" onclick="openModal('modalIncident')"><i class="fa-solid fa-triangle-exclamation"></i> Alerte</button></div>
-                        <table style="min-width: 300px;"><thead><tr><th>Date</th><th>Diag</th><th class="text-right">Act</th></tr></thead><tbody id="table-incidents"></tbody></table>
+                        <table style="min-width: 300px;"><thead><tr><th>Date</th><th>Diag</th><th class="text-right no-print">Act</th></tr></thead><tbody id="table-incidents"></tbody></table>
                     </div>
                     <div class="table-container">
                         <div class="table-header"><div class="table-title">Rapports Maintenance</div><button class="btn btn-primary" onclick="openModal('modalMaintenance')"><i class="fa-solid fa-clipboard-check"></i> Log</button></div>
-                        <table style="min-width: 300px;"><thead><tr><th>Système</th><th>Rapport</th><th class="text-right">Act</th></tr></thead><tbody id="table-maintenance"></tbody></table>
+                        <table style="min-width: 300px;"><thead><tr><th>Système</th><th>Rapport</th><th class="text-right no-print">Act</th></tr></thead><tbody id="table-maintenance"></tbody></table>
                     </div>
                 </div>
             </div>
@@ -338,7 +340,7 @@
                     </div>
                     <div class="table-container" style="margin-bottom:0;">
                         <div class="table-header"><div class="table-title">Relevés</div></div>
-                        <table style="min-width: 250px;"><thead><tr><th>Réseau</th><th>Montant</th><th class="text-right">Act</th></tr></thead><tbody id="table-conso"></tbody></table>
+                        <table style="min-width: 250px;"><thead><tr><th>Réseau</th><th>Montant</th><th class="text-right no-print">Act</th></tr></thead><tbody id="table-conso"></tbody></table>
                     </div>
                 </div>
             </div>
@@ -362,7 +364,7 @@
             <div id="page-fournisseurs" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Base Prestataires</div><button class="btn btn-outline" onclick="openModal('modalFournisseur')"><i class="fa-solid fa-plus"></i> Nouveau</button></div>
-                    <table><thead><tr><th>Entité</th><th>Contact</th><th class="text-right">Act</th></tr></thead><tbody id="table-fournisseurs"></tbody></table>
+                    <table><thead><tr><th>Entité</th><th>Contact</th><th class="text-right no-print">Act</th></tr></thead><tbody id="table-fournisseurs"></tbody></table>
                 </div>
             </div>
 
@@ -609,7 +611,6 @@
 
         function saveConsommation() { const ty = document.getElementById('conso-type').value; const mo = parseInt(document.getElementById('conso-mois').value); const mt = parseFloat(document.getElementById('conso-montant').value); if (!mt || mt <= 0) return toast("Valeur nulle", "error"); if(!db.consommations) db.consommations = []; db.consommations.push({ id: Date.now(), type: ty, mois: mo, montant: mt, indexConsommation: document.getElementById('conso-index').value, dateSaisie: new Date().toISOString() }); saveDB(); closeModal('modalConso'); document.getElementById('conso-montant').value = ''; document.getElementById('conso-index').value = ''; refreshUI(); toast('Télémétrie MÀJ !'); }
 
-        // NOUVEAU : Fonction pour générer le Relevé Annuel de TOUTES les dépenses
         function printDepensesAnnee() {
             toast("Génération du relevé des dépenses...", "info");
             setTimeout(() => {
@@ -617,12 +618,7 @@
                 const chgs = db.charges.filter(c => getYearOf(c) === year);
                 const deps = db.depenses.filter(c => getYearOf(c) === year);
                 const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))];
-                
-                if (allSorties.length === 0) {
-                    toast("Aucune dépense enregistrée cette année.", "warning");
-                    return;
-                }
-
+                if (allSorties.length === 0) { toast("Aucune dépense enregistrée.", "warning"); return; }
                 allSorties.sort((a,b) => new Date(a.date) - new Date(b.date));
                 const total = allSorties.reduce((s, c) => s + parseFloat(c.montant), 0);
 
@@ -631,21 +627,13 @@
                 doc.text(`RELEVE DETAILLE DES DEPENSES - ${year}`, 105, 20, { align: "center" });
 
                 let bodyData = allSorties.map(c => [ new Date(c.date).toLocaleDateString('fr-FR'), s(c.type), s(c.desc), formatMoney.format(parseFloat(c.montant)) ]);
-
-                doc.autoTable({
-                    startY: 30, head: [['Date', 'Catégorie', 'Description / Motif', 'Montant']], body: bodyData,
-                    foot: [['', '', 'TOTAL ANNUEL', formatMoney.format(total)]],
-                    theme: 'striped', headStyles: { fillColor: [255, 0, 85], textColor: 255 }, footStyles: { fillColor: [10, 14, 23], textColor: 255 }
-                });
-
+                doc.autoTable({ startY: 30, head: [['Date', 'Catégorie', 'Description / Motif', 'Montant']], body: bodyData, foot: [['', '', 'TOTAL ANNUEL', formatMoney.format(total)]], theme: 'striped', headStyles: { fillColor: [255, 0, 85], textColor: 255 }, footStyles: { fillColor: [10, 14, 23], textColor: 255 } });
                 doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
                 doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')} - Syndicat GH5-SN8`, 195, doc.lastAutoTable.finalY + 15, { align: "right" });
-                doc.save(`Releve_Depenses_${year}.pdf`);
-                toast("Export PDF réussi !", "success");
+                doc.save(`Releve_Depenses_${year}.pdf`); toast("Export PDF réussi !", "success");
             }, 500);
         }
 
-        // MISE À JOUR : Bilan A3 avec Annexe des "Divers"
         function printBilanGlobal() {
             toast("Génération du PDF en cours...", "info");
             setTimeout(() => {
@@ -663,8 +651,7 @@
 
                 let depensesParMois = Array(12).fill(null).map(() => ({ menage: 0, ascenseur: 0, electricite: 0, autres: 0, total: 0 }));
                 const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))];
-                
-                let listeDivers = []; // Pour stocker les détails de la colonne "Divers"
+                let listeDivers = []; 
 
                 allSorties.forEach(c => {
                     let moisIndex = new Date(c.date).getMonth();
@@ -674,77 +661,95 @@
                     if (catLower.includes('ménage') || catLower.includes('femme') || descLower.includes('ménage')) { depensesParMois[moisIndex].menage += montant; } 
                     else if (catLower.includes('ascenseur') || descLower.includes('ascenseur')) { depensesParMois[moisIndex].ascenseur += montant; } 
                     else if (catLower.includes('élec') || catLower.includes('elec') || descLower.includes('élec') || descLower.includes('one')) { depensesParMois[moisIndex].electricite += montant; } 
-                    else { 
-                        depensesParMois[moisIndex].autres += montant; 
-                        listeDivers.push({ date: c.date, type: c.type, desc: c.desc, montant: montant }); // On garde en mémoire pour l'annexe
-                    }
+                    else { depensesParMois[moisIndex].autres += montant; listeDivers.push({ date: c.date, type: c.type, desc: c.desc, montant: montant }); }
                     depensesParMois[moisIndex].total += montant;
                 });
 
-                const doc = new jsPDF('landscape');
-                doc.setFont("helvetica", "bold"); doc.setFontSize(22);
+                const doc = new jsPDF('landscape'); doc.setFont("helvetica", "bold"); doc.setFontSize(22);
                 doc.text(`BILAN ANNUEL DES DEPENSES - GH5-SN8 (${year})`, 148, 20, { align: "center" });
 
                 let bodyData = depensesParMois.map((m, idx) => [ MOIS_NOMS[idx], m.menage > 0 ? formatMoney.format(m.menage) : '-', m.ascenseur > 0 ? formatMoney.format(m.ascenseur) : '-', m.electricite > 0 ? formatMoney.format(m.electricite) : '-', m.autres > 0 ? formatMoney.format(m.autres) : '-', m.total > 0 ? formatMoney.format(m.total) : '-' ]);
-                doc.autoTable({
-                    startY: 35, head: [['Mois', 'Menage', 'Ascenseur', 'Electricite', 'Autres Divers', 'Total Mensuel']], body: bodyData,
-                    foot: [['TOTAL ANNEE', formatMoney.format(depensesParMois.reduce((s, m) => s + m.menage, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.ascenseur, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.electricite, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0)), formatMoney.format(totalDepensesAnnee)]],
-                    theme: 'striped', headStyles: { fillColor: [0, 229, 255], textColor: 0, fontStyle: 'bold' }, footStyles: { fillColor: [10, 14, 23], textColor: 255, fontStyle: 'bold' }
-                });
+                doc.autoTable({ startY: 35, head: [['Mois', 'Menage', 'Ascenseur', 'Electricite', 'Autres Divers', 'Total Mensuel']], body: bodyData, foot: [['TOTAL ANNEE', formatMoney.format(depensesParMois.reduce((s, m) => s + m.menage, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.ascenseur, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.electricite, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0)), formatMoney.format(totalDepensesAnnee)]], theme: 'striped', headStyles: { fillColor: [0, 229, 255], textColor: 0, fontStyle: 'bold' }, footStyles: { fillColor: [10, 14, 23], textColor: 255, fontStyle: 'bold' } });
 
                 let finalY = doc.lastAutoTable.finalY + 20;
-                doc.setFontSize(16); doc.setTextColor(0, 0, 0); doc.text(`Synthese Financiere - Exercice ${year}`, 14, finalY);
-                doc.setFontSize(14); doc.setTextColor(16, 185, 129); doc.text(`Total Recettes Collectees : +${formatMoney.format(totalRecettesAnnee)}`, 14, finalY + 10);
-                doc.setTextColor(239, 68, 68); doc.text(`Total Depenses de l'annee : -${formatMoney.format(totalDepensesAnnee)}`, 14, finalY + 20);
-                if(soldeGlobal >= 0) { doc.setTextColor(0, 229, 255); } else { doc.setTextColor(239, 68, 68); } doc.text(`Reliquat Tresorerie : ${formatMoney.format(soldeGlobal)}`, 14, finalY + 30);
-                doc.setTextColor(100, 100, 100); doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.text(`Genere le ${new Date().toLocaleDateString('fr-FR')} - Syndicat GH5-SN8`, 280, finalY + 40, { align: "right" });
+                doc.setFontSize(16); doc.setTextColor(0, 0, 0); doc.text(`Synthese Financiere - Exercice ${year}`, 14, finalY); doc.setFontSize(14); doc.setTextColor(16, 185, 129); doc.text(`Total Recettes Collectees : +${formatMoney.format(totalRecettesAnnee)}`, 14, finalY + 10); doc.setTextColor(239, 68, 68); doc.text(`Total Depenses de l'annee : -${formatMoney.format(totalDepensesAnnee)}`, 14, finalY + 20); if(soldeGlobal >= 0) { doc.setTextColor(0, 229, 255); } else { doc.setTextColor(239, 68, 68); } doc.text(`Reliquat Tresorerie : ${formatMoney.format(soldeGlobal)}`, 14, finalY + 30); doc.setTextColor(100, 100, 100); doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.text(`Genere le ${new Date().toLocaleDateString('fr-FR')} - Syndicat GH5-SN8`, 280, finalY + 40, { align: "right" });
 
-                // NOUVEAU : Page 2 (Annexe pour les divers)
                 if (listeDivers.length > 0) {
-                    doc.addPage();
-                    doc.setFontSize(18); doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold");
+                    doc.addPage(); doc.setFontSize(18); doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold");
                     doc.text(`ANNEXE : DETAIL DES DEPENSES "AUTRES DIVERS" (${year})`, 148, 20, { align: "center" });
-                    
                     listeDivers.sort((a,b) => new Date(a.date) - new Date(b.date));
                     let divBody = listeDivers.map(d => [ new Date(d.date).toLocaleDateString('fr-FR'), s(d.type), s(d.desc), formatMoney.format(d.montant) ]);
-                    
-                    doc.autoTable({
-                        startY: 35, head: [['Date', 'Catégorie', 'Description / Motif', 'Montant (DH)']], body: divBody,
-                        foot: [['', '', 'TOTAL DIVERS', formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0))]],
-                        theme: 'grid', headStyles: { fillColor: [100, 116, 139], textColor: 255 }, footStyles: { fillColor: [10, 14, 23], textColor: 255 }
-                    });
+                    doc.autoTable({ startY: 35, head: [['Date', 'Catégorie', 'Description / Motif', 'Montant (DH)']], body: divBody, foot: [['', '', 'TOTAL DIVERS', formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0))]], theme: 'grid', headStyles: { fillColor: [100, 116, 139], textColor: 255 }, footStyles: { fillColor: [10, 14, 23], textColor: 255 } });
                 }
 
-                doc.save(`Bilan_Annuel_${year}.pdf`);
-                toast("Export PDF réussi !", "success");
+                doc.save(`Bilan_Annuel_${year}.pdf`); toast("Export PDF réussi !", "success");
             }, 500); 
         }
 
-        function relanceWA(aptId, reste) { const apt = db.apartments.find(a => a.id === aptId); let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1); window.open(`https://wa.me/${tel}?text=Système Syndic : Déficit constaté sur le lot ${apt.number}. Reste : ${reste} DH. Merci de régulariser.`, '_blank'); }
-        function bilanGroupeWA() { window.open(`https://wa.me/?text=Bilan généré, veuillez consulter le rapport PDF.`, '_blank'); }
-        function relanceGroupeWA() { window.open(`https://wa.me/?text=Relance auto exécutée.`, '_blank'); }
+        // NOUVELLES FONCTIONS WHATSAPP (Rétablies avec texte arabe complet)
+        function relanceWA(aptId, reste) {
+            const apt = db.apartments.find(a => a.id === aptId);
+            let actualYear = new Date().getFullYear();
+            let currentM = (currentYear < actualYear) ? 11 : new Date().getMonth();
+            const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear);
+            let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
+            let unpaidMonths = []; let unpaidAmount = 0;
+            for(let i = 0; i <= currentM; i++) {
+                if(!paidStr.includes(MOIS_NOMS[i].toLowerCase())) {
+                    unpaidMonths.push(MOIS_NOMS[i]);
+                    unpaidAmount += COTISATION_MENSUELLE;
+                }
+            }
+            if(unpaidMonths.length === 0) { toast("Appartement à jour pour les mois écoulés.", "info"); return; }
+            let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : '';
+            if(tel.startsWith('0')) tel = '212' + tel.substring(1);
+            let text = `السلام عليكم،\n\nكنذكركم بلي واجبات السنديك ديال الشقة ${apt.number} بالنسبة للشهر (أو الأشهر): *${unpaidMonths.join(', ')}* مزال ما تخلصاتش (المبلغ: *${unpaidAmount} درهم*).\n\nالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت.\n\nشكرا، السنديك.`;
+            window.open(`https://wa.me/${tel}?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function bilanGroupeWA() {
+            let currentM = new Date().getMonth(); let currentMonthName = MOIS_NOMS[currentM];
+            let aptsAJour = []; let aptsEnRetard = [];
+            db.apartments.forEach(apt => {
+                const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear);
+                let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
+                if (paidStr.includes(currentMonthName.toLowerCase())) { aptsAJour.push(apt.number); } else { aptsEnRetard.push(apt.number); }
+            });
+            let listeAJour = aptsAJour.length > 0 ? aptsAJour.map(num => "• الشقة " + num).join('\n') : "لا أحد";
+            let listeEnRetard = aptsEnRetard.length > 0 ? aptsEnRetard.map(num => "• الشقة " + num).join('\n') : "لا أحد";
+            let text = `السلام عليكم الجيران،\n\nهادا تقرير بخصوص واجبات السنديك ديال هاد الشهر (*${currentMonthName}*).\n\n✅ *الشقق لي خلصو هاد الشهر:*\n${listeAJour}\n\n❌ *الشقق لي مزال ما خلصوش هاد الشهر:*\n${listeEnRetard}\n\nشكرا للناس لي خلصو، والله يجازيكم بخير لي مزال ما خلصش يكمل الواجب ديالو باش نقدرو نغطيو مصاريف العمارة.`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function relanceGroupeWA() {
+            let currentM = new Date().getMonth(); let currentMonthName = MOIS_NOMS[currentM];
+            let aptsEnRetard = []; let missingTotal = 0;
+            db.apartments.forEach(apt => {
+                const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear);
+                let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
+                if (!paidStr.includes(currentMonthName.toLowerCase())) { aptsEnRetard.push(apt.number); missingTotal += COTISATION_MENSUELLE; }
+            });
+            if (aptsEnRetard.length === 0) { toast("Tous les appartements sont à jour ce mois-ci !", "success"); return; }
+            let listeApts = aptsEnRetard.map(num => "• الشقة " + num).join('\n');
+            let text = `السلام عليكم الجيران،\n\nتذكير بخصوص واجبات السنديك ديال هاد الشهر (*${currentMonthName}*).\n\nالشقق لي مزال ما خلصوش هما:\n${listeApts}\n\nالمجموع لي ناقصنا هاد الشهر هو: *${missingTotal} درهم*\n\nالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت باش نقدرو نخلصو المصاريف ديال العمارة.\nشكرا لتعاونكم.`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function shareReceiptWA(aptId) {
+            const apt = db.apartments.find(a => a.id === aptId);
+            const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear);
+            const totalPaye = paiements.reduce((s, c) => s + parseFloat(c.montant), 0);
+            const reste = (COTISATION_MENSUELLE * 12) - totalPaye;
+            let details = paiements.map(p => `- ${p.moisStr || MOIS_NOMS[(p.mois||1)-1]} : ${p.montant} DH`).join('\n');
+            if(!details) details = "Aucun paiement enregistré.";
+            let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : '';
+            if(tel.startsWith('0')) tel = '212' + tel.substring(1);
+            let text = `🏢 *REÇU GLOBAL SYNDIC - ${currentYear}* 🏢\n\n👤 *Appartement ${apt.number}* - ${apt.owner}\n\n✅ *Logs de Paiements :*\n${details}\n\n💰 *Total Acquis :* ${totalPaye} DH\n⚠️ *Déficit Actuel :* ${Math.max(reste, 0)} DH\n\nMerci ! 🙏`;
+            window.open(`https://wa.me/${tel}?text=${encodeURIComponent(text)}`, '_blank');
+        }
 
         function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dlElem = document.getElementById('downloadAnchorElem'); dlElem.setAttribute("href", dataStr); dlElem.setAttribute("download", `DUMP_${new Date().toISOString().slice(0,10)}.json`); dlElem.click(); toast('Extraction Terminée'); }
-        function importJSON(event) {
-            const file = event.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                try {
-                    let i = JSON.parse(e.target.result);
-                    // Validation stricte : on refuse tout fichier qui ne ressemble pas à une vraie sauvegarde complète,
-                    // pour ne jamais pousser un import vide ou corrompu vers le Cloud (même faille que l'ancien saveDB()).
-                    const requiredArrays = ['apartments', 'cotisations', 'charges'];
-                    const isValid = requiredArrays.every(k => Array.isArray(i[k])) && i.apartments.length > 0;
-                    if (!isValid) { toast('Fichier invalide ou vide — import annulé pour éviter un écrasement', 'error'); return; }
-                    if (!confirm(`Ce fichier contient ${i.apartments.length} lots et ${i.cotisations.length} paiements. Il va REMPLACER toutes les données actuelles. Confirmer ?`)) return;
-                    db = i;
-                    saveDB(); // repasse par la garde anti-écrasement + sauvegarde silencieuse, au lieu d'un .set() direct
-                    toast("Import validé, synchronisation...", "success");
-                    setTimeout(() => window.location.reload(), 1500);
-                } catch (err) { toast('Fichier corrompu', 'error'); }
-            };
-            reader.readAsText(file);
-        }
+        function importJSON(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { let i = JSON.parse(e.target.result); if(i.apartments) { db = i; localStorage.setItem('syndic_fallback', JSON.stringify(db)); toast("Injection Cloud..."); dbCloud.collection("syndic_data").doc("main_database").set(db).then(() => { toast("OK ! Reboot...", "success"); setTimeout(() => window.location.reload(), 2000); }).catch(() => toast("Erreur Serveur", "error")); } } catch(err) { toast('Fichier corrompu', 'error'); } }; reader.readAsText(file); }
 
         function openModal(id) { document.getElementById(id).classList.add('active'); let aptO = db.apartments.map(a => `<option value="${a.id}">L_${a.number.toString().padStart(2,'0')} - ${s(a.owner)}</option>`).join(''); document.querySelectorAll('.form-apt').forEach(sl => sl.innerHTML = aptO); let t = new Date().toISOString().split('T')[0]; ['form-date','charge-date','annexe-date','incident-date','maint-date'].forEach(i => { if(document.getElementById(i)) document.getElementById(i).value = t; }); if(id === 'modalPaiement') { document.getElementById('form-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateTotalModalPaiement()"><span class="month-btn">${m}</span></label>`).join(''); updateTotalModalPaiement(); } if(id === 'modalCharge') { document.getElementById('charge-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateChargeTotal()"><span class="month-btn">${m}</span></label>`).join(''); document.getElementById('charge-type').value = 'femme'; onChargeTypeChange(); } }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
