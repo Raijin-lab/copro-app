@@ -186,7 +186,6 @@
         </div>
     </div>
 
-    <!-- SIDEBAR (PC Only) -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-brand"><i class="fa-solid fa-server"></i><span>GH5-SN8 SYNDIC</span></div>
         <div class="sidebar-nav">
@@ -197,7 +196,6 @@
         </div>
     </nav>
 
-    <!-- MAIN LAYOUT -->
     <main class="main-wrapper">
         <header class="topbar no-print">
             <h2 id="page-title" style="font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-main);">Télémétrie Financière</h2>
@@ -209,7 +207,6 @@
         </header>
 
         <div class="page-content">
-            <!-- PAGE: DASHBOARD -->
             <div id="page-dashboard" class="page-view">
                 <div class="grid-4">
                     <div class="card">
@@ -235,7 +232,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: HUB -->
             <div id="page-hub" class="page-view hidden">
                 <h3 style="margin-bottom: 20px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; color: var(--primary);">Modules du Système</h3>
                 <div class="hub-grid">
@@ -249,7 +245,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: APPARTEMENTS -->
             <div id="page-apartments" class="page-view hidden">
                 <div class="table-container" style="background: transparent; border: none; padding: 0;">
                     <div class="table-header" style="background: var(--bg-card); border-radius: var(--radius) var(--radius) 0 0;">
@@ -276,7 +271,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: COTISATIONS -->
             <div id="page-cotisations" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Registre des Entrées</div><button class="btn btn-success" onclick="openModal('modalPaiement')"><i class="fa-solid fa-plus"></i> Saisir Paiement</button></div>
@@ -284,7 +278,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: ANNEXES -->
             <div id="page-annexes" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card"><div class="stat-header"><div><div class="stat-title">Fonds Travaux</div><div class="stat-value font-mono text-success" id="annexes-total-collecte">0 DH</div></div></div></div>
@@ -297,7 +290,6 @@
                 <div class="grid-2" id="annexes-projects-container" style="margin-top: 24px;"></div>
             </div>
 
-            <!-- PAGE: CHARGES -->
             <div id="page-charges" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header">
@@ -311,7 +303,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: TECHNIQUE -->
             <div id="page-technique" class="page-view hidden">
                 <div class="grid-2">
                     <div class="table-container">
@@ -325,7 +316,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: ENERGIE -->
             <div id="page-energie" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
@@ -339,7 +329,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: RAPPORT & RELANCES -->
             <div id="page-rapport" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 15px;">
@@ -354,7 +343,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: FOURNISSEURS -->
             <div id="page-fournisseurs" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Base Prestataires</div><button class="btn btn-outline" onclick="openModal('modalFournisseur')"><i class="fa-solid fa-plus"></i> Nouveau</button></div>
@@ -362,7 +350,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: PARAMETRES -->
             <div id="page-parametres" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
@@ -382,7 +369,6 @@
         </div>
     </main>
 
-    <!-- BOTTOM NAV (Mobile Only) -->
     <nav class="bottom-nav">
         <div class="b-nav-item active" data-target="dashboard" onclick="switchPage('dashboard')"><i class="fa-solid fa-chart-line"></i><span>Télémétrie</span></div>
         <div class="b-nav-item" data-target="apartments" onclick="switchPage('apartments')"><i class="fa-solid fa-layer-group"></i><span>Réseau</span></div>
@@ -390,26 +376,16 @@
         <div class="b-nav-item" data-target="hub" onclick="switchPage('hub')"><i class="fa-solid fa-grip"></i><span>Système</span></div>
     </nav>
 
-    <!-- MODALS -->
     <div class="modal-overlay" id="modalAptDetails"><div class="modal-content"><div class="modal-header"><h3 id="apt-detail-title" style="color: var(--primary);"><i class="fa-solid fa-door-open"></i> Lot</h3><button class="btn-icon" onclick="closeModal('modalAptDetails')"><i class="fa-solid fa-chevron-down"></i></button></div><div class="modal-body" id="apt-detail-body"></div><div class="modal-footer"><button class="btn btn-outline" id="btn-edit-apt-shortcut">Modifier Profil</button><button class="btn btn-primary" onclick="closeModal('modalAptDetails')">Fermer</button></div></div></div>
-    
     <div class="modal-overlay" id="modalEditApt"><div class="modal-content"><div class="modal-header"><h3>Configuration Lot</h3><button class="btn-icon" onclick="closeModal('modalEditApt')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><input type="hidden" id="edit-apt-id"><div class="form-group"><label class="form-label">Identifiant Lot</label><input type="text" class="form-control font-mono" id="edit-apt-num" readonly></div><div class="form-group"><label class="form-label">Entité (Nom)</label><input type="text" class="form-control" id="edit-apt-owner"></div><div class="form-group"><label class="form-label">Contact</label><input type="tel" class="form-control font-mono" id="edit-apt-phone"></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalEditApt')">Annuler</button><button class="btn btn-primary" onclick="saveAptEdit()">Enregistrer</button></div></div></div>
-    
     <div class="modal-overlay" id="modalPaiement"><div class="modal-content"><div class="modal-header"><h3>Transaction Entrante</h3><button class="btn-icon" onclick="closeModal('modalPaiement')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Cible (Lot)</label><select class="form-control form-apt"></select></div><div class="form-group"><label class="form-label">Cycles couverts</label><div class="month-grid" id="form-months"></div></div><div style="display:flex; gap:15px; margin-top:15px;"><div class="form-group" style="flex:1;"><label class="form-label">Vecteur</label><select class="form-control" id="form-mode"><option>Espèces</option><option>Virement</option><option>Chèque</option></select></div><div class="form-group" style="flex:1;"><label class="form-label">Statut</label><select class="form-control" id="form-statut" style="color:var(--warning);"><option value="Validé" style="color:var(--success)">Encaissé (Validé)</option><option value="En attente" style="color:var(--warning)">Promesse (En attente)</option></select></div></div><div class="form-group"><label class="form-label">Horodatage</label><input type="date" class="form-control font-mono" id="form-date"></div><div class="text-right" style="margin-top:10px; background:#000; padding:15px; border-radius:12px;"><strong class="font-mono" style="font-size:1.8rem; color:var(--success);" id="form-total">0 DH</strong></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-success" onclick="savePaiement()">Exécuter</button></div></div></div>
-    
     <div class="modal-overlay" id="modalAnnexe"><div class="modal-content"><div class="modal-header"><h3>Fonds Exceptionnel</h3><button class="btn-icon" onclick="closeModal('modalAnnexe')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Nature</label><select class="form-control" id="annexe-projet-select" onchange="onAnnexeTypeChange()"><option value="custom_projet">Intervention Technique</option><option value="Report Exercice Précédent">Report Trésorerie</option></select></div><div class="form-group" id="annexe-projet-custom-section"><label class="form-label">Intitulé Projet</label><input type="text" class="form-control" id="annexe-projet"></div><div class="form-group"><label class="form-label">Source (Lot ou Global)</label><select class="form-control form-apt" id="annexe-apt"></select></div><div class="form-group"><label class="form-label">Valeur (DH)</label><input type="number" class="form-control font-mono" id="annexe-montant"></div><div style="display:flex; gap:15px;"><div class="form-group" style="flex:1;"><label class="form-label">Vecteur</label><select class="form-control" id="annexe-mode"><option>Espèces</option><option>Virement</option></select></div><div class="form-group" style="flex:1;"><label class="form-label">Horodatage</label><input type="date" class="form-control font-mono" id="annexe-date"></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAnnexe')">Annuler</button><button class="btn btn-primary" onclick="saveAnnexe()">Valider</button></div></div></div>
-    
     <div class="modal-overlay" id="modalCharge"><div class="modal-content"><div class="modal-header"><h3>Transaction Sortante</h3><button class="btn-icon" onclick="closeModal('modalCharge')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Catégorie</label><select class="form-control" id="charge-type" onchange="onChargeTypeChange()"><option value="femme">Hygiène / Ménage</option><option value="ascenseur">Maintenance Ascenseur</option><option value="electricite">Réseau Électrique</option><option value="custom">Intervention Spécifique</option></select></div><div class="form-group" id="charge-mois-section"><label class="form-label">Cycles concernés</label><div class="month-grid" id="charge-months"></div></div><div class="form-group" id="charge-desc-section" style="display:none;"><label class="form-label">Détails techniques</label><input type="text" class="form-control" id="charge-desc"></div><div style="display:flex; gap:15px;"><div class="form-group" style="flex:1;"><label class="form-label" id="charge-montant-label">Base (DH/mois)</label><input type="number" class="form-control font-mono" id="charge-montant" value="500" oninput="updateChargeTotal()"></div><div class="form-group" style="flex:1;"><label class="form-label">Horodatage</label><input type="date" class="form-control font-mono" id="charge-date"></div></div><div class="text-right" style="margin-top:10px; background:#000; padding:15px; border-radius:12px;"><span style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); display:block;">Impact Trésorerie</span><strong class="font-mono" style="font-size:1.8rem; color:var(--danger);" id="charge-total-display">500 DH</strong></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalCharge')">Annuler</button><button class="btn btn-danger" onclick="saveCharge()">Exécuter</button></div></div></div>
-    
     <div class="modal-overlay" id="modalFournisseur"><div class="modal-content"><div class="modal-header"><h3>Fiche Prestataire</h3><button class="btn-icon" onclick="closeModal('modalFournisseur')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Domaine</label><input type="text" class="form-control" id="fourn-type"></div><div class="form-group"><label class="form-label">Entité</label><input type="text" class="form-control" id="fourn-nom"></div><div class="form-group"><label class="form-label">Contact</label><input type="tel" class="form-control font-mono" id="fourn-tel"></div><div class="form-group"><label class="form-label">Notes techniques</label><input type="text" class="form-control" id="fourn-notes"></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalFournisseur')">Annuler</button><button class="btn btn-primary" onclick="saveFournisseur()">Valider</button></div></div></div>
-    
     <div class="modal-overlay" id="modalIncident"><div class="modal-content"><div class="modal-header"><h3>Alerte Système</h3><button class="btn-icon" onclick="closeModal('modalIncident')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Diagnostic court</label><input type="text" class="form-control" id="incident-titre"></div><div class="form-group"><label class="form-label">Détails logs</label><textarea class="form-control" id="incident-desc" rows="3"></textarea></div><div style="display:flex; gap:15px;"><div class="form-group" style="flex:1;"><label class="form-label">Horodatage</label><input type="date" class="form-control font-mono" id="incident-date"></div><div class="form-group" style="flex:1;"><label class="form-label">Gravité</label><select class="form-control" id="incident-prio"><option value="Basse">Standard</option><option value="Haute">Critique</option></select></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalIncident')">Annuler</button><button class="btn btn-warning" onclick="saveIncident()">Enregistrer Log</button></div></div></div>
-    
     <div class="modal-overlay" id="modalMaintenance"><div class="modal-content"><div class="modal-header"><h3>Log Maintenance</h3><button class="btn-icon" onclick="closeModal('modalMaintenance')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Système</label><select class="form-control" id="maint-equip"><option>Ascenseur</option><option>Porte Automatique</option><option>Surpresseur Eau</option><option>Extincteurs</option></select></div><div class="form-group"><label class="form-label">Horodatage</label><input type="date" class="form-control font-mono" id="maint-date"></div><div class="form-group"><label class="form-label">Bilan Technique</label><textarea class="form-control" id="maint-obs" rows="3"></textarea></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalMaintenance')">Annuler</button><button class="btn btn-primary" onclick="saveMaintenance()">Archiver</button></div></div></div>
-    
     <div class="modal-overlay" id="modalConso"><div class="modal-content"><div class="modal-header"><h3>Télémétrie Fluide</h3><button class="btn-icon" onclick="closeModal('modalConso')"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="form-group"><label class="form-label">Réseau</label><select class="form-control" id="conso-type"><option value="Eau">Hydrique (Eau)</option><option value="Électricité">Électrique (ONE)</option></select></div><div class="form-group"><label class="form-label">Cycle (Mois)</label><select class="form-control" id="conso-mois"><option value="1">Janvier</option><option value="2">Février</option><option value="3">Mars</option><option value="4">Avril</option><option value="5">Mai</option><option value="6">Juin</option><option value="7">Juillet</option><option value="8">Août</option><option value="9">Septembre</option><option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option></select></div><div class="form-group"><label class="form-label">Valeur (DH)</label><input type="number" class="form-control font-mono" id="conso-montant"></div><div class="form-group"><label class="form-label">Index Compteur</label><input type="text" class="form-control font-mono" id="conso-index"></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalConso')">Annuler</button><button class="btn btn-primary" onclick="saveConsommation()">Enregistrer</button></div></div></div>
 
-    <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toastBox"></div>
 
     <script>
@@ -495,13 +471,20 @@
 
         function refreshUI() {
             document.getElementById('rapport-title-year').innerText = `Bilan Synthétique ${currentYear}`;
-            const recYear = db.cotisations.filter(c => getYearOf(c) === currentYear && c.statut !== 'En attente').reduce((sum, c) => sum + parseFloat(c.montant), 0);
+            
+            // CORRECTION: Seuls les "Report Exercice Précédent" s'ajoutent aux Recettes Globales (Trésorerie)
+            const reportYear = db.cotisationsAnnexes.filter(c => getYearOf(c) === currentYear && c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
+            const reportGlobal = db.cotisationsAnnexes.filter(c => c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
+
+            const recYear = db.cotisations.filter(c => getYearOf(c) === currentYear && c.statut !== 'En attente').reduce((sum, c) => sum + parseFloat(c.montant), 0) + reportYear;
             const depYear = db.charges.filter(c => getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.depenses.filter(d => getYearOf(d) === currentYear).reduce((sum, d) => sum + parseFloat(d.montant), 0);
-            const recTot = db.cotisations.filter(c => c.statut !== 'En attente').reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((sum, c) => sum + parseFloat(c.montant), 0);
+            
+            const recTot = db.cotisations.filter(c => c.statut !== 'En attente').reduce((sum, c) => sum + parseFloat(c.montant), 0) + reportGlobal;
             const depTot = db.charges.reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.depenses.reduce((sum, c) => sum + parseFloat(c.montant), 0);
             
             document.getElementById('dash-recettes').innerText = formatMoney.format(recYear); document.getElementById('dash-depenses').innerText = formatMoney.format(depYear);
             document.getElementById('dash-solde').innerText = formatMoney.format(recTot - depTot); document.getElementById('dash-taux').innerText = Math.round((recYear/(NB_APPARTEMENTS * COTISATION_MENSUELLE * 12))*100) + '%';
+            
             initCharts(); renderApartments(); renderAnnexes(); renderTables(); renderTechnique(); renderEnergie();
         }
 
@@ -786,14 +769,17 @@
             toast("Génération du PDF en cours...", "info");
             setTimeout(() => {
                 const year = currentYear; 
+                // CORRECTION ICI AUSSI: Le PDF ne prend en compte que le Report Exercice Précédent pour les recettes globales
                 const cots = db.cotisations.filter(c => getYearOf(c) === year && c.statut !== 'En attente'); 
-                const anns = db.cotisationsAnnexes.filter(c => getYearOf(c) === year); 
+                const anns = db.cotisationsAnnexes.filter(c => getYearOf(c) === year && c.projet === 'Report Exercice Précédent'); 
                 const chgs = db.charges.filter(c => getYearOf(c) === year); 
                 const deps = db.depenses.filter(c => getYearOf(c) === year);
                 
                 const totalRecettesAnnee = cots.reduce((sum, c) => sum + parseFloat(c.montant), 0) + anns.reduce((sum, c) => sum + parseFloat(c.montant), 0); 
                 const totalDepensesAnnee = chgs.reduce((sum, c) => sum + parseFloat(c.montant), 0) + deps.reduce((sum, c) => sum + parseFloat(c.montant), 0);
-                const totalRecettesGlobal = db.cotisations.filter(c => c.statut !== 'En attente').reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.cotisationsAnnexes.reduce((sum, c) => sum + parseFloat(c.montant), 0); 
+                
+                const reportGlobal = db.cotisationsAnnexes.filter(c => c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
+                const totalRecettesGlobal = db.cotisations.filter(c => c.statut !== 'En attente').reduce((sum, c) => sum + parseFloat(c.montant), 0) + reportGlobal; 
                 const totalSortiesGlobal = db.charges.reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.depenses.reduce((sum, c) => sum + parseFloat(c.montant), 0); 
                 const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
 
@@ -841,36 +827,6 @@
         function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dlElem = document.getElementById('downloadAnchorElem'); dlElem.setAttribute("href", dataStr); dlElem.setAttribute("download", `DUMP_${new Date().toISOString().slice(0,10)}.json`); dlElem.click(); toast('Extraction Terminée'); }
         function importJSON(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { let i = JSON.parse(e.target.result); if(i.apartments) { db = i; localStorage.setItem('syndic_fallback', JSON.stringify(db)); toast("Injection Cloud..."); dbCloud.collection("syndic_data").doc("main_database").set(db).then(() => { toast("OK ! Reboot...", "success"); setTimeout(() => window.location.reload(), 2000); }).catch(() => toast("Erreur Serveur", "error")); } } catch(err) { toast('Fichier corrompu', 'error'); } }; reader.readAsText(file); }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); let aptO = db.apartments.map(a => `<option value="${a.id}">L_${a.number.toString().padStart(2,'0')} - ${s(a.owner)}</option>`).join(''); document.querySelectorAll('.form-apt').forEach(sl => sl.innerHTML = aptO); let t = new Date().toISOString().split('T')[0]; ['form-date','charge-date','annexe-date','incident-date','maint-date'].forEach(i => { if(document.getElementById(i)) document.getElementById(i).value = t; }); if(id === 'modalPaiement') { document.getElementById('form-statut').value = 'Validé'; document.getElementById('form-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateTotalModalPaiement()"><span class="month-btn">${m}</span></label>`).join(''); updateTotalModalPaiement(); } if(id === 'modalCharge') { document.getElementById('charge-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateChargeTotal()"><span class="month-btn">${m}</span></label>`).join(''); document.getElementById('charge-type').value = 'femme'; onChargeTypeChange(); } }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        
-        function updateTotalModalPaiement() { document.getElementById('form-total').innerText = (document.querySelectorAll('#form-months input:checked').length * COTISATION_MENSUELLE) + ' DH'; }
-        function onAnnexeTypeChange() { const v = document.getElementById('annexe-projet-select').value; const c = document.getElementById('annexe-projet-custom-section'); if(v === 'Report Exercice Précédent') { c.style.display = 'none'; document.getElementById('annexe-montant').value = '1717'; } else { c.style.display = 'block'; document.getElementById('annexe-montant').value = ''; } }
-        function onChargeTypeChange() { const t = document.getElementById('charge-type').value; const m = document.getElementById('charge-montant'); const st = document.getElementById('charge-desc-section'); const l = document.getElementById('charge-montant-label'); m.readOnly = false; m.style.background = '#000'; if(t === 'femme') { m.value = 500; st.style.display = 'none'; l.innerText = 'Base (DH/mois)'; } else if(t === 'ascenseur') { m.value = 150; st.style.display = 'none'; l.innerText = 'Base (DH/mois)'; } else if(t === 'electricite') { m.value = ''; st.style.display = 'none'; l.innerText = 'Base (DH/mois)'; } else { m.value = ''; st.style.display = 'block'; l.innerText = 'Base (DH/mois)'; } updateChargeTotal(); }
-        function updateChargeTotal() { document.getElementById('charge-total-display').innerText = (document.querySelectorAll('#charge-months input:checked').length * (parseFloat(document.getElementById('charge-montant').value) || 0)) + ' DH'; }
-
-        function savePaiement() { const b = document.querySelectorAll('#form-months input:checked'); if(b.length === 0) return toast('Cochez un cycle', 'error'); let mN = []; b.forEach(x => mN.push(MOIS_NOMS[x.value - 1])); db.cotisations.push({ id: Date.now(), aptId: parseInt(document.querySelector('#modalPaiement .form-apt').value), date: document.getElementById('form-date').value, mode: document.getElementById('form-mode').value, statut: document.getElementById('form-statut').value, montant: b.length * COTISATION_MENSUELLE, moisStr: mN.join(', ') }); saveDB(); refreshUI(); closeModal('modalPaiement'); toast('Transaction validée'); triggerHaptic('success'); }
-        function saveAnnexe() { const sv = document.getElementById('annexe-projet-select').value; const p = sv === 'Report Exercice Précédent' ? 'Report Exercice Précédent' : document.getElementById('annexe-projet').value; const mt = document.getElementById('annexe-montant').value; if(!p.trim() || !mt) return toast('Données requises', 'error'); db.cotisationsAnnexes.push({ id: Date.now(), projet: p, aptId: sv === 'Report Exercice Précédent' ? null : parseInt(document.getElementById('annexe-apt').value), montant: parseFloat(mt), mode: document.getElementById('annexe-mode').value, date: document.getElementById('annexe-date').value }); saveDB(); refreshUI(); closeModal('modalAnnexe'); toast('Fond ajouté'); triggerHaptic('success'); }
-        function saveCharge() { const t = document.getElementById('charge-type').value; const d = document.getElementById('charge-date').value; const mt = parseFloat(document.getElementById('charge-montant').value) || 0; if(!mt || mt <= 0) return toast('Montant invalide', 'error'); let cat, desc; if(t === 'femme') { cat = 'Hygiène'; desc = 'Entretien'; } else if(t === 'ascenseur') { cat = 'Ascenseur'; desc = 'Maintenance'; } else if(t === 'electricite') { cat = 'Énergie'; desc = 'Réseau ONE'; } else { cat = 'Autre'; desc = document.getElementById('charge-desc').value; if(!desc) return toast('Détail requis', 'error'); } const bx = document.querySelectorAll('#charge-months input:checked'); if(bx.length === 0) return toast('Cycle requis', 'error'); const bId = Date.now(); bx.forEach(b => { let mi = parseInt(b.value) - 1; db.charges.push({ id: bId + mi, cat: cat, date: d, desc: desc + ' - ' + MOIS_NOMS[mi], montant: mt }); }); saveDB(); refreshUI(); closeModal('modalCharge'); toast('Sortie confirmée'); triggerHaptic('success'); }
-        
-        function deleteEntry(table, id) { if(confirm('Purger ce log ?')) { db[table] = db[table].filter(row => row.id !== id); saveDB(); refreshUI(); toast('Log effacé'); } }
-        function saveFournisseur() { db.fournisseurs.push({ id: Date.now(), type: document.getElementById('fourn-type').value, nom: document.getElementById('fourn-nom').value, tel: document.getElementById('fourn-tel').value, notes: document.getElementById('fourn-notes').value }); saveDB(); refreshUI(); closeModal('modalFournisseur'); toast('Profil créé'); }
-        function saveIncident() { db.incidents.push({ id: Date.now(), titre: document.getElementById('incident-titre').value, desc: document.getElementById('incident-desc').value, date: document.getElementById('incident-date').value, prio: document.getElementById('incident-prio').value, statut: 'En attente' }); saveDB(); refreshUI(); closeModal('modalIncident'); toast('Alerte Loggée'); }
-        function resolveIncident(id) { let i = db.incidents.find(x => x.id === id); if(i) { i.statut = 'Résolu'; saveDB(); refreshUI(); toast('Acquitté'); } }
-        function saveMaintenance() { db.maintenance.push({ id: Date.now(), equip: document.getElementById('maint-equip').value, date: document.getElementById('maint-date').value, obs: document.getElementById('maint-obs').value }); saveDB(); refreshUI(); closeModal('modalMaintenance'); toast('Archivé'); }
-
-        function toast(msg, type = 'success') { const b = document.getElementById('toastBox'); const el = document.createElement('div'); el.className = `toast`; let ic = type === 'success' ? 'fa-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-info-circle'; let col = type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--info)'; el.innerHTML = `<div style="font-size:1.5rem; color:${col}; text-shadow:0 0 10px ${col}"><i class="fa-solid ${ic}"></i></div> <div style="font-size:0.85rem; font-weight:600; letter-spacing:0.5px;">${msg}</div>`; b.appendChild(el); setTimeout(() => el.remove(), 3500); }
-
-        function initDB() {
-            let l = localStorage.getItem('syndic_fallback'); if (l) { try { let p = JSON.parse(l); if (p.apartments && p.apartments.length > 0) { db = p; refreshUI(); } } catch(e) {} }
-            dbCloud.collection("syndic_data").doc("main_database").onSnapshot((doc) => {
-                if (doc.exists) { const d = doc.data(); if (d.apartments && d.apartments.length > 0) { db.settings = d.settings || { pin: '0000' }; db.apartments = d.apartments || []; db.cotisations = d.cotisations || []; db.charges = d.charges || []; db.depenses = d.depenses || []; db.cotisationsAnnexes = d.cotisationsAnnexes || []; db.fournisseurs = d.fournisseurs || []; db.incidents = d.incidents || []; db.maintenance = d.maintenance || []; db.consommations = d.consommations || []; localStorage.setItem('syndic_fallback', JSON.stringify(db)); } }
-                else if (!l) { if (db.apartments.length === 0) { for (let i = 1; i <= NB_APPARTEMENTS; i++) { db.apartments.push({ id: i, number: i, owner: `PROPRIETAIRE_${i}`, phone: '' }); } saveDB(); } }
-                populateYearSelector(); refreshUI();
-            }, (error) => { toast("Mode HORS-LIGNE", "warning"); });
-        }
-
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').then(r => r.update()); }); }
         window.onload = function() { ['mousemove', 'keydown', 'click', 'touchstart'].forEach(e => document.addEventListener(e, resetInactivityTimer, true)); };
     </script>
 </body>
