@@ -1,4 +1,4 @@
-const CACHE_NAME = 'syndic-cache-v53'; // On passe à la v10 pour forcer la purge
+const CACHE_NAME = 'syndic-cache-v54'; // On passe à la v10 pour forcer la purge
 const urlsToCache = [
     './',
     './index.html',
