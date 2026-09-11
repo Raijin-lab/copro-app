@@ -470,9 +470,16 @@
         }
 
         function refreshUI() {
+            // BOUCLIER ANTI-CRASH: Sécurise la mémoire même si les données sont anciennes
+            if (!db.cotisations) db.cotisations = [];
+            if (!db.charges) db.charges = [];
+            if (!db.depenses) db.depenses = [];
+            if (!db.cotisationsAnnexes) db.cotisationsAnnexes = [];
+            if (!db.apartments || db.apartments.length === 0) return;
+
             document.getElementById('rapport-title-year').innerText = `Bilan Synthétique ${currentYear}`;
             
-            // CORRECTION: Seuls les "Report Exercice Précédent" s'ajoutent aux Recettes Globales (Trésorerie)
+            // LA TRÉSORERIE EST PROTÉGÉE: Seul le Report Exercice s'ajoute à la caisse principale
             const reportYear = db.cotisationsAnnexes.filter(c => getYearOf(c) === currentYear && c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
             const reportGlobal = db.cotisationsAnnexes.filter(c => c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
 
@@ -769,7 +776,6 @@
             toast("Génération du PDF en cours...", "info");
             setTimeout(() => {
                 const year = currentYear; 
-                // CORRECTION ICI AUSSI: Le PDF ne prend en compte que le Report Exercice Précédent pour les recettes globales
                 const cots = db.cotisations.filter(c => getYearOf(c) === year && c.statut !== 'En attente'); 
                 const anns = db.cotisationsAnnexes.filter(c => getYearOf(c) === year && c.projet === 'Report Exercice Précédent'); 
                 const chgs = db.charges.filter(c => getYearOf(c) === year); 
@@ -827,6 +833,40 @@
         function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dlElem = document.getElementById('downloadAnchorElem'); dlElem.setAttribute("href", dataStr); dlElem.setAttribute("download", `DUMP_${new Date().toISOString().slice(0,10)}.json`); dlElem.click(); toast('Extraction Terminée'); }
         function importJSON(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { let i = JSON.parse(e.target.result); if(i.apartments) { db = i; localStorage.setItem('syndic_fallback', JSON.stringify(db)); toast("Injection Cloud..."); dbCloud.collection("syndic_data").doc("main_database").set(db).then(() => { toast("OK ! Reboot...", "success"); setTimeout(() => window.location.reload(), 2000); }).catch(() => toast("Erreur Serveur", "error")); } } catch(err) { toast('Fichier corrompu', 'error'); } }; reader.readAsText(file); }
 
+        function initDB() {
+            let l = localStorage.getItem('syndic_fallback'); 
+            if (l) { try { let p = JSON.parse(l); if (p.apartments && p.apartments.length > 0) { db = p; refreshUI(); } } catch(e) {} }
+            dbCloud.collection("syndic_data").doc("main_database").onSnapshot((doc) => {
+                if (doc.exists) { 
+                    const d = doc.data(); 
+                    if (d.apartments && d.apartments.length > 0) { 
+                        db.settings = d.settings || { pin: '0000' }; 
+                        db.apartments = d.apartments || []; 
+                        db.cotisations = d.cotisations || []; 
+                        db.charges = d.charges || []; 
+                        db.depenses = d.depenses || []; 
+                        db.cotisationsAnnexes = d.cotisationsAnnexes || []; 
+                        db.fournisseurs = d.fournisseurs || []; 
+                        db.incidents = d.incidents || []; 
+                        db.maintenance = d.maintenance || []; 
+                        db.consommations = d.consommations || []; 
+                        localStorage.setItem('syndic_fallback', JSON.stringify(db)); 
+                    } 
+                }
+                else if (!l) { 
+                    if (db.apartments.length === 0) { 
+                        for (let i = 1; i <= NB_APPARTEMENTS; i++) { db.apartments.push({ id: i, number: i, owner: `PROPRIETAIRE_${i}`, phone: '' }); } 
+                        saveDB(); 
+                    } 
+                }
+                populateYearSelector(); refreshUI();
+            }, (error) => { 
+                toast("Mode HORS-LIGNE", "warning"); 
+                populateYearSelector(); refreshUI();
+            });
+        }
+
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(function(registrations) { for(let registration of registrations) { registration.unregister(); } }); }
         window.onload = function() { ['mousemove', 'keydown', 'click', 'touchstart'].forEach(e => document.addEventListener(e, resetInactivityTimer, true)); };
     </script>
 </body>
