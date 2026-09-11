@@ -445,7 +445,21 @@
             if (authReady) { if (input === sessionPin) { unlockUI(); } else { document.getElementById('pinError').style.display = 'block'; document.getElementById('pinInput').value = ''; triggerHaptic('error'); } return; }
             if (input.length < 6) { document.getElementById('pinError').innerText = 'Clé 6 caractères min.'; document.getElementById('pinError').style.display = 'block'; triggerHaptic('error'); return; }
             btn.disabled = true; btn.innerText = 'TRAITEMENT...';
-            dbAuth.signInWithEmailAndPassword(ADMIN_EMAIL, input).then(() => { sessionPin = input; authReady = true; initDB(); unlockUI(); }).catch(() => { document.getElementById('pinError').innerText = 'Accès Refusé.'; document.getElementById('pinError').style.display = 'block'; document.getElementById('pinInput').value = ''; triggerHaptic('error'); }).finally(() => { btn.disabled = false; btn.innerText = 'DÉVERROUILLER'; });
+            
+            dbAuth.signInWithEmailAndPassword(ADMIN_EMAIL, input).then(() => { 
+                sessionPin = input; authReady = true; initDB(); unlockUI(); 
+            }).catch((err) => { 
+                if(err.message.includes('network') || err.message.includes('blocked')) {
+                    document.getElementById('pinError').innerText = 'Connexion bloquée par le navigateur (Désactivez AdBlocker/DevTools).';
+                } else {
+                    document.getElementById('pinError').innerText = 'Accès Refusé. Code incorrect.';
+                }
+                document.getElementById('pinError').style.display = 'block'; 
+                document.getElementById('pinInput').value = ''; 
+                triggerHaptic('error'); 
+            }).finally(() => { 
+                btn.disabled = false; btn.innerText = 'DÉVERROUILLER'; 
+            });
         }
         document.getElementById('pinInput').addEventListener('keypress', function (e) { if (e.key === 'Enter') verifyPin(); });
         function updatePin() {
@@ -470,7 +484,6 @@
         }
 
         function refreshUI() {
-            // BOUCLIER ANTI-CRASH: Sécurise la mémoire même si les données sont anciennes
             if (!db.cotisations) db.cotisations = [];
             if (!db.charges) db.charges = [];
             if (!db.depenses) db.depenses = [];
@@ -479,7 +492,6 @@
 
             document.getElementById('rapport-title-year').innerText = `Bilan Synthétique ${currentYear}`;
             
-            // LA TRÉSORERIE EST PROTÉGÉE: Seul le Report Exercice s'ajoute à la caisse principale
             const reportYear = db.cotisationsAnnexes.filter(c => getYearOf(c) === currentYear && c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
             const reportGlobal = db.cotisationsAnnexes.filter(c => c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
 
@@ -861,8 +873,12 @@
                 }
                 populateYearSelector(); refreshUI();
             }, (error) => { 
-                toast("Mode HORS-LIGNE", "warning"); 
-                populateYearSelector(); refreshUI();
+                if (l) {
+                    toast("Mode HORS-LIGNE (Données locales)", "warning"); 
+                    populateYearSelector(); refreshUI();
+                } else {
+                    toast("BLOCAGE RÉSEAU : Impossible de télécharger les données.", "error");
+                }
             });
         }
 
