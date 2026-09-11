@@ -207,7 +207,6 @@
         </header>
 
         <div class="page-content">
-            <!-- PAGE: DASHBOARD -->
             <div id="page-dashboard" class="page-view">
                 <div class="grid-4">
                     <div class="card">
@@ -233,7 +232,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: HUB -->
             <div id="page-hub" class="page-view hidden">
                 <h3 style="margin-bottom: 20px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; color: var(--primary);">Modules du Système</h3>
                 <div class="hub-grid">
@@ -247,7 +245,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: APPARTEMENTS -->
             <div id="page-apartments" class="page-view hidden">
                 <div class="table-container" style="background: transparent; border: none; padding: 0;">
                     <div class="table-header" style="background: var(--bg-card); border-radius: var(--radius) var(--radius) 0 0;">
@@ -274,7 +271,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: COTISATIONS -->
             <div id="page-cotisations" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Registre des Entrées</div><button class="btn btn-success" onclick="openModal('modalPaiement')"><i class="fa-solid fa-plus"></i> Saisir Paiement</button></div>
@@ -282,7 +278,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: ANNEXES -->
             <div id="page-annexes" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card"><div class="stat-header"><div><div class="stat-title">Fonds Travaux Récoltés</div><div class="stat-value font-mono text-success" id="annexes-total-collecte">0 DH</div></div></div></div>
@@ -293,12 +288,14 @@
                         <div class="table-title">Registre Interventions</div>
                         <button class="btn btn-primary" onclick="openModal('modalAnnexe')"><i class="fa-solid fa-plus"></i> Saisir une participation</button>
                     </div>
-                    <table><thead><tr><th>Date</th><th>Projet</th><th>Montant</th><th class="text-right no-print">Act</th></tr></thead><tbody id="table-annexes"></tbody></table>
+                    <table style="min-width: 600px;">
+                        <thead><tr><th>Date</th><th>Projet</th><th>Source</th><th>Montant</th><th class="text-right no-print">Act</th></tr></thead>
+                        <tbody id="table-annexes"></tbody>
+                    </table>
                 </div>
                 <div class="grid-2" id="annexes-projects-container" style="margin-top: 24px;"></div>
             </div>
 
-            <!-- PAGE: CHARGES -->
             <div id="page-charges" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header">
@@ -312,7 +309,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: TECHNIQUE -->
             <div id="page-technique" class="page-view hidden">
                 <div class="grid-2">
                     <div class="table-container">
@@ -326,7 +322,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: ENERGIE -->
             <div id="page-energie" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
@@ -340,7 +335,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: RAPPORT & RELANCES -->
             <div id="page-rapport" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 15px;">
@@ -355,7 +349,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: FOURNISSEURS -->
             <div id="page-fournisseurs" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Base Prestataires</div><button class="btn btn-outline" onclick="openModal('modalFournisseur')"><i class="fa-solid fa-plus"></i> Nouveau</button></div>
@@ -363,7 +356,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: PARAMETRES -->
             <div id="page-parametres" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
@@ -726,14 +718,12 @@
             document.getElementById('rapport-title-year').innerText = `Bilan Synthétique ${currentYear}`;
             
             // LA NOUVELLE LOGIQUE MATHEMATIQUE (Caisse Principale isolée des Travaux)
-            // Seul le "Report Exercice Précédent" s'ajoute à la Trésorerie globale
             const reportYear = db.cotisationsAnnexes.filter(c => getYearOf(c) === currentYear && c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
             const reportGlobal = db.cotisationsAnnexes.filter(c => c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
 
             const recYear = db.cotisations.filter(c => getYearOf(c) === currentYear && c.statut !== 'En attente').reduce((sum, c) => sum + parseFloat(c.montant), 0) + reportYear;
             const recTot = db.cotisations.filter(c => c.statut !== 'En attente').reduce((sum, c) => sum + parseFloat(c.montant), 0) + reportGlobal;
 
-            // Les dépenses globales IGNORENT les dépenses de catégorie 'Projet' (Fonds Travaux)
             const depYear = db.charges.filter(c => getYearOf(c) === currentYear && c.cat !== 'Projet').reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.depenses.filter(d => getYearOf(d) === currentYear).reduce((sum, d) => sum + parseFloat(d.montant), 0);
             const depTot = db.charges.filter(c => c.cat !== 'Projet').reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.depenses.reduce((sum, c) => sum + parseFloat(c.montant), 0);
             
@@ -953,7 +943,11 @@
         }
 
         function renderAnnexes() {
-            document.getElementById('table-annexes').innerHTML = [...db.cotisationsAnnexes].filter(c => getYearOf(c) === currentYear).map(c => `<tr><td class="font-mono">${new Date(c.date).toLocaleDateString()}</td><td>${s(c.projet)}</td><td class="font-mono text-success">+${c.montant}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisationsAnnexes', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
+            // Affichage dans le tableau principal de l'onglet Travaux
+            document.getElementById('table-annexes').innerHTML = [...db.cotisationsAnnexes].filter(c => getYearOf(c) === currentYear).sort((a,b) => new Date(b.date) - new Date(a.date)).map(c => {
+                let sourceHtml = (c.aptId === 'Global' || !c.aptId) ? '<span class="badge badge-info">GLOBAL</span>' : `<span class="badge badge-success">Lot ${c.aptId.toString().padStart(2,'0')}</span>`;
+                return `<tr><td class="font-mono">${new Date(c.date).toLocaleDateString()}</td><td>${s(c.projet)}</td><td>${sourceHtml}</td><td class="font-mono text-success">+${c.montant}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisationsAnnexes', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`;
+            }).join('');
             
             let data = {}; 
             let collect = 0; 
@@ -964,7 +958,7 @@
                 let np = projetName.trim().toUpperCase(); 
                 if (np.includes('RESTE ANNÉE') || np.includes('REPORT EXERCICE')) return; 
                 if(!data[np]) data[np] = { nom: projetName, mt: parseFloat(c.montantTotal || c.montant), payeurs: [] }; 
-                if(c.aptId && !data[np].payeurs.includes(c.aptId)) data[np].payeurs.push(c.aptId); 
+                if(c.aptId && c.aptId !== 'Global' && !data[np].payeurs.includes(c.aptId)) data[np].payeurs.push(c.aptId); 
             });
             
             const cont = document.getElementById('annexes-projects-container'); 
@@ -993,7 +987,6 @@
             
             document.getElementById('annexes-total-collecte').innerText = formatMoney.format(collect); 
             
-            // Le solde travaux = Argent récolté pour travaux - Argent dépensé pour les travaux
             let depensesTravaux = db.charges.filter(c => c.cat === 'Projet').reduce((sum, c) => sum + parseFloat(c.montant), 0);
             let soldeTravaux = collect - depensesTravaux;
             document.getElementById('annexes-total-impayes').innerText = formatMoney.format(soldeTravaux);
@@ -1067,7 +1060,11 @@
                 document.getElementById('charge-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateChargeTotal()"><span class="month-btn">${m}</span></label>`).join(''); 
                 document.getElementById('charge-type').value = 'femme'; 
                 onChargeTypeChange(); 
-            } 
+            }
+            if(id === 'modalAnnexe') {
+                document.getElementById('annexe-projet-select').value = 'custom_projet';
+                onAnnexeTypeChange();
+            }
         }
 
         function closeModal(id) { 
@@ -1081,12 +1078,19 @@
         function onAnnexeTypeChange() { 
             const v = document.getElementById('annexe-projet-select').value; 
             const c = document.getElementById('annexe-projet-custom-section'); 
+            const aptSelect = document.getElementById('annexe-apt');
+            
             if(v === 'Report Exercice Précédent') { 
                 c.style.display = 'none'; 
-                document.getElementById('annexe-montant').value = '1717'; 
+                document.getElementById('annexe-montant').value = ''; 
+                aptSelect.innerHTML = '<option value="Global">Trésorerie GLOBALE</option>';
+                aptSelect.disabled = true;
             } else { 
                 c.style.display = 'block'; 
                 document.getElementById('annexe-montant').value = ''; 
+                let aptO = db.apartments.map(a => `<option value="${a.id}">L_${a.number.toString().padStart(2,'0')} - ${s(a.owner)}</option>`).join(''); 
+                aptSelect.innerHTML = aptO;
+                aptSelect.disabled = false;
             } 
         }
 
@@ -1129,7 +1133,17 @@
             const p = sv === 'Report Exercice Précédent' ? 'Report Exercice Précédent' : document.getElementById('annexe-projet').value; 
             const mt = document.getElementById('annexe-montant').value; 
             if(!p.trim() || !mt) return toast('Données requises', 'error'); 
-            db.cotisationsAnnexes.push({ id: Date.now(), projet: p, aptId: sv === 'Report Exercice Précédent' ? null : parseInt(document.getElementById('annexe-apt').value), montant: parseFloat(mt), mode: document.getElementById('annexe-mode').value, date: document.getElementById('annexe-date').value }); 
+            
+            let aptIdValue = sv === 'Report Exercice Précédent' ? 'Global' : parseInt(document.getElementById('annexe-apt').value);
+            
+            db.cotisationsAnnexes.push({ 
+                id: Date.now(), 
+                projet: p, 
+                aptId: aptIdValue, 
+                montant: parseFloat(mt), 
+                mode: document.getElementById('annexe-mode').value, 
+                date: document.getElementById('annexe-date').value 
+            }); 
             saveDB(); refreshUI(); closeModal('modalAnnexe'); toast('Fond ajouté'); triggerHaptic('success'); 
         }
 
@@ -1307,16 +1321,9 @@
             }, 500); 
         }
 
-        function toast(msg, type = 'success') { 
-            const b = document.getElementById('toastBox'); 
-            const el = document.createElement('div'); 
-            el.className = `toast`; 
-            let ic = type === 'success' ? 'fa-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-info-circle'; 
-            let col = type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--info)'; 
-            el.innerHTML = `<div style="font-size:1.5rem; color:${col}; text-shadow:0 0 10px ${col}"><i class="fa-solid ${ic}"></i></div> <div style="font-size:0.85rem; font-weight:600; letter-spacing:0.5px;">${msg}</div>`; 
-            b.appendChild(el); 
-            setTimeout(() => el.remove(), 3500); 
-        }
+        function relanceWA(aptId, reste) { const apt = db.apartments.find(a => a.id === aptId); let actualYear = new Date().getFullYear(); let currentM = (currentYear < actualYear) ? 11 : new Date().getMonth(); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' '); let unpaidMonths = []; let unpaidAmount = 0; for(let i = 0; i <= currentM; i++) { if(!paidStr.includes(MOIS_NOMS[i].toLowerCase())) { unpaidMonths.push(MOIS_NOMS[i]); unpaidAmount += COTISATION_MENSUELLE; } } if(unpaidMonths.length === 0) { toast("Appartement à jour pour les mois écoulés.", "info"); return; } let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1); let text = `السلام عليكم،\n\nكنذكركم بلي واجبات السنديك ديال الشقة ${apt.number} بالنسبة للشهر (أو الأشهر): *${unpaidMonths.join(', ')}* مزال ما تخلصاتش (المبلغ: *${unpaidAmount} درهم*).\n\nالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت.\n\nشكرا، السنديك.`; window.open(`https://wa.me/${tel}?text=${encodeURIComponent(text)}`, '_blank'); }
+        function bilanGroupeWA() { let currentM = new Date().getMonth(); let currentMonthName = MOIS_NOMS[currentM]; let aptsAJour = []; let aptsEnRetard = []; db.apartments.forEach(apt => { const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' '); if (paidStr.includes(currentMonthName.toLowerCase())) { aptsAJour.push(apt.number); } else { aptsEnRetard.push(apt.number); } }); let listeAJour = aptsAJour.length > 0 ? aptsAJour.map(num => "• الشقة " + num).join('\n') : "لا أحد"; let listeEnRetard = aptsEnRetard.length > 0 ? aptsEnRetard.map(num => "• الشقة " + num).join('\n') : "لا أحد"; let text = `السلام عليكم الجيران،\n\nهادا تقرير بخصوص واجبات السنديك ديال هاد الشهر (*${currentMonthName}*).\n\n✅ *الشقق لي خلصو هاد الشهر:*\n${listeAJour}\n\n❌ *الشقق لي مزال ما خلصوش هاد الشهر:*\n${listeEnRetard}\n\nشكرا للناس لي خلصو، والله يجازيكم بخير لي مزال ما خلصش يكمل الواجب ديالو باش نقدرو نغطيو مصاريف العمارة.`; window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); }
+        function relanceGroupeWA() { let currentM = new Date().getMonth(); let currentMonthName = MOIS_NOMS[currentM]; let aptsEnRetard = []; let missingTotal = 0; db.apartments.forEach(apt => { const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' '); if (!paidStr.includes(currentMonthName.toLowerCase())) { aptsEnRetard.push(apt.number); missingTotal += COTISATION_MENSUELLE; } }); if (aptsEnRetard.length === 0) { toast("Tous les appartements sont à jour ce mois-ci !", "success"); return; } let listeApts = aptsEnRetard.map(num => "• الشقة " + num).join('\n'); let text = `السلام عليكم الجيران،\n\nتذكير بخصوص واجبات السنديك ديال هاد الشهر (*${currentMonthName}*).\n\nالشقق لي مزال ما خلصوش هما:\n${listeApts}\n\nالمجموع لي ناقصنا هاد الشهر هو: *${missingTotal} درهم*\n\nالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت باش نقدرو نخلصو المصاريف ديال العمارة.\nشكرا لتعاونكم.`; window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); }
 
         function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dlElem = document.getElementById('downloadAnchorElem'); dlElem.setAttribute("href", dataStr); dlElem.setAttribute("download", `DUMP_${new Date().toISOString().slice(0,10)}.json`); dlElem.click(); toast('Extraction Terminée'); }
         function importJSON(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { let i = JSON.parse(e.target.result); if(i.apartments) { db = i; localStorage.setItem('syndic_fallback', JSON.stringify(db)); toast("Injection Cloud..."); dbCloud.collection("syndic_data").doc("main_database").set(db).then(() => { toast("OK ! Reboot...", "success"); setTimeout(() => window.location.reload(), 2000); }).catch(() => toast("Erreur Serveur", "error")); } } catch(err) { toast('Fichier corrompu', 'error'); } }; reader.readAsText(file); }
