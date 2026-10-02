@@ -13,8 +13,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- CORRECTION CRITIQUE : Initialisation du moteur PDF AVANT AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>window.jsPDF = window.jspdf.jsPDF;</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -817,65 +815,65 @@
             triggerHaptic('success');
         }
 
+        // SUPPRESSION DU SETTIMEOUT POUR ÉVITER LE BLOCAGE NAVIGATEUR MOBILE
         function printMatricePDF() {
             toast("Génération de la matrice A3...", "info");
-            setTimeout(() => {
-                const doc = new jsPDF({ orientation: 'landscape', format: 'a3' });
-                doc.setFont("helvetica", "bold"); doc.setFontSize(22);
-                doc.text(`ETAT DES PAIEMENTS SYNDIC - GH5-SN8 (${currentYear})`, 210, 16, { align: "center" });
+            
+            const doc = new jsPDF({ orientation: 'landscape', format: 'a3' });
+            doc.setFont("helvetica", "bold"); doc.setFontSize(22);
+            doc.text(`ETAT DES PAIEMENTS SYNDIC - GH5-SN8 (${currentYear})`, 210, 16, { align: "center" });
 
-                let actualYear = new Date().getFullYear();
-                let currentMonthIndex = new Date().getMonth();
+            let actualYear = new Date().getFullYear();
+            let currentMonthIndex = new Date().getMonth();
 
-                let bodyData = db.apartments.map(apt => {
-                    const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear && c.statut !== 'En attente');
-                    let paye = paiements.reduce((sum, c) => sum + parseFloat(c.montant), 0);
-                    let du = COTISATION_MENSUELLE * 12;
-                    let reste = Math.max(du - paye, 0);
-                    let pStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
+            let bodyData = db.apartments.map(apt => {
+                const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear && c.statut !== 'En attente');
+                let paye = paiements.reduce((sum, c) => sum + parseFloat(c.montant), 0);
+                let du = COTISATION_MENSUELLE * 12;
+                let reste = Math.max(du - paye, 0);
+                let pStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
 
-                    let row = [`Apt ${apt.number.toString().padStart(2,'0')}`];
-                    MOIS_NOMS.forEach((m, mIndex) => {
-                        let isPaid = pStr.includes(m.toLowerCase());
-                        let isPastOrCurrent = (currentYear < actualYear) || (currentYear === actualYear && mIndex <= currentMonthIndex);
-                        if (isPaid) { row.push('OK'); } else if (isPastOrCurrent) { row.push('X'); } else { row.push('-'); }
-                    });
-                    row.push(`${paye} DH`, `${reste} DH`);
-                    return row;
+                let row = [`Apt ${apt.number.toString().padStart(2,'0')}`];
+                MOIS_NOMS.forEach((m, mIndex) => {
+                    let isPaid = pStr.includes(m.toLowerCase());
+                    let isPastOrCurrent = (currentYear < actualYear) || (currentYear === actualYear && mIndex <= currentMonthIndex);
+                    if (isPaid) { row.push('OK'); } else if (isPastOrCurrent) { row.push('X'); } else { row.push('-'); }
                 });
+                row.push(`${paye} DH`, `${reste} DH`);
+                return row;
+            });
 
-                doc.autoTable({
-                    startY: 22, head: [['Appartement', ...MOIS_NOMS, 'Total Payé', 'Reste à Payer']], body: bodyData, theme: 'grid',
-                    styles: { lineColor: [0, 0, 0], lineWidth: 0.4, textColor: [0, 0, 0] },
-                    headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', halign: 'center', fontSize: 10 },
-                    bodyStyles: { halign: 'center', fontSize: 9, cellPadding: 2 },
-                    columnStyles: { 0: { fontStyle: 'bold', halign: 'center', cellWidth: 35 } },
-                    margin: { top: 22, right: 10, bottom: 15, left: 10 },
-                    didParseCell: function(data) {
-                        if (data.section === 'body') {
-                            if (data.column.index >= 1 && data.column.index <= 12) {
-                                if (data.cell.raw === 'OK') { data.cell.styles.textColor = [16, 185, 129]; data.cell.styles.fontStyle = 'bold'; } 
-                                else if (data.cell.raw === 'X') { data.cell.styles.textColor = [239, 68, 68]; data.cell.styles.fontStyle = 'bold'; } 
-                                else if (data.cell.raw === '-') { data.cell.styles.textColor = [150, 150, 150]; }
-                            }
-                            if (data.column.index === 14) { 
-                                if (data.cell.raw !== '0 DH') { data.cell.styles.textColor = [239, 68, 68]; data.cell.styles.fontStyle = 'bold'; } 
-                                else { data.cell.styles.textColor = [16, 185, 129]; }
-                            }
+            doc.autoTable({
+                startY: 22, head: [['Appartement', ...MOIS_NOMS, 'Total Payé', 'Reste à Payer']], body: bodyData, theme: 'grid',
+                styles: { lineColor: [0, 0, 0], lineWidth: 0.4, textColor: [0, 0, 0] },
+                headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', halign: 'center', fontSize: 10 },
+                bodyStyles: { halign: 'center', fontSize: 9, cellPadding: 2 },
+                columnStyles: { 0: { fontStyle: 'bold', halign: 'center', cellWidth: 35 } },
+                margin: { top: 22, right: 10, bottom: 15, left: 10 },
+                didParseCell: function(data) {
+                    if (data.section === 'body') {
+                        if (data.column.index >= 1 && data.column.index <= 12) {
+                            if (data.cell.raw === 'OK') { data.cell.styles.textColor = [16, 185, 129]; data.cell.styles.fontStyle = 'bold'; } 
+                            else if (data.cell.raw === 'X') { data.cell.styles.textColor = [239, 68, 68]; data.cell.styles.fontStyle = 'bold'; } 
+                            else if (data.cell.raw === '-') { data.cell.styles.textColor = [150, 150, 150]; }
+                        }
+                        if (data.column.index === 14) { 
+                            if (data.cell.raw !== '0 DH') { data.cell.styles.textColor = [239, 68, 68]; data.cell.styles.fontStyle = 'bold'; } 
+                            else { data.cell.styles.textColor = [16, 185, 129]; }
                         }
                     }
-                });
+                }
+            });
 
-                const finalY = doc.lastAutoTable.finalY + 10;
-                doc.setFontSize(12); doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold");
-                doc.text(`Syndic Bénévole : Zouhair Badis`, 15, finalY);
-                doc.text(`Contact (WhatsApp / Tél) : 0661 733 195`, 15, finalY + 6);
-                doc.setFontSize(10); doc.setTextColor(100, 100, 100); doc.setFont("helvetica", "italic");
-                let dateStr = new Date().toLocaleString('fr-FR');
-                doc.text(`Document officiel généré par le système le ${dateStr}`, 405, finalY + 6, { align: "right" });
-                doc.save(`Matrice_Paiements_A3_${currentYear}.pdf`);
-                toast("Export Matrice A3 réussi !", "success");
-            }, 500);
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(12); doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold");
+            doc.text(`Syndic Bénévole : Zouhair Badis`, 15, finalY);
+            doc.text(`Contact (WhatsApp / Tél) : 0661 733 195`, 15, finalY + 6);
+            doc.setFontSize(10); doc.setTextColor(100, 100, 100); doc.setFont("helvetica", "italic");
+            let dateStr = new Date().toLocaleString('fr-FR');
+            doc.text(`Document officiel généré par le système le ${dateStr}`, 405, finalY + 6, { align: "right" });
+            doc.save(`Matrice_Paiements_A3_${currentYear}.pdf`);
+            toast("Export Matrice A3 réussi !", "success");
         }
 
         function renderApartments() {
@@ -992,56 +990,56 @@
             document.getElementById('annexes-total-impayes').innerText = formatMoney.format(soldeTravaux);
         }
 
+        // SUPPRESSION DU SETTIMEOUT POUR ÉVITER LE BLOCAGE NAVIGATEUR MOBILE
         function printProjetPDF(encodedProjetName) {
             let projetName = decodeURIComponent(encodedProjetName);
             toast("Génération de l'affiche A4...", "info");
-            setTimeout(() => {
-                const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
-                doc.setFont("helvetica", "bold"); doc.setFontSize(18);
-                doc.text(`ETAT DE COTISATION : ${projetName.toUpperCase()}`, 105, 20, { align: "center" });
+            
+            const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
+            doc.setFont("helvetica", "bold"); doc.setFontSize(18);
+            doc.text(`ETAT DE COTISATION : ${projetName.toUpperCase()}`, 105, 20, { align: "center" });
 
-                let payeCount = 0; let nonPayeCount = 0; let totalCollecte = 0;
+            let payeCount = 0; let nonPayeCount = 0; let totalCollecte = 0;
 
-                let bodyData = db.apartments.map(apt => {
-                    const paiements = db.cotisationsAnnexes.filter(c => c.aptId === apt.id && s(c.projet).toUpperCase() === projetName.toUpperCase() && getYearOf(c) === currentYear);
-                    let paye = paiements.reduce((sum, c) => sum + parseFloat(c.montant), 0);
-                    let statut = "";
-                    if (paye > 0) { statut = "PAYE"; payeCount++; totalCollecte += paye; } else { statut = "NON PAYE"; nonPayeCount++; }
-                    return [`Apt ${apt.number.toString().padStart(2,'0')}`, s(apt.owner), `${paye} DH`, statut];
-                });
+            let bodyData = db.apartments.map(apt => {
+                const paiements = db.cotisationsAnnexes.filter(c => c.aptId === apt.id && s(c.projet).toUpperCase() === projetName.toUpperCase() && getYearOf(c) === currentYear);
+                let paye = paiements.reduce((sum, c) => sum + parseFloat(c.montant), 0);
+                let statut = "";
+                if (paye > 0) { statut = "PAYE"; payeCount++; totalCollecte += paye; } else { statut = "NON PAYE"; nonPayeCount++; }
+                return [`Apt ${apt.number.toString().padStart(2,'0')}`, s(apt.owner), `${paye} DH`, statut];
+            });
 
-                doc.autoTable({
-                    startY: 30, head: [['Appartement', 'Proprietaire', 'Montant', 'Statut']], body: bodyData, theme: 'grid',
-                    styles: { lineColor: [0, 0, 0], lineWidth: 0.4, textColor: [0, 0, 0] },
-                    headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', halign: 'center' },
-                    bodyStyles: { halign: 'center', fontSize: 11, cellPadding: 3 },
-                    columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'left' } },
-                    didParseCell: function(data) {
-                        if (data.section === 'body' && data.column.index === 3) {
-                            if (data.cell.raw === 'PAYE') { data.cell.styles.textColor = [16, 185, 129]; data.cell.styles.fontStyle = 'bold'; } 
-                            else { data.cell.styles.textColor = [239, 68, 68]; data.cell.styles.fontStyle = 'bold'; }
-                        }
+            doc.autoTable({
+                startY: 30, head: [['Appartement', 'Proprietaire', 'Montant', 'Statut']], body: bodyData, theme: 'grid',
+                styles: { lineColor: [0, 0, 0], lineWidth: 0.4, textColor: [0, 0, 0] },
+                headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', halign: 'center' },
+                bodyStyles: { halign: 'center', fontSize: 11, cellPadding: 3 },
+                columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'left' } },
+                didParseCell: function(data) {
+                    if (data.section === 'body' && data.column.index === 3) {
+                        if (data.cell.raw === 'PAYE') { data.cell.styles.textColor = [16, 185, 129]; data.cell.styles.fontStyle = 'bold'; } 
+                        else { data.cell.styles.textColor = [239, 68, 68]; data.cell.styles.fontStyle = 'bold'; }
                     }
-                });
+                }
+            });
 
-                const finalY = doc.lastAutoTable.finalY + 10;
-                doc.setFontSize(12); doc.setTextColor(0,0,0); doc.setFont("helvetica", "bold");
-                doc.text(`Resume du projet :`, 14, finalY);
-                doc.setFontSize(11); doc.setFont("helvetica", "normal");
-                doc.text(`- Appartements ayant participe : ${payeCount} / 26`, 14, finalY + 7);
-                doc.text(`- En attente de paiement : ${nonPayeCount} / 26`, 14, finalY + 14);
-                doc.text(`- Total collecte a ce jour : ${formatMoney.format(totalCollecte)}`, 14, finalY + 21);
-                doc.setFontSize(12); doc.setFont("helvetica", "bold");
-                doc.text(`Syndic Benevole : Zouhair Badis`, 14, finalY + 35);
-                doc.text(`Contact (WhatsApp / Tel) : 0661 733 195`, 14, finalY + 42);
-                doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.setFont("helvetica", "italic");
-                let dateStr = new Date().toLocaleString('fr-FR');
-                doc.text(`Affiche officielle generee le ${dateStr}`, 195, finalY + 42, { align: "right" });
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(12); doc.setTextColor(0,0,0); doc.setFont("helvetica", "bold");
+            doc.text(`Resume du projet :`, 14, finalY);
+            doc.setFontSize(11); doc.setFont("helvetica", "normal");
+            doc.text(`- Appartements ayant participe : ${payeCount} / 26`, 14, finalY + 7);
+            doc.text(`- En attente de paiement : ${nonPayeCount} / 26`, 14, finalY + 14);
+            doc.text(`- Total collecte a ce jour : ${formatMoney.format(totalCollecte)}`, 14, finalY + 21);
+            doc.setFontSize(12); doc.setFont("helvetica", "bold");
+            doc.text(`Syndic Benevole : Zouhair Badis`, 14, finalY + 35);
+            doc.text(`Contact (WhatsApp / Tel) : 0661 733 195`, 14, finalY + 42);
+            doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.setFont("helvetica", "italic");
+            let dateStr = new Date().toLocaleString('fr-FR');
+            doc.text(`Affiche officielle generee le ${dateStr}`, 195, finalY + 42, { align: "right" });
 
-                let safeFileName = projetName.replace(/[^a-zA-Z0-9]/g, '_');
-                doc.save(`Affiche_Projet_${safeFileName}.pdf`);
-                toast("Export Affiche A4 réussi !", "success");
-            }, 500);
+            let safeFileName = projetName.replace(/[^a-zA-Z0-9]/g, '_');
+            doc.save(`Affiche_Projet_${safeFileName}.pdf`);
+            toast("Export Affiche A4 réussi !", "success");
         }
 
         function openModal(id) { 
@@ -1244,81 +1242,83 @@
 
         function saveConsommation() { const ty = document.getElementById('conso-type').value; const mo = parseInt(document.getElementById('conso-mois').value); const mt = parseFloat(document.getElementById('conso-montant').value); if (!mt || mt <= 0) return toast("Valeur nulle", "error"); if(!db.consommations) db.consommations = []; db.consommations.push({ id: Date.now(), type: ty, mois: mo, montant: mt, indexConsommation: document.getElementById('conso-index').value, dateSaisie: new Date().toISOString() }); saveDB(); closeModal('modalConso'); document.getElementById('conso-montant').value = ''; document.getElementById('conso-index').value = ''; refreshUI(); toast('Télémétrie MÀJ !'); }
 
+        // SUPPRESSION DU SETTIMEOUT POUR ÉVITER LE BLOCAGE NAVIGATEUR MOBILE
         function printDepensesAnnee() {
             toast("Génération du relevé des dépenses...", "info");
-            setTimeout(() => {
-                const year = currentYear;
-                const chgs = db.charges.filter(c => getYearOf(c) === year && c.cat !== 'Projet');
-                const deps = db.depenses.filter(c => getYearOf(c) === year);
-                const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))];
-                if (allSorties.length === 0) { toast("Aucune dépense enregistrée.", "warning"); return; }
-                allSorties.sort((a,b) => new Date(a.date) - new Date(b.date));
-                const total = allSorties.reduce((s, c) => s + parseFloat(c.montant), 0);
+            
+            const year = currentYear;
+            const chgs = db.charges.filter(c => getYearOf(c) === year && c.cat !== 'Projet');
+            const deps = db.depenses.filter(c => getYearOf(c) === year);
+            const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))];
+            if (allSorties.length === 0) { toast("Aucune dépense enregistrée.", "warning"); return; }
+            allSorties.sort((a,b) => new Date(a.date) - new Date(b.date));
+            const total = allSorties.reduce((s, c) => s + parseFloat(c.montant), 0);
 
-                const doc = new jsPDF();
-                doc.setFont("helvetica", "bold"); doc.setFontSize(18);
-                doc.text(`RELEVE DETAILLE DES DEPENSES - ${year}`, 105, 20, { align: "center" });
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold"); doc.setFontSize(18);
+            doc.text(`RELEVE DETAILLE DES DEPENSES - ${year}`, 105, 20, { align: "center" });
 
-                let bodyData = allSorties.map(c => [ new Date(c.date).toLocaleDateString('fr-FR'), s(c.type), s(c.desc), formatMoney.format(parseFloat(c.montant)) ]);
-                doc.autoTable({ startY: 30, head: [['Date', 'Catégorie', 'Description / Motif', 'Montant']], body: bodyData, foot: [['', '', 'TOTAL ANNUEL', formatMoney.format(total)]], theme: 'striped', headStyles: { fillColor: [255, 0, 85], textColor: 255 }, footStyles: { fillColor: [10, 14, 23], textColor: 255 } });
-                doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
-                doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')} - Syndicat GH5-SN8`, 195, doc.lastAutoTable.finalY + 15, { align: "right" });
-                doc.save(`Releve_Depenses_${year}.pdf`); toast("Export PDF réussi !", "success");
-            }, 500);
+            let bodyData = allSorties.map(c => [ new Date(c.date).toLocaleDateString('fr-FR'), s(c.type), s(c.desc), formatMoney.format(parseFloat(c.montant)) ]);
+            doc.autoTable({ startY: 30, head: [['Date', 'Catégorie', 'Description / Motif', 'Montant']], body: bodyData, foot: [['', '', 'TOTAL ANNUEL', formatMoney.format(total)]], theme: 'striped', headStyles: { fillColor: [255, 0, 85], textColor: 255 }, footStyles: { fillColor: [10, 14, 23], textColor: 255 } });
+            doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
+            doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')} - Syndicat GH5-SN8`, 195, doc.lastAutoTable.finalY + 15, { align: "right" });
+            doc.save(`Releve_Depenses_${year}.pdf`);
+            toast("Export PDF réussi !", "success");
         }
 
+        // SUPPRESSION DU SETTIMEOUT POUR ÉVITER LE BLOCAGE NAVIGATEUR MOBILE
         function printBilanGlobal() {
             toast("Génération du PDF en cours...", "info");
-            setTimeout(() => {
-                const year = currentYear; 
-                const cots = db.cotisations.filter(c => getYearOf(c) === year && c.statut !== 'En attente'); 
-                const anns = db.cotisationsAnnexes.filter(c => getYearOf(c) === year && c.projet === 'Report Exercice Précédent'); 
-                const chgs = db.charges.filter(c => getYearOf(c) === year && c.cat !== 'Projet'); 
-                const deps = db.depenses.filter(c => getYearOf(c) === year);
-                
-                const totalRecettesAnnee = cots.reduce((sum, c) => sum + parseFloat(c.montant), 0) + anns.reduce((sum, c) => sum + parseFloat(c.montant), 0); 
-                const totalDepensesAnnee = chgs.reduce((sum, c) => sum + parseFloat(c.montant), 0) + deps.reduce((sum, c) => sum + parseFloat(c.montant), 0);
-                
-                const reportGlobal = db.cotisationsAnnexes.filter(c => c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
-                const totalRecettesGlobal = db.cotisations.filter(c => c.statut !== 'En attente').reduce((sum, c) => sum + parseFloat(c.montant), 0) + reportGlobal; 
-                const totalSortiesGlobal = db.charges.filter(c => c.cat !== 'Projet').reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.depenses.reduce((sum, c) => sum + parseFloat(c.montant), 0); 
-                const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
+            
+            const year = currentYear; 
+            const cots = db.cotisations.filter(c => getYearOf(c) === year && c.statut !== 'En attente'); 
+            const anns = db.cotisationsAnnexes.filter(c => getYearOf(c) === year && c.projet === 'Report Exercice Précédent'); 
+            const chgs = db.charges.filter(c => getYearOf(c) === year && c.cat !== 'Projet'); 
+            const deps = db.depenses.filter(c => getYearOf(c) === year);
+            
+            const totalRecettesAnnee = cots.reduce((sum, c) => sum + parseFloat(c.montant), 0) + anns.reduce((sum, c) => sum + parseFloat(c.montant), 0); 
+            const totalDepensesAnnee = chgs.reduce((sum, c) => sum + parseFloat(c.montant), 0) + deps.reduce((sum, c) => sum + parseFloat(c.montant), 0);
+            
+            const reportGlobal = db.cotisationsAnnexes.filter(c => c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
+            const totalRecettesGlobal = db.cotisations.filter(c => c.statut !== 'En attente').reduce((sum, c) => sum + parseFloat(c.montant), 0) + reportGlobal; 
+            const totalSortiesGlobal = db.charges.filter(c => c.cat !== 'Projet').reduce((sum, c) => sum + parseFloat(c.montant), 0) + db.depenses.reduce((sum, c) => sum + parseFloat(c.montant), 0); 
+            const soldeGlobal = totalRecettesGlobal - totalSortiesGlobal;
 
-                let depensesParMois = Array(12).fill(null).map(() => ({ menage: 0, ascenseur: 0, electricite: 0, autres: 0, total: 0 }));
-                const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))];
-                let listeDivers = []; 
+            let depensesParMois = Array(12).fill(null).map(() => ({ menage: 0, ascenseur: 0, electricite: 0, autres: 0, total: 0 }));
+            const allSorties = [...chgs.map(c => ({...c, type: c.cat, desc: c.desc})), ...deps.map(d => ({...d, type: d.typeDepense || 'Dépense', desc: d.beneficiaire || d.description}))];
+            let listeDivers = []; 
 
-                allSorties.forEach(c => {
-                    let moisIndex = new Date(c.date).getMonth();
-                    if (c.desc) { let dLower = c.desc.toLowerCase(); MOIS_NOMS.forEach((m, idx) => { if (dLower.includes(m.toLowerCase())) moisIndex = idx; }); }
-                    let montant = parseFloat(c.montant);
-                    let catLower = (c.type || '').toLowerCase(); let descLower = (c.desc || '').toLowerCase();
-                    if (catLower.includes('ménage') || catLower.includes('femme') || descLower.includes('ménage')) { depensesParMois[moisIndex].menage += montant; } 
-                    else if (catLower.includes('ascenseur') || descLower.includes('ascenseur')) { depensesParMois[moisIndex].ascenseur += montant; } 
-                    else if (catLower.includes('élec') || catLower.includes('elec') || descLower.includes('élec') || descLower.includes('one')) { depensesParMois[moisIndex].electricite += montant; } 
-                    else { depensesParMois[moisIndex].autres += montant; listeDivers.push({ date: c.date, type: c.type, desc: c.desc, montant: montant }); }
-                    depensesParMois[moisIndex].total += montant;
-                });
+            allSorties.forEach(c => {
+                let moisIndex = new Date(c.date).getMonth();
+                if (c.desc) { let dLower = c.desc.toLowerCase(); MOIS_NOMS.forEach((m, idx) => { if (dLower.includes(m.toLowerCase())) moisIndex = idx; }); }
+                let montant = parseFloat(c.montant);
+                let catLower = (c.type || '').toLowerCase(); let descLower = (c.desc || '').toLowerCase();
+                if (catLower.includes('ménage') || catLower.includes('femme') || descLower.includes('ménage')) { depensesParMois[moisIndex].menage += montant; } 
+                else if (catLower.includes('ascenseur') || descLower.includes('ascenseur')) { depensesParMois[moisIndex].ascenseur += montant; } 
+                else if (catLower.includes('élec') || catLower.includes('elec') || descLower.includes('élec') || descLower.includes('one')) { depensesParMois[moisIndex].electricite += montant; } 
+                else { depensesParMois[moisIndex].autres += montant; listeDivers.push({ date: c.date, type: c.type, desc: c.desc, montant: montant }); }
+                depensesParMois[moisIndex].total += montant;
+            });
 
-                const doc = new jsPDF('landscape'); doc.setFont("helvetica", "bold"); doc.setFontSize(22);
-                doc.text(`BILAN ANNUEL DES DEPENSES - GH5-SN8 (${year})`, 148, 20, { align: "center" });
+            const doc = new jsPDF('landscape'); doc.setFont("helvetica", "bold"); doc.setFontSize(22);
+            doc.text(`BILAN ANNUEL DES DEPENSES - GH5-SN8 (${year})`, 148, 20, { align: "center" });
 
-                let bodyData = depensesParMois.map((m, idx) => [ MOIS_NOMS[idx], m.menage > 0 ? formatMoney.format(m.menage) : '-', m.ascenseur > 0 ? formatMoney.format(m.ascenseur) : '-', m.electricite > 0 ? formatMoney.format(m.electricite) : '-', m.autres > 0 ? formatMoney.format(m.autres) : '-', m.total > 0 ? formatMoney.format(m.total) : '-' ]);
-                doc.autoTable({ startY: 35, head: [['Mois', 'Menage', 'Ascenseur', 'Electricite', 'Autres Divers', 'Total Mensuel']], body: bodyData, foot: [['TOTAL ANNEE', formatMoney.format(depensesParMois.reduce((s, m) => s + m.menage, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.ascenseur, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.electricite, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0)), formatMoney.format(totalDepensesAnnee)]], theme: 'striped', headStyles: { fillColor: [0, 229, 255], textColor: 0, fontStyle: 'bold' }, footStyles: { fillColor: [10, 14, 23], textColor: 255, fontStyle: 'bold' } });
+            let bodyData = depensesParMois.map((m, idx) => [ MOIS_NOMS[idx], m.menage > 0 ? formatMoney.format(m.menage) : '-', m.ascenseur > 0 ? formatMoney.format(m.ascenseur) : '-', m.electricite > 0 ? formatMoney.format(m.electricite) : '-', m.autres > 0 ? formatMoney.format(m.autres) : '-', m.total > 0 ? formatMoney.format(m.total) : '-' ]);
+            doc.autoTable({ startY: 35, head: [['Mois', 'Menage', 'Ascenseur', 'Electricite', 'Autres Divers', 'Total Mensuel']], body: bodyData, foot: [['TOTAL ANNEE', formatMoney.format(depensesParMois.reduce((s, m) => s + m.menage, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.ascenseur, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.electricite, 0)), formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0)), formatMoney.format(totalDepensesAnnee)]], theme: 'striped', headStyles: { fillColor: [0, 229, 255], textColor: 0, fontStyle: 'bold' }, footStyles: { fillColor: [10, 14, 23], textColor: 255, fontStyle: 'bold' } });
 
-                let finalY = doc.lastAutoTable.finalY + 20;
-                doc.setFontSize(16); doc.setTextColor(0, 0, 0); doc.text(`Synthese Financiere - Exercice ${year}`, 14, finalY); doc.setFontSize(14); doc.setTextColor(16, 185, 129); doc.text(`Total Recettes Collectees : +${formatMoney.format(totalRecettesAnnee)}`, 14, finalY + 10); doc.setTextColor(239, 68, 68); doc.text(`Total Depenses de l'annee : -${formatMoney.format(totalDepensesAnnee)}`, 14, finalY + 20); if(soldeGlobal >= 0) { doc.setTextColor(0, 229, 255); } else { doc.setTextColor(239, 68, 68); } doc.text(`Reliquat Tresorerie : ${formatMoney.format(soldeGlobal)}`, 14, finalY + 30); doc.setTextColor(100, 100, 100); doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.text(`Genere le ${new Date().toLocaleDateString('fr-FR')} - Syndicat GH5-SN8`, 280, finalY + 40, { align: "right" });
+            let finalY = doc.lastAutoTable.finalY + 20;
+            doc.setFontSize(16); doc.setTextColor(0, 0, 0); doc.text(`Synthese Financiere - Exercice ${year}`, 14, finalY); doc.setFontSize(14); doc.setTextColor(16, 185, 129); doc.text(`Total Recettes Collectees : +${formatMoney.format(totalRecettesAnnee)}`, 14, finalY + 10); doc.setTextColor(239, 68, 68); doc.text(`Total Depenses de l'annee : -${formatMoney.format(totalDepensesAnnee)}`, 14, finalY + 20); if(soldeGlobal >= 0) { doc.setTextColor(0, 229, 255); } else { doc.setTextColor(239, 68, 68); } doc.text(`Reliquat Tresorerie : ${formatMoney.format(soldeGlobal)}`, 14, finalY + 30); doc.setTextColor(100, 100, 100); doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.text(`Genere le ${new Date().toLocaleDateString('fr-FR')} - Syndicat GH5-SN8`, 280, finalY + 40, { align: "right" });
 
-                if (listeDivers.length > 0) {
-                    doc.addPage(); doc.setFontSize(18); doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold");
-                    doc.text(`ANNEXE : DETAIL DES DEPENSES "AUTRES DIVERS" (${year})`, 148, 20, { align: "center" });
-                    listeDivers.sort((a,b) => new Date(a.date) - new Date(b.date));
-                    let divBody = listeDivers.map(d => [ new Date(d.date).toLocaleDateString('fr-FR'), s(d.type), s(d.desc), formatMoney.format(d.montant) ]);
-                    doc.autoTable({ startY: 35, head: [['Date', 'Catégorie', 'Description / Motif', 'Montant (DH)']], body: divBody, foot: [['', '', 'TOTAL DIVERS', formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0))]], theme: 'grid', headStyles: { fillColor: [100, 116, 139], textColor: 255 }, footStyles: { fillColor: [10, 14, 23], textColor: 255 } });
-                }
+            if (listeDivers.length > 0) {
+                doc.addPage(); doc.setFontSize(18); doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold");
+                doc.text(`ANNEXE : DETAIL DES DEPENSES "AUTRES DIVERS" (${year})`, 148, 20, { align: "center" });
+                listeDivers.sort((a,b) => new Date(a.date) - new Date(b.date));
+                let divBody = listeDivers.map(d => [ new Date(d.date).toLocaleDateString('fr-FR'), s(d.type), s(d.desc), formatMoney.format(d.montant) ]);
+                doc.autoTable({ startY: 35, head: [['Date', 'Catégorie', 'Description / Motif', 'Montant (DH)']], body: divBody, foot: [['', '', 'TOTAL DIVERS', formatMoney.format(depensesParMois.reduce((s, m) => s + m.autres, 0))]], theme: 'grid', headStyles: { fillColor: [100, 116, 139], textColor: 255 }, footStyles: { fillColor: [10, 14, 23], textColor: 255 } });
+            }
 
-                doc.save(`Bilan_Annuel_${year}.pdf`); toast("Export PDF réussi !", "success");
-            }, 500); 
+            doc.save(`Bilan_Annuel_${year}.pdf`);
+            toast("Export PDF réussi !", "success");
         }
 
         function relanceWA(aptId, reste) { const apt = db.apartments.find(a => a.id === aptId); let actualYear = new Date().getFullYear(); let currentM = (currentYear < actualYear) ? 11 : new Date().getMonth(); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' '); let unpaidMonths = []; let unpaidAmount = 0; for(let i = 0; i <= currentM; i++) { if(!paidStr.includes(MOIS_NOMS[i].toLowerCase())) { unpaidMonths.push(MOIS_NOMS[i]); unpaidAmount += COTISATION_MENSUELLE; } } if(unpaidMonths.length === 0) { toast("Appartement à jour pour les mois écoulés.", "info"); return; } let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1); let text = `السلام عليكم،\n\nكنذكركم بلي واجبات السنديك ديال الشقة ${apt.number} بالنسبة للشهر (أو الأشهر): *${unpaidMonths.join(', ')}* مزال ما تخلصاتش (المبلغ: *${unpaidAmount} درهم*).\n\nالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت.\n\nشكرا، السنديك.`; window.open(`https://wa.me/${tel}?text=${encodeURIComponent(text)}`, '_blank'); }
