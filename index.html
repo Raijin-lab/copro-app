@@ -13,7 +13,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- CORRECTION CRITIQUE : Initialisation du moteur PDF AVANT AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>window.jsPDF = window.jspdf.jsPDF;</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -551,7 +554,6 @@
         const ADMIN_EMAIL = "admin@gh5-sn8-syndic.local";
         let authReady = false;
 
-        window.jsPDF = window.jspdf.jsPDF;
         const COTISATION_MENSUELLE = 50; 
         const NB_APPARTEMENTS = 26;
         const MOIS_NOMS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
@@ -717,7 +719,6 @@
 
             document.getElementById('rapport-title-year').innerText = `Bilan Synthétique ${currentYear}`;
             
-            // LA NOUVELLE LOGIQUE MATHEMATIQUE (Caisse Principale isolée des Travaux)
             const reportYear = db.cotisationsAnnexes.filter(c => getYearOf(c) === currentYear && c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
             const reportGlobal = db.cotisationsAnnexes.filter(c => c.projet === 'Report Exercice Précédent').reduce((sum, c) => sum + parseFloat(c.montant), 0);
 
@@ -943,7 +944,6 @@
         }
 
         function renderAnnexes() {
-            // Affichage dans le tableau principal de l'onglet Travaux
             document.getElementById('table-annexes').innerHTML = [...db.cotisationsAnnexes].filter(c => getYearOf(c) === currentYear).sort((a,b) => new Date(b.date) - new Date(a.date)).map(c => {
                 let sourceHtml = (c.aptId === 'Global' || !c.aptId) ? '<span class="badge badge-info">GLOBAL</span>' : `<span class="badge badge-success">Lot ${c.aptId.toString().padStart(2,'0')}</span>`;
                 return `<tr><td class="font-mono">${new Date(c.date).toLocaleDateString()}</td><td>${s(c.projet)}</td><td>${sourceHtml}</td><td class="font-mono text-success">+${c.montant}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('cotisationsAnnexes', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`;
