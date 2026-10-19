@@ -400,7 +400,7 @@
         <div class="modal-content">
             <div class="modal-header"><h3 id="apt-detail-title" style="color: var(--primary);"><i class="fa-solid fa-door-open"></i> Lot</h3><button class="btn-icon" onclick="closeModal('modalAptDetails')"><i class="fa-solid fa-chevron-down"></i></button></div>
             <div class="modal-body" id="apt-detail-body"></div>
-            <div class="modal-footer"><button class="btn btn-outline" id="btn-edit-apt-shortcut">Modifier Profil</button><button class="btn btn-primary" onclick="closeModal('modalAptDetails')">Fermer</button></div>
+            <div class="modal-footer"><button class="btn btn-success" id="btn-pay-apt-shortcut">Saisir paiement</button><button class="btn btn-outline" id="btn-edit-apt-shortcut">Modifier Profil</button><button class="btn btn-primary" onclick="closeModal('modalAptDetails')">Fermer</button></div>
         </div>
     </div>
 
@@ -421,16 +421,17 @@
         <div class="modal-content">
             <div class="modal-header"><h3>Transaction Entrante</h3><button class="btn-icon" onclick="closeModal('modalPaiement')"><i class="fa-solid fa-xmark"></i></button></div>
             <div class="modal-body">
-                <div class="form-group"><label class="form-label">Cible (Lot)</label><select class="form-control form-apt"></select></div>
-                <div class="form-group"><label class="form-label">Cycles couverts</label><div class="month-grid" id="form-months"></div></div>
+                <div class="form-group"><label class="form-label">Cible (Lot)</label><select class="form-control form-apt" id="form-apt" onchange="renderPaiementMonths()"></select></div>
+                <div class="form-group"><label class="form-label">Cycles couverts</label><div id="form-months-info" style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; line-height:1.5;"></div><div style="display:flex; gap:8px; margin-bottom:10px;"><button type="button" class="btn btn-outline" style="padding:6px 12px; font-size:0.7rem;" onclick="quickMonths('next')">Prochain mois</button><button type="button" class="btn btn-outline" style="padding:6px 12px; font-size:0.7rem;" onclick="quickMonths('all')">Tout cocher</button><button type="button" class="btn btn-outline" style="padding:6px 12px; font-size:0.7rem;" onclick="quickMonths('none')">Vider</button></div><div class="month-grid" id="form-months"></div></div>
                 <div style="display:flex; gap:15px; margin-top:15px;">
                     <div class="form-group" style="flex:1;"><label class="form-label">Vecteur</label><select class="form-control" id="form-mode"><option>Espèces</option><option>Virement</option><option>Chèque</option></select></div>
                     <div class="form-group" style="flex:1;"><label class="form-label">Statut</label><select class="form-control" id="form-statut" style="color:var(--warning);"><option value="Validé" style="color:var(--success)">Encaissé (Validé)</option><option value="En attente" style="color:var(--warning)">Promesse (En attente)</option></select></div>
                 </div>
                 <div class="form-group"><label class="form-label">Horodatage</label><input type="date" class="form-control font-mono" id="form-date"></div>
+                <label style="display:flex; align-items:center; gap:8px; margin-top:10px; font-size:0.78rem; color:var(--text-muted); cursor:pointer;"><input type="checkbox" id="form-continue"> Enchaîner : passer au lot suivant après validation</label>
                 <div class="text-right" style="margin-top:10px; background:#000; padding:15px; border-radius:12px;"><strong class="font-mono" style="font-size:1.8rem; color:var(--success);" id="form-total">0 DH</strong></div>
             </div>
-            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-success" onclick="savePaiement()">Exécuter</button></div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-success" id="btn-save-paiement" onclick="savePaiement()">Exécuter</button></div>
         </div>
     </div>
 
@@ -530,7 +531,7 @@
         <div class="modal-content">
             <div class="modal-header"><h3>Télémétrie Fluide</h3><button class="btn-icon" onclick="closeModal('modalConso')"><i class="fa-solid fa-xmark"></i></button></div>
             <div class="modal-body">
-                <div class="form-group"><label class="form-label">Réseau</label><select class="form-control" id="conso-type"><option value="Eau">Hydrique (Eau)</option><option value="Électricité">Électrique (ONE)</option></select></div>
+                <div class="form-group"><label class="form-label">Réseau</label><select class="form-control" id="conso-type" onchange="renderConsoMois()"><option value="Eau">Hydrique (Eau)</option><option value="Électricité">Électrique (ONE)</option></select></div>
                 <div class="form-group">
                     <label class="form-label">Cycle (Mois)</label>
                     <select class="form-control" id="conso-mois">
@@ -854,7 +855,7 @@
                 let paye = paiements.reduce((sum, c) => sum + parseFloat(c.montant), 0);
                 let du = COTISATION_MENSUELLE * 12;
                 let reste = Math.max(du - paye, 0);
-                let pStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
+                let pStr = moisSetOf(paiements);
 
                 let row = [`Apt ${apt.number.toString().padStart(2,'0')}`];
                 MOIS_NOMS.forEach((m, mIndex) => {
@@ -915,8 +916,8 @@
                 
                 grid.innerHTML += `<div class="apt-card ${cls}" onclick="showAptDetails(${apt.id})"><div class="apt-num">${apt.number.toString().padStart(2,'0')}</div><div class="apt-owner">${s(apt.owner)}</div></div>`;
 
-                let pStr = paiements.filter(c => c.statut !== 'En attente').map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
-                let pendStr = paiements.filter(c => c.statut === 'En attente').map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
+                let pStr = moisSetOf(paiements.filter(c => c.statut !== 'En attente'));
+                let pendStr = moisSetOf(paiements.filter(c => c.statut === 'En attente'));
                 
                 tableHTML += `<tr><td style="position:sticky; left:0; background:var(--bg-card); z-index:1; border-right: 1px solid var(--border);"><strong class="text-primary font-mono cursor-pointer" onclick="showAptDetails(${apt.id})">#${apt.number.toString().padStart(2,'0')}</strong></td>`;
                 MOIS_NOMS.forEach(m => {
@@ -944,8 +945,8 @@
             const du = COTISATION_MENSUELLE * 12; 
             const reste = Math.max(du - total, 0);
             
-            let pStr = validPaiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
-            let pendStr = pendingPaiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' ');
+            let pStr = moisSetOf(validPaiements);
+            let pendStr = moisSetOf(pendingPaiements);
 
             document.getElementById('apt-detail-title').innerHTML = `<i class="fa-solid fa-cube text-primary"></i> CELLULE ${apt.number.toString().padStart(2,'0')}`;
             let html = `<div style="text-align:center; margin-bottom:20px; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase;">Cible : <span style="color:var(--text-main)">${s(apt.owner)}</span></div><div class="month-grid" style="margin-bottom: 24px;">`;
@@ -959,7 +960,8 @@
                 html += `<div style="padding:10px 5px; border-radius:8px; text-align:center; background:#000; border:1px solid ${borderColor};"><div style="font-size:0.65rem; color:var(--text-muted); margin-bottom:5px; text-transform:uppercase;">${m}</div><div style="color:${colorClass}; font-size:1.2rem;">${iconHtml}</div></div>`; 
             });
             html += `</div><div style="display:flex; justify-content:space-between; background:#000; padding:20px; border-radius:12px; border:1px solid var(--border);"><div><div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Fonds Validés</div><strong class="font-mono" style="font-size:1.4rem; color:var(--success);">${formatMoney.format(total)}</strong></div><div style="text-align:right;"><div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Déficit Reste</div><strong class="font-mono" style="font-size:1.4rem; color:${reste>0?'var(--danger)':'var(--text-main)'};">${formatMoney.format(reste)}</strong></div></div>`;
-            document.getElementById('btn-edit-apt-shortcut').onclick = function() { openEditApt(apt.id); }; 
+            document.getElementById('btn-edit-apt-shortcut').onclick = function() { openEditApt(apt.id); };
+            document.getElementById('btn-pay-apt-shortcut').onclick = function() { closeModal('modalAptDetails'); openModal('modalPaiement'); document.getElementById('form-apt').value = apt.id; renderPaiementMonths(); }; 
             document.getElementById('apt-detail-body').innerHTML = html; 
             openModal('modalAptDetails');
         }
@@ -1070,15 +1072,15 @@
             ['form-date','charge-date','annexe-date','incident-date','maint-date'].forEach(i => { if(document.getElementById(i)) document.getElementById(i).value = t; }); 
             
             if(id === 'modalPaiement') { 
-                document.getElementById('form-statut').value = 'Validé'; 
-                document.getElementById('form-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateTotalModalPaiement()"><span class="month-btn">${m}</span></label>`).join(''); 
-                updateTotalModalPaiement(); 
+                document.getElementById('form-statut').value = 'Validé'; { const fc = document.getElementById('form-continue'); if (fc) fc.checked = false; } 
+                renderPaiementMonths();
             } 
             if(id === 'modalCharge') { 
                 document.getElementById('charge-months').innerHTML = MOIS_NOMS.map((m, i) => `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateChargeTotal()"><span class="month-btn">${m}</span></label>`).join(''); 
                 document.getElementById('charge-type').value = 'femme'; 
                 onChargeTypeChange(); 
             }
+            if(id === 'modalConso') renderConsoMois();
             if(id === 'modalAnnexe') {
                 document.getElementById('annexe-projet-select').value = 'custom_projet';
                 onAnnexeTypeChange();
@@ -1089,6 +1091,63 @@
             document.getElementById(id).classList.remove('active'); 
         }
         
+
+        // Mois (index 0-11) couverts par un enregistrement
+        function moisIdxOf(c) {
+            const n = MOIS_NOMS.map(m => m.toLowerCase());
+            if (c.moisStr) return c.moisStr.split(',').map(x => n.indexOf(x.trim().toLowerCase())).filter(i => i > -1);
+            return c.mois ? [parseInt(c.mois) - 1] : [];
+        }
+        // Objet compatible .includes('jan') utilisé par les anciens affichages, mais en correspondance exacte
+        function moisSetOf(list) {
+            const set = new Set(); list.forEach(c => moisIdxOf(c).forEach(i => set.add(i)));
+            return { has: i => set.has(i), includes: name => set.has(MOIS_NOMS.findIndex(m => m.toLowerCase() === String(name).toLowerCase())) };
+        }
+        function getMoisStatus(aptId, year) {
+            const l = (db.cotisations || []).filter(c => parseInt(c.aptId) === parseInt(aptId) && getYearOf(c) === year);
+            const mk = arr => { const s = new Set(); arr.forEach(c => moisIdxOf(c).forEach(i => s.add(i))); return s; };
+            return { paid: mk(l.filter(c => c.statut !== 'En attente')), pending: mk(l.filter(c => c.statut === 'En attente')) };
+        }
+        function consoYear(c) { return c.annee ? parseInt(c.annee) : (c.dateSaisie ? new Date(c.dateSaisie).getFullYear() : currentYear); }
+        const MOIS_FULL = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+        // Affiche uniquement les mois encore disponibles pour le lot sélectionné
+        function renderPaiementMonths() {
+            const aptSel = document.getElementById('form-apt');
+            const grid = document.getElementById('form-months');
+            const info = document.getElementById('form-months-info');
+            const btn = document.getElementById('btn-save-paiement');
+            if (!aptSel || !grid) return;
+
+            const { paid, pending } = getMoisStatus(aptSel.value, currentYear);
+            let html = '';
+            MOIS_NOMS.forEach((m, i) => {
+                if (paid.has(i) || pending.has(i)) return; // mois déjà saisi : caché
+                html += `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateTotalModalPaiement()"><span class="month-btn">${m}</span></label>`;
+            });
+
+            const libres = 12 - new Set([...paid, ...pending]).size;
+            if (libres === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:16px; color:var(--success); font-size:0.85rem;"><i class="fa-solid fa-circle-check"></i> Tous les mois de ' + currentYear + ' sont déjà réglés pour ce lot.</div>';
+            } else {
+                grid.innerHTML = html;
+            }
+
+            let msg = [];
+            if (paid.size) msg.push('<span style="color:var(--success);">Déjà validés (' + currentYear + ') : ' + [...paid].sort((a,b)=>a-b).map(i => MOIS_NOMS[i]).join(', ') + '</span>');
+            if (pending.size) msg.push('<span style="color:var(--warning);">En attente (à valider depuis le registre) : ' + [...pending].sort((a,b)=>a-b).map(i => MOIS_NOMS[i]).join(', ') + '</span>');
+            info.innerHTML = msg.length ? msg.join('<br>') : 'Exercice ' + currentYear + ' : aucun mois enregistré pour ce lot.';
+
+            if (btn) btn.disabled = (libres === 0);
+            updateTotalModalPaiement();
+        }
+
+        function quickMonths(mode) {
+            const bx = [...document.querySelectorAll('#form-months input')];
+            bx.forEach((b, i) => { b.checked = mode === 'all' ? true : (mode === 'next' ? i === 0 : false); });
+            updateTotalModalPaiement();
+        }
+
         function updateTotalModalPaiement() { 
             document.getElementById('form-total').innerText = (document.querySelectorAll('#form-months input:checked').length * COTISATION_MENSUELLE) + ' DH'; 
         }
@@ -1125,7 +1184,20 @@
             else if(t === 'electricite') { m.value = ''; st.style.display = 'none'; l.innerText = 'Base (DH/mois)'; } 
             else if(t === 'projet' || t === 'custom') { m.value = ''; st.style.display = 'block'; l.innerText = 'Montant Total (DH)'; } 
             
+            renderChargeMonths();
             updateChargeTotal(); 
+        }
+
+        function chargeCatDesc(t) { return ({ femme: ['Hygiène','Entretien'], ascenseur: ['Ascenseur','Maintenance'], electricite: ['Énergie','Réseau ONE'] })[t] || null; }
+        function chargeMoisUsed(t) {
+            const cd = chargeCatDesc(t), used = new Set(); if (!cd) return used;
+            (db.charges || []).forEach(c => { if (c.cat === cd[0] && getYearOf(c) === currentYear && c.desc && c.desc.indexOf(cd[1] + ' - ') === 0) { const i = MOIS_NOMS.indexOf(c.desc.split(' - ').pop()); if (i > -1) used.add(i); } });
+            return used;
+        }
+        function renderChargeMonths() {
+            const used = chargeMoisUsed(document.getElementById('charge-type').value), g = document.getElementById('charge-months');
+            const h = MOIS_NOMS.map((m, i) => used.has(i) ? '' : `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateChargeTotal()"><span class="month-btn">${m}</span></label>`).join('');
+            g.innerHTML = used.size >= 12 ? '<div style="grid-column:1/-1; text-align:center; padding:14px; color:var(--success); font-size:0.85rem;">Tous les mois de ' + currentYear + ' sont déjà saisis.</div>' : h;
         }
 
         function updateChargeTotal() { 
@@ -1141,9 +1213,14 @@
         function savePaiement() { 
             const b = document.querySelectorAll('#form-months input:checked'); 
             if(b.length === 0) return toast('Cochez un cycle', 'error'); 
+            const aptIdSel = parseInt(document.querySelector('#modalPaiement .form-apt').value);
+            const dejaSaisis = getMoisStatus(aptIdSel, currentYear);
+            const doublons = [];
+            b.forEach(x => { const i = x.value - 1; if (dejaSaisis.paid.has(i) || dejaSaisis.pending.has(i)) doublons.push(MOIS_NOMS[i]); });
+            if (doublons.length) { renderPaiementMonths(); return toast('Déjà enregistré : ' + doublons.join(', '), 'error'); }
             let mN = []; b.forEach(x => mN.push(MOIS_NOMS[x.value - 1])); 
-            db.cotisations.push({ id: Date.now(), aptId: parseInt(document.querySelector('#modalPaiement .form-apt').value), date: document.getElementById('form-date').value, mode: document.getElementById('form-mode').value, statut: document.getElementById('form-statut').value, montant: b.length * COTISATION_MENSUELLE, moisStr: mN.join(', ') }); 
-            saveDB(); refreshUI(); closeModal('modalPaiement'); toast('Transaction validée'); triggerHaptic('success'); 
+            db.cotisations.push({ id: Date.now(), aptId: aptIdSel, annee: currentYear, date: document.getElementById('form-date').value, mode: document.getElementById('form-mode').value, statut: document.getElementById('form-statut').value, montant: b.length * COTISATION_MENSUELLE, moisStr: mN.join(', ') }); 
+            saveDB(); refreshUI(); if (document.getElementById('form-continue').checked) { const sl = document.getElementById('form-apt'); if (sl.selectedIndex < sl.options.length - 1) sl.selectedIndex++; renderPaiementMonths(); toast('Validé — lot suivant', 'success'); } else { closeModal('modalPaiement'); toast('Transaction validée'); } triggerHaptic('success'); 
         }
 
         function saveAnnexe() { 
@@ -1191,10 +1268,12 @@
             } else {
                 const bx = document.querySelectorAll('#charge-months input:checked'); 
                 if(bx.length === 0) return toast('Cycle requis', 'error'); 
+                const usedM = chargeMoisUsed(t), dup = []; bx.forEach(b => { if (usedM.has(parseInt(b.value) - 1)) dup.push(MOIS_NOMS[b.value - 1]); });
+                if (dup.length) { renderChargeMonths(); return toast('Déjà saisi : ' + dup.join(', '), 'error'); }
                 const bId = Date.now(); 
                 bx.forEach(b => { 
                     let mi = parseInt(b.value) - 1; 
-                    db.charges.push({ id: bId + mi, cat: cat, date: d, desc: desc + ' - ' + MOIS_NOMS[mi], montant: mt }); 
+                    db.charges.push({ id: bId + mi, annee: currentYear, cat: cat, date: d, desc: desc + ' - ' + MOIS_NOMS[mi], montant: mt }); 
                 }); 
             }
             
@@ -1206,11 +1285,22 @@
             if(p) { p.statut = 'Validé'; saveDB(); refreshUI(); toast('Paiement acquitté et validé !', 'success'); triggerHaptic('success'); } 
         }
 
-        function deleteEntry(table, id) { 
-            if(confirm('Purger ce log ?')) { 
-                db[table] = db[table].filter(row => row.id !== id); 
-                saveDB(); refreshUI(); toast('Log effacé'); 
-            } 
+        function deleteEntry(table, id) {
+            const row = db[table].find(r => r.id === id); if (!row) return;
+            const idx = db[table].indexOf(row);
+            db[table] = db[table].filter(r => r.id !== id);
+            saveDB(); refreshUI();
+            toastUndo('Log effacé', () => { db[table].splice(Math.min(idx, db[table].length), 0, row); saveDB(); refreshUI(); toast('Restauré', 'info'); });
+        }
+
+        function toastUndo(msg, onUndo) {
+            const b = document.getElementById('toastBox'); if (!b) return;
+            const el = document.createElement('div'); el.className = 'toast';
+            el.innerHTML = '<div style="font-size:0.85rem; font-weight:600;">' + msg + '</div>';
+            const btn = document.createElement('button'); btn.className = 'btn btn-outline';
+            btn.style.cssText = 'pointer-events:auto; padding:6px 14px; font-size:0.75rem; margin-left:10px;'; btn.textContent = 'Annuler';
+            btn.onclick = () => { el.remove(); onUndo(); };
+            el.appendChild(btn); b.appendChild(el); setTimeout(() => el.remove(), 6000);
         }
 
         function renderTables() {
@@ -1219,6 +1309,7 @@
                 let textColor = c.statut === 'En attente' ? 'text-warning' : 'text-success';
                 let btnHtml = '';
                 if(c.statut === 'En attente') btnHtml += `<button class="btn-icon" title="Acquitter" onclick="validerPaiement(${c.id})"><i class="fa-solid fa-check-double text-success"></i></button>`;
+                if(c.statut !== 'En attente') btnHtml += `<button class="btn-icon" title="Reçu WhatsApp" onclick="recuWA(${c.id})"><i class="fa-brands fa-whatsapp text-info"></i></button>`;
                 btnHtml += `<button class="btn-icon" onclick="deleteEntry('cotisations', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button>`;
                 return `<tr><td class="font-mono">${c.date ? new Date(c.date).toLocaleDateString() : '01/'+(c.mois||1).toString().padStart(2,'0')+'/'+c.annee}</td><td>${badgeStatus}</td><td><span class="font-mono" style="font-size:0.75rem; text-transform:uppercase;">${c.moisStr || MOIS_NOMS[(c.mois||1)-1]}</span></td><td class="${textColor} font-mono text-right">+${c.montant}</td><td class="text-right no-print">${btnHtml}</td></tr>`;
             }).join('');
@@ -1255,12 +1346,20 @@
 
         function renderEnergie() {
             if(!db.consommations) db.consommations = [];
-            document.getElementById('table-conso').innerHTML = db.consommations.sort((a,b) => b.mois - a.mois).map(c => `<tr><td><span style="text-transform:uppercase; font-size:0.75rem; font-weight:600; color:var(--text-muted);">${MOIS_NOMS[c.mois - 1]}</span></td><td><span class="badge ${c.type === 'Eau' ? 'badge-info' : 'badge-warning'}"><i class="fa-solid ${c.type === 'Eau' ? 'fa-droplet' : 'fa-bolt'}"></i> ${c.type}</span></td><td class="text-right font-mono">${c.montant}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('consommations', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
-            let e = Array(12).fill(0), el = Array(12).fill(0); db.consommations.forEach(c => { if(c.type === 'Eau') e[c.mois - 1] += parseFloat(c.montant); if(c.type === 'Électricité') el[c.mois - 1] += parseFloat(c.montant); });
+            document.getElementById('table-conso').innerHTML = db.consommations.filter(c => consoYear(c) === currentYear).sort((a,b) => b.mois - a.mois).map(c => `<tr><td><span style="text-transform:uppercase; font-size:0.75rem; font-weight:600; color:var(--text-muted);">${MOIS_NOMS[c.mois - 1]}</span></td><td><span class="badge ${c.type === 'Eau' ? 'badge-info' : 'badge-warning'}"><i class="fa-solid ${c.type === 'Eau' ? 'fa-droplet' : 'fa-bolt'}"></i> ${c.type}</span></td><td class="text-right font-mono">${c.montant}</td><td class="text-right no-print"><button class="btn-icon" onclick="deleteEntry('consommations', ${c.id})"><i class="fa-solid fa-trash text-danger"></i></button></td></tr>`).join('');
+            let e = Array(12).fill(0), el = Array(12).fill(0); db.consommations.filter(c => consoYear(c) === currentYear).forEach(c => { if(c.type === 'Eau') e[c.mois - 1] += parseFloat(c.montant); if(c.type === 'Électricité') el[c.mois - 1] += parseFloat(c.montant); });
             if(chartConso) chartConso.destroy(); chartConso = new Chart(document.getElementById('consoChart'), { type: 'line', data: { labels: MOIS_NOMS, datasets: [{ label: 'Hydrique', data: e, borderColor: '#00e5ff', backgroundColor: 'rgba(0, 229, 255, 0.1)', fill: true, tension: 0.4 }, { label: 'Électrique', data: el, borderColor: '#ffd500', backgroundColor: 'rgba(255, 213, 0, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false } });
         }
 
-        function saveConsommation() { const ty = document.getElementById('conso-type').value; const mo = parseInt(document.getElementById('conso-mois').value); const mt = parseFloat(document.getElementById('conso-montant').value); if (!mt || mt <= 0) return toast("Valeur nulle", "error"); if(!db.consommations) db.consommations = []; db.consommations.push({ id: Date.now(), type: ty, mois: mo, montant: mt, indexConsommation: document.getElementById('conso-index').value, dateSaisie: new Date().toISOString() }); saveDB(); closeModal('modalConso'); document.getElementById('conso-montant').value = ''; document.getElementById('conso-index').value = ''; refreshUI(); toast('Télémétrie MÀJ !'); }
+        function renderConsoMois() {
+            const sel = document.getElementById('conso-mois'), ty = document.getElementById('conso-type').value, prev = sel.value;
+            const used = new Set((db.consommations || []).filter(c => c.type === ty && consoYear(c) === currentYear).map(c => parseInt(c.mois)));
+            const opts = MOIS_FULL.map((m, i) => used.has(i + 1) ? '' : `<option value="${i+1}">${m}</option>`).join('');
+            sel.innerHTML = opts || '<option value="">Tous les mois sont déjà saisis</option>';
+            if (prev && !used.has(parseInt(prev))) sel.value = prev;
+        }
+
+        function saveConsommation() { const ty = document.getElementById('conso-type').value; const mo = parseInt(document.getElementById('conso-mois').value); const mt = parseFloat(document.getElementById('conso-montant').value); if (!mo) return toast("Aucun mois disponible", "error"); if (!mt || mt <= 0) return toast("Valeur nulle", "error"); if ((db.consommations || []).some(c => c.type === ty && parseInt(c.mois) === mo && consoYear(c) === currentYear)) { renderConsoMois(); return toast("Déjà saisi pour ce mois", "error"); } if(!db.consommations) db.consommations = []; db.consommations.push({ id: Date.now(), annee: currentYear, type: ty, mois: mo, montant: mt, indexConsommation: document.getElementById('conso-index').value, dateSaisie: new Date().toISOString() }); saveDB(); closeModal('modalConso'); document.getElementById('conso-montant').value = ''; document.getElementById('conso-index').value = ''; refreshUI(); toast('Télémétrie MÀJ !'); }
 
         function printDepensesAnnee() {
             const year = currentYear;
@@ -1336,9 +1435,19 @@
             toast("Export PDF réussi !", "success");
         }
 
-        function relanceWA(aptId, reste) { const apt = db.apartments.find(a => a.id === aptId); let actualYear = new Date().getFullYear(); let currentM = (currentYear < actualYear) ? 11 : new Date().getMonth(); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' '); let unpaidMonths = []; let unpaidAmount = 0; for(let i = 0; i <= currentM; i++) { if(!paidStr.includes(MOIS_NOMS[i].toLowerCase())) { unpaidMonths.push(MOIS_NOMS[i]); unpaidAmount += COTISATION_MENSUELLE; } } if(unpaidMonths.length === 0) { toast("Appartement à jour pour les mois écoulés.", "info"); return; } let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1); let text = `السلام عليكم،\n\nكنذكركم بلي واجبات السنديك ديال الشقة ${apt.number} بالنسبة للشهر (أو الأشهر): *${unpaidMonths.join(', ')}* مزال ما تخلصاتش (المبلغ: *${unpaidAmount} درهم*).\n\nالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت.\n\nشكرا، السنديك.`; window.open(`https://wa.me/${tel}?text=${encodeURIComponent(text)}`, '_blank'); }
-        function bilanGroupeWA() { let currentM = new Date().getMonth(); let currentMonthName = MOIS_NOMS[currentM]; let aptsAJour = []; let aptsEnRetard = []; db.apartments.forEach(apt => { const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' '); if (paidStr.includes(currentMonthName.toLowerCase())) { aptsAJour.push(apt.number); } else { aptsEnRetard.push(apt.number); } }); let listeAJour = aptsAJour.length > 0 ? aptsAJour.map(num => "• الشقة " + num).join('\n') : "لا أحد"; let listeEnRetard = aptsEnRetard.length > 0 ? aptsEnRetard.map(num => "• الشقة " + num).join('\n') : "لا أحد"; let text = `السلام عليكم الجيران،\n\nهادا تقرير بخصوص واجبات السنديك ديال هاد الشهر (*${currentMonthName}*).\n\n✅ *الشقق لي خلصو هاد الشهر:*\n${listeAJour}\n\n❌ *الشقق لي مزال ما خلصوش هاد الشهر:*\n${listeEnRetard}\n\nشكرا للناس لي خلصو، والله يجازيكم بخير لي مزال ما خلصش يكمل الواجب ديالو باش نقدرو نغطيو مصاريف العمارة.`; window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); }
-        function relanceGroupeWA() { let currentM = new Date().getMonth(); let currentMonthName = MOIS_NOMS[currentM]; let aptsEnRetard = []; let missingTotal = 0; db.apartments.forEach(apt => { const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = paiements.map(p => p.moisStr ? p.moisStr.toLowerCase() : (p.mois ? MOIS_NOMS[p.mois-1].toLowerCase() : '')).join(' '); if (!paidStr.includes(currentMonthName.toLowerCase())) { aptsEnRetard.push(apt.number); missingTotal += COTISATION_MENSUELLE; } }); if (aptsEnRetard.length === 0) { toast("Tous les appartements sont à jour ce mois-ci !", "success"); return; } let listeApts = aptsEnRetard.map(num => "• الشقة " + num).join('\n'); let text = `السلام عليكم الجيران،\n\nتذكير بخصوص واجبات السنديك ديال هاد الشهر (*${currentMonthName}*).\n\nالشقق لي مزال ما خلصوش هما:\n${listeApts}\n\nالمجموع لي ناقصنا هاد الشهر هو: *${missingTotal} درهم*\n\nالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت باش نقدرو نخلصو المصاريف ديال العمارة.\nشكرا لتعاونكم.`; window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); }
+        function recuWA(id) {
+            const c = db.cotisations.find(x => x.id === id); if (!c) return;
+            const apt = db.apartments.find(a => a.id === c.aptId); if (!apt) return;
+            let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if (tel.startsWith('0')) tel = '212' + tel.substring(1);
+            const mois = c.moisStr || (c.mois ? MOIS_NOMS[c.mois - 1] : '');
+            const dt = c.date ? new Date(c.date).toLocaleDateString('fr-FR') : '';
+            const text = `السلام عليكم،\n\nتوصلنا بواجبات السنديك ديال الشقة ${apt.number}.\n\n✅ الأشهر: *${mois}* (${getYearOf(c)})\n💰 المبلغ: *${c.montant} درهم*\n📅 التاريخ: ${dt}\n\nشكرا ليكم، السنديك.`;
+            window.open(`https://wa.me/${tel}?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function relanceWA(aptId, reste) { const apt = db.apartments.find(a => a.id === aptId); let actualYear = new Date().getFullYear(); let currentM = (currentYear < actualYear) ? 11 : new Date().getMonth(); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = moisSetOf(paiements); let unpaidMonths = []; let unpaidAmount = 0; for(let i = 0; i <= currentM; i++) { if(!paidStr.includes(MOIS_NOMS[i].toLowerCase())) { unpaidMonths.push(MOIS_NOMS[i]); unpaidAmount += COTISATION_MENSUELLE; } } if(unpaidMonths.length === 0) { toast("Appartement à jour pour les mois écoulés.", "info"); return; } let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1); let text = `السلام عليكم،\n\nكنذكركم بلي واجبات السنديك ديال الشقة ${apt.number} بالنسبة للشهر (أو الأشهر): *${unpaidMonths.join(', ')}* مزال ما تخلصاتش (المبلغ: *${unpaidAmount} درهم*).\n\nالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت.\n\nشكرا، السنديك.`; window.open(`https://wa.me/${tel}?text=${encodeURIComponent(text)}`, '_blank'); }
+        function bilanGroupeWA() { let currentM = (currentYear < new Date().getFullYear()) ? 11 : new Date().getMonth(); let currentMonthName = MOIS_NOMS[currentM]; let aptsAJour = []; let aptsEnRetard = []; db.apartments.forEach(apt => { const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = moisSetOf(paiements); if (paidStr.includes(currentMonthName.toLowerCase())) { aptsAJour.push(apt.number); } else { aptsEnRetard.push(apt.number); } }); let listeAJour = aptsAJour.length > 0 ? aptsAJour.map(num => "• الشقة " + num).join('\n') : "لا أحد"; let listeEnRetard = aptsEnRetard.length > 0 ? aptsEnRetard.map(num => "• الشقة " + num).join('\n') : "لا أحد"; let text = `السلام عليكم الجيران،\n\nهادا تقرير بخصوص واجبات السنديك ديال هاد الشهر (*${currentMonthName}*).\n\n✅ *الشقق لي خلصو هاد الشهر:*\n${listeAJour}\n\n❌ *الشقق لي مزال ما خلصوش هاد الشهر:*\n${listeEnRetard}\n\nشكرا للناس لي خلصو، والله يجازيكم بخير لي مزال ما خلصش يكمل الواجب ديالو باش نقدرو نغطيو مصاريف العمارة.`; window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); }
+        function relanceGroupeWA() { let currentM = (currentYear < new Date().getFullYear()) ? 11 : new Date().getMonth(); let currentMonthName = MOIS_NOMS[currentM]; let aptsEnRetard = []; let missingTotal = 0; db.apartments.forEach(apt => { const paiements = db.cotisations.filter(c => c.aptId === apt.id && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = moisSetOf(paiements); if (!paidStr.includes(currentMonthName.toLowerCase())) { aptsEnRetard.push(apt.number); missingTotal += COTISATION_MENSUELLE; } }); if (aptsEnRetard.length === 0) { toast("Tous les appartements sont à jour ce mois-ci !", "success"); return; } let listeApts = aptsEnRetard.map(num => "• الشقة " + num).join('\n'); let text = `السلام عليكم الجيران،\n\nتذكير بخصوص واجبات السنديك ديال هاد الشهر (*${currentMonthName}*).\n\nالشقق لي مزال ما خلصوش هما:\n${listeApts}\n\nالمجموع لي ناقصنا هاد الشهر هو: *${missingTotal} درهم*\n\nالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت باش نقدرو نخلصو المصاريف ديال العمارة.\nشكرا لتعاونكم.`; window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); }
 
         function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dlElem = document.getElementById('downloadAnchorElem'); dlElem.setAttribute("href", dataStr); dlElem.setAttribute("download", `DUMP_${new Date().toISOString().slice(0,10)}.json`); dlElem.click(); toast('Extraction Terminée'); }
         function importJSON(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { let i = JSON.parse(e.target.result); if(i.apartments) { db = i; localStorage.setItem('syndic_fallback', JSON.stringify(db)); toast("Injection Cloud..."); dbCloud.collection("syndic_data").doc("main_database").set(db).then(() => { toast("OK ! Reboot...", "success"); setTimeout(() => window.location.reload(), 2000); }).catch(() => toast("Erreur Serveur", "error")); } } catch(err) { toast('Fichier corrompu', 'error'); } }; reader.readAsText(file); }
