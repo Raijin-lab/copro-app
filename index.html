@@ -208,7 +208,6 @@
         </header>
 
         <div class="page-content">
-            <!-- PAGE: DASHBOARD -->
             <div id="page-dashboard" class="page-view">
                 <div class="grid-4">
                     <div class="card">
@@ -234,7 +233,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: HUB -->
             <div id="page-hub" class="page-view hidden">
                 <h3 style="margin-bottom: 20px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; color: var(--primary);">Modules du Système</h3>
                 <div class="hub-grid">
@@ -248,7 +246,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: APPARTEMENTS -->
             <div id="page-apartments" class="page-view hidden">
                 <div class="table-container" style="background: transparent; border: none; padding: 0;">
                     <div class="table-header" style="background: var(--bg-card); border-radius: var(--radius) var(--radius) 0 0;">
@@ -275,7 +272,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: COTISATIONS -->
             <div id="page-cotisations" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Registre des Entrées</div><button class="btn btn-success" onclick="openModal('modalPaiement')"><i class="fa-solid fa-plus"></i> Saisir Paiement</button></div>
@@ -283,7 +279,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: ANNEXES -->
             <div id="page-annexes" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card"><div class="stat-header"><div><div class="stat-title">Fonds Travaux Récoltés</div><div class="stat-value font-mono text-success" id="annexes-total-collecte">0 DH</div></div></div></div>
@@ -302,7 +297,6 @@
                 <div class="grid-2" id="annexes-projects-container" style="margin-top: 24px;"></div>
             </div>
 
-            <!-- PAGE: CHARGES -->
             <div id="page-charges" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header">
@@ -316,7 +310,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: TECHNIQUE -->
             <div id="page-technique" class="page-view hidden">
                 <div class="grid-2">
                     <div class="table-container">
@@ -330,7 +323,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: ENERGIE -->
             <div id="page-energie" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
@@ -344,7 +336,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: RAPPORT & RELANCES -->
             <div id="page-rapport" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 15px;">
@@ -359,7 +350,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: FOURNISSEURS -->
             <div id="page-fournisseurs" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Base Prestataires</div><button class="btn btn-outline" onclick="openModal('modalFournisseur')"><i class="fa-solid fa-plus"></i> Nouveau</button></div>
@@ -367,7 +357,6 @@
                 </div>
             </div>
 
-            <!-- PAGE: PARAMETRES -->
             <div id="page-parametres" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
@@ -387,7 +376,6 @@
         </div>
     </main>
 
-    <!-- BOTTOM NAV (Mobile Only) -->
     <nav class="bottom-nav">
         <div class="b-nav-item active" data-target="dashboard" onclick="switchPage('dashboard')"><i class="fa-solid fa-chart-line"></i><span>Télémétrie</span></div>
         <div class="b-nav-item" data-target="apartments" onclick="switchPage('apartments')"><i class="fa-solid fa-layer-group"></i><span>Réseau</span></div>
@@ -1017,9 +1005,11 @@
 
         function printProjetPDF(encodedProjetName) {
             let projetName = decodeURIComponent(encodedProjetName);
+            toast("Génération de l'affiche A4...", "info");
+            
             const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
-            doc.setFont("helvetica", "bold"); doc.setFontSize(18);
-            doc.text(`ETAT DE COTISATION : ${projetName.toUpperCase()}`, 105, 20, { align: "center" });
+            doc.setFont("helvetica", "bold"); doc.setFontSize(16);
+            doc.text(`ETAT DE COTISATION : ${projetName.toUpperCase()}`, 105, 18, { align: "center" });
 
             let payeCount = 0; let nonPayeCount = 0; let totalCollecte = 0;
 
@@ -1028,36 +1018,42 @@
                 let paye = paiements.reduce((sum, c) => sum + parseFloat(c.montant), 0);
                 let statut = "";
                 if (paye > 0) { statut = "PAYE"; payeCount++; totalCollecte += paye; } else { statut = "NON PAYE"; nonPayeCount++; }
-                return [`Apt ${apt.number.toString().padStart(2,'0')}`, s(apt.owner), `${paye} DH`, statut];
+                return [`Apt ${apt.number.toString().padStart(2,'0')}`, `${paye} DH`, statut];
             });
 
             doc.autoTable({
-                startY: 30, head: [['Appartement', 'Proprietaire', 'Montant', 'Statut']], body: bodyData, theme: 'grid',
+                startY: 25, 
+                head: [['Appartement', 'Montant', 'Statut']], 
+                body: bodyData, 
+                theme: 'grid',
                 styles: { lineColor: [0, 0, 0], lineWidth: 0.4, textColor: [0, 0, 0] },
-                headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', halign: 'center' },
-                bodyStyles: { halign: 'center', fontSize: 11, cellPadding: 3 },
-                columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'left' } },
+                headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', halign: 'center', fontSize: 10 },
+                bodyStyles: { halign: 'center', fontSize: 10, cellPadding: 1.5 },
+                columnStyles: { 0: { fontStyle: 'bold' } },
+                margin: { top: 25, bottom: 15 },
                 didParseCell: function(data) {
-                    if (data.section === 'body' && data.column.index === 3) {
+                    if (data.section === 'body' && data.column.index === 2) {
                         if (data.cell.raw === 'PAYE') { data.cell.styles.textColor = [16, 185, 129]; data.cell.styles.fontStyle = 'bold'; } 
                         else { data.cell.styles.textColor = [239, 68, 68]; data.cell.styles.fontStyle = 'bold'; }
                     }
                 }
             });
 
-            const finalY = doc.lastAutoTable.finalY + 10;
-            doc.setFontSize(12); doc.setTextColor(0,0,0); doc.setFont("helvetica", "bold");
-            doc.text(`Resume du projet :`, 14, finalY);
-            doc.setFontSize(11); doc.setFont("helvetica", "normal");
-            doc.text(`- Appartements ayant participe : ${payeCount} / 26`, 14, finalY + 7);
-            doc.text(`- En attente de paiement : ${nonPayeCount} / 26`, 14, finalY + 14);
-            doc.text(`- Total collecte a ce jour : ${formatMoney.format(totalCollecte)}`, 14, finalY + 21);
-            doc.setFontSize(12); doc.setFont("helvetica", "bold");
-            doc.text(`Syndic Benevole : Zouhair Badis`, 14, finalY + 35);
-            doc.text(`Contact (WhatsApp / Tel) : 0661 733 195`, 14, finalY + 42);
-            doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.setFont("helvetica", "italic");
+            const finalY = doc.lastAutoTable.finalY + 8;
+            doc.setFontSize(11); doc.setTextColor(0,0,0); doc.setFont("helvetica", "bold");
+            doc.text(`Résumé du projet :`, 14, finalY);
+            doc.setFontSize(10); doc.setFont("helvetica", "normal");
+            doc.text(`- Appartements ayant participé : ${payeCount} / 26`, 14, finalY + 6);
+            doc.text(`- En attente de paiement : ${nonPayeCount} / 26`, 14, finalY + 12);
+            doc.text(`- Total collecté à ce jour : ${formatMoney.format(totalCollecte)}`, 14, finalY + 18);
+            
+            doc.setFontSize(11); doc.setFont("helvetica", "bold");
+            doc.text(`Syndic Bénévole : Zouhair Badis`, 14, finalY + 28);
+            doc.text(`Contact (WhatsApp / Tél) : 0661 733 195`, 14, finalY + 34);
+            
+            doc.setFontSize(8); doc.setTextColor(100, 100, 100); doc.setFont("helvetica", "italic");
             let dateStr = new Date().toLocaleString('fr-FR');
-            doc.text(`Affiche officielle generee le ${dateStr}`, 195, finalY + 42, { align: "right" });
+            doc.text(`Affiche officielle générée le ${dateStr}`, 195, finalY + 34, { align: "right" });
 
             let safeFileName = projetName.replace(/[^a-zA-Z0-9]/g, '_');
             doc.save(`Affiche_Projet_${safeFileName}.pdf`);
