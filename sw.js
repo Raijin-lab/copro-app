@@ -1,4 +1,4 @@
-const CACHE_NAME = 'syndic-cache-v68'; // Incrémenter à chaque mise à jour de index.html
+const CACHE_NAME = 'syndic-cache-v69'; // Incrémenter à chaque mise à jour de index.html
 const LOCAL = ['./', './index.html', './manifest.json'];
 const OPTIONAL = [
     './icon-192.png', './icon-512.png',
