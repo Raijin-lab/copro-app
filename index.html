@@ -208,6 +208,7 @@
         </header>
 
         <div class="page-content">
+            <!-- PAGE: DASHBOARD -->
             <div id="page-dashboard" class="page-view">
                 <div class="grid-4">
                     <div class="card">
@@ -233,6 +234,7 @@
                 </div>
             </div>
 
+            <!-- PAGE: HUB -->
             <div id="page-hub" class="page-view hidden">
                 <h3 style="margin-bottom: 20px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; color: var(--primary);">Modules du Système</h3>
                 <div class="hub-grid">
@@ -246,6 +248,7 @@
                 </div>
             </div>
 
+            <!-- PAGE: APPARTEMENTS -->
             <div id="page-apartments" class="page-view hidden">
                 <div class="table-container" style="background: transparent; border: none; padding: 0;">
                     <div class="table-header" style="background: var(--bg-card); border-radius: var(--radius) var(--radius) 0 0;">
@@ -272,6 +275,7 @@
                 </div>
             </div>
 
+            <!-- PAGE: COTISATIONS -->
             <div id="page-cotisations" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Registre des Entrées</div><button class="btn btn-success" onclick="openModal('modalPaiement')"><i class="fa-solid fa-plus"></i> Saisir Paiement</button></div>
@@ -279,6 +283,7 @@
                 </div>
             </div>
 
+            <!-- PAGE: ANNEXES -->
             <div id="page-annexes" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card"><div class="stat-header"><div><div class="stat-title">Fonds Travaux Récoltés</div><div class="stat-value font-mono text-success" id="annexes-total-collecte">0 DH</div></div></div></div>
@@ -297,6 +302,7 @@
                 <div class="grid-2" id="annexes-projects-container" style="margin-top: 24px;"></div>
             </div>
 
+            <!-- PAGE: CHARGES -->
             <div id="page-charges" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header">
@@ -310,6 +316,7 @@
                 </div>
             </div>
 
+            <!-- PAGE: TECHNIQUE -->
             <div id="page-technique" class="page-view hidden">
                 <div class="grid-2">
                     <div class="table-container">
@@ -323,6 +330,7 @@
                 </div>
             </div>
 
+            <!-- PAGE: ENERGIE -->
             <div id="page-energie" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
@@ -336,6 +344,7 @@
                 </div>
             </div>
 
+            <!-- PAGE: RAPPORT & RELANCES -->
             <div id="page-rapport" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 15px;">
@@ -350,6 +359,7 @@
                 </div>
             </div>
 
+            <!-- PAGE: FOURNISSEURS -->
             <div id="page-fournisseurs" class="page-view hidden">
                 <div class="table-container">
                     <div class="table-header"><div class="table-title">Base Prestataires</div><button class="btn btn-outline" onclick="openModal('modalFournisseur')"><i class="fa-solid fa-plus"></i> Nouveau</button></div>
@@ -357,6 +367,7 @@
                 </div>
             </div>
 
+            <!-- PAGE: PARAMETRES -->
             <div id="page-parametres" class="page-view hidden">
                 <div class="grid-2">
                     <div class="card">
@@ -376,6 +387,7 @@
         </div>
     </main>
 
+    <!-- BOTTOM NAV (Mobile Only) -->
     <nav class="bottom-nav">
         <div class="b-nav-item active" data-target="dashboard" onclick="switchPage('dashboard')"><i class="fa-solid fa-chart-line"></i><span>Télémétrie</span></div>
         <div class="b-nav-item" data-target="apartments" onclick="switchPage('apartments')"><i class="fa-solid fa-layer-group"></i><span>Réseau</span></div>
@@ -446,6 +458,7 @@
         </div>
     </div>
 
+    <!-- NOUVELLE LOGIQUE : Modal de Dépenses avec la sélection du projet -->
     <div class="modal-overlay" id="modalCharge">
         <div class="modal-content">
             <div class="modal-header"><h3>Transaction Sortante</h3><button class="btn-icon" onclick="closeModal('modalCharge')"><i class="fa-solid fa-xmark"></i></button></div>
@@ -460,14 +473,21 @@
                         <option value="custom">Intervention Spécifique Principale</option>
                     </select>
                 </div>
+                
+                <!-- NOUVEAU MENU DÉROULANT POUR LES PROJETS -->
+                <div class="form-group" id="charge-projet-section" style="display:none;">
+                    <label class="form-label">Sélectionner le Projet lié</label>
+                    <select class="form-control" id="charge-projet-select"></select>
+                </div>
+
                 <div class="form-group" id="charge-mois-section"><label class="form-label">Cycles concernés</label><div class="month-grid" id="charge-months"></div></div>
-                <div class="form-group" id="charge-desc-section" style="display:none;"><label class="form-label">Détails techniques</label><input type="text" class="form-control" id="charge-desc"></div>
+                <div class="form-group" id="charge-desc-section" style="display:none;"><label class="form-label">Détails techniques (Facture, achat...)</label><input type="text" class="form-control" id="charge-desc"></div>
                 <div style="display:flex; gap:15px;">
                     <div class="form-group" style="flex:1;"><label class="form-label" id="charge-montant-label">Base (DH/mois)</label><input type="number" class="form-control font-mono" id="charge-montant" value="500" oninput="updateChargeTotal()"></div>
                     <div class="form-group" style="flex:1;"><label class="form-label">Horodatage</label><input type="date" class="form-control font-mono" id="charge-date"></div>
                 </div>
                 <div class="text-right" style="margin-top:10px; background:#000; padding:15px; border-radius:12px;">
-                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); display:block;">Impact Trésorerie</span>
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); display:block;">Impact Caisse</span>
                     <strong class="font-mono" style="font-size:1.8rem; color:var(--danger);" id="charge-total-display">500 DH</strong>
                 </div>
             </div>
@@ -534,7 +554,6 @@
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toastBox"></div>
 
     <script>
@@ -572,7 +591,6 @@
             }); 
         }
 
-        // LA FONCTION TOAST EST BIEN LÀ ET SÉCURISÉE
         function toast(msg, type = 'success') { 
             const b = document.getElementById('toastBox'); 
             if (!b) return;
@@ -885,7 +903,6 @@
             let dateStr = new Date().toLocaleString('fr-FR');
             doc.text(`Document officiel généré par le système le ${dateStr}`, 405, finalY + 6, { align: "right" });
             doc.save(`Matrice_Paiements_A3_${currentYear}.pdf`);
-            toast("Export Matrice A3 réussi !", "success");
         }
 
         function renderApartments() {
@@ -980,24 +997,31 @@
                 let col = p.payeurs.length * p.mt; 
                 let pct = Math.min((col / pr) * 100, 100); 
                 let safeNom = encodeURIComponent(p.nom);
+
+                // NOUVEAU: On calcule la dépense exacte de CE projet
+                let depensesDuProjet = db.charges.filter(c => c.cat === 'Projet' && c.projet === p.nom && getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0);
+                let soldeDuProjet = col - depensesDuProjet;
                 
                 cont.innerHTML += `<div class="card">
                     <div class="stat-header">
                         <div class="stat-title text-primary">${s(p.nom)}</div>
-                        <div style="display:flex; gap:10px; align-items:center;">
+                        <div style="display:flex; gap:8px; align-items:center;">
                             <span class="badge badge-info">${p.payeurs.length}/${NB_APPARTEMENTS}</span>
-                            <button class="btn-icon text-primary" style="background: rgba(0, 229, 255, 0.1); border-radius: 8px; padding: 6px 10px;" title="Imprimer Affiche" onclick="printProjetPDF('${safeNom}')"><i class="fa-solid fa-print"></i></button>
+                            <button class="btn-icon text-primary" style="background: rgba(0, 229, 255, 0.1); border-radius: 8px; padding: 6px 10px;" title="Affiche (Qui a payé)" onclick="printProjetPDF('${safeNom}')"><i class="fa-solid fa-print"></i></button>
+                            <!-- NOUVEAU BOUTON : Bilan Financier -->
+                            <button class="btn-icon text-info" style="background: rgba(0, 229, 255, 0.1); border-radius: 8px; padding: 6px 10px;" title="Bilan Financier du Projet" onclick="printBilanProjetPDF('${safeNom}')"><i class="fa-solid fa-file-invoice-dollar"></i></button>
                         </div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:10px;">
-                        <span style="color:var(--text-muted)">Avancement :</span><strong class="font-mono text-success">${formatMoney.format(col)}</strong>
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:10px;">
+                        <span style="color:var(--text-muted)">Collecté: <strong class="text-success">${formatMoney.format(col)}</strong></span>
+                        <span style="color:var(--text-muted)">Dépensé: <strong class="text-danger">${formatMoney.format(depensesDuProjet)}</strong></span>
                     </div>
+                    <div style="font-size:0.85rem; font-weight:700; text-align:right; margin-bottom:6px;">Reste: <span class="text-info">${formatMoney.format(soldeDuProjet)}</span></div>
                     <div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${pct}%"></div></div>
                 </div>`; 
             });
             
             document.getElementById('annexes-total-collecte').innerText = formatMoney.format(collect); 
-            
             let depensesTravaux = db.charges.filter(c => c.cat === 'Projet').reduce((sum, c) => sum + parseFloat(c.montant), 0);
             let soldeTravaux = collect - depensesTravaux;
             document.getElementById('annexes-total-impayes').innerText = formatMoney.format(soldeTravaux);
@@ -1005,8 +1029,6 @@
 
         function printProjetPDF(encodedProjetName) {
             let projetName = decodeURIComponent(encodedProjetName);
-            toast("Génération de l'affiche A4...", "info");
-            
             const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
             doc.setFont("helvetica", "bold"); doc.setFontSize(16);
             doc.text(`ETAT DE COTISATION : ${projetName.toUpperCase()}`, 105, 18, { align: "center" });
@@ -1018,6 +1040,7 @@
                 let paye = paiements.reduce((sum, c) => sum + parseFloat(c.montant), 0);
                 let statut = "";
                 if (paye > 0) { statut = "PAYE"; payeCount++; totalCollecte += paye; } else { statut = "NON PAYE"; nonPayeCount++; }
+                // ICI: On ne met plus le nom du propriétaire
                 return [`Apt ${apt.number.toString().padStart(2,'0')}`, `${paye} DH`, statut];
             });
 
@@ -1028,6 +1051,7 @@
                 theme: 'grid',
                 styles: { lineColor: [0, 0, 0], lineWidth: 0.4, textColor: [0, 0, 0] },
                 headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', halign: 'center', fontSize: 10 },
+                // Marges très serrées pour le format A4
                 bodyStyles: { halign: 'center', fontSize: 10, cellPadding: 1.5 },
                 columnStyles: { 0: { fontStyle: 'bold' } },
                 margin: { top: 25, bottom: 15 },
@@ -1057,8 +1081,85 @@
 
             let safeFileName = projetName.replace(/[^a-zA-Z0-9]/g, '_');
             doc.save(`Affiche_Projet_${safeFileName}.pdf`);
-            toast("Export Affiche A4 réussi !", "success");
         }
+
+        // NOUVELLE FONCTION : Générer le Bilan Financier d'un Projet Spécifique
+        function printBilanProjetPDF(encodedProjetName) {
+            let projetName = decodeURIComponent(encodedProjetName);
+            const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
+            
+            doc.setFont("helvetica", "bold"); doc.setFontSize(18);
+            doc.text(`BILAN FINANCIER DU PROJET`, 105, 15, { align: "center" });
+            doc.setFontSize(14); doc.setTextColor(0, 229, 255);
+            doc.text(`${projetName.toUpperCase()}`, 105, 22, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+
+            // 1. Liste des Dépenses pour CE projet
+            let depensesProjet = db.charges.filter(c => c.cat === 'Projet' && c.projet === projetName && getYearOf(c) === currentYear);
+            let totalDepense = depensesProjet.reduce((sum, c) => sum + parseFloat(c.montant), 0);
+            
+            doc.setFontSize(12); doc.setFont("helvetica", "bold");
+            doc.text(`1. DEPENSES REALISEES`, 14, 35);
+            
+            let depensesData = depensesProjet.map(d => [
+                new Date(d.date).toLocaleDateString('fr-FR'),
+                s(d.desc),
+                `${parseFloat(d.montant).toFixed(2)} DH`
+            ]);
+
+            if(depensesData.length === 0) {
+                depensesData = [['-', 'Aucune dépense enregistrée', '-']];
+            }
+
+            doc.autoTable({
+                startY: 40,
+                head: [['Date', 'Description / Facture', 'Montant']],
+                body: depensesData,
+                theme: 'striped',
+                headStyles: { fillColor: [239, 68, 68], textColor: 255 }, // Entête rouge pour dépenses
+                foot: [['', 'TOTAL DEPENSES', `${totalDepense.toFixed(2)} DH`]],
+                footStyles: { fillColor: [20, 20, 20], textColor: 255, fontStyle: 'bold' }
+            });
+
+            // 2. Résumé financier global
+            let totalCollecte = db.cotisationsAnnexes.filter(c => s(c.projet) === projetName && getYearOf(c) === currentYear).reduce((sum, c) => sum + parseFloat(c.montant), 0);
+            let reliquat = totalCollecte - totalDepense;
+
+            let currentY = doc.lastAutoTable.finalY + 15;
+            doc.setFontSize(12); doc.setFont("helvetica", "bold");
+            doc.text(`2. SYNTHESE FINANCIERE`, 14, currentY);
+            
+            currentY += 8;
+            doc.setFontSize(11); doc.setFont("helvetica", "normal");
+            doc.text(`Fonds total collecté auprès des résidents :`, 14, currentY);
+            doc.setTextColor(16, 185, 129); doc.setFont("helvetica", "bold");
+            doc.text(`+ ${formatMoney.format(totalCollecte)}`, 140, currentY);
+            
+            currentY += 8;
+            doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
+            doc.text(`Total des dépenses réalisées :`, 14, currentY);
+            doc.setTextColor(239, 68, 68); doc.setFont("helvetica", "bold");
+            doc.text(`- ${formatMoney.format(totalDepense)}`, 140, currentY);
+            
+            currentY += 10;
+            doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold");
+            doc.text(`RELIQUAT (SOLDE RESTANT) :`, 14, currentY);
+            doc.setTextColor(reliquat >= 0 ? 16 : 239, reliquat >= 0 ? 185 : 68, reliquat >= 0 ? 129 : 68);
+            doc.text(`${formatMoney.format(reliquat)}`, 140, currentY);
+
+            // Signature
+            currentY += 30;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12); doc.setFont("helvetica", "bold");
+            doc.text(`Syndic Bénévole : Zouhair Badis`, 14, currentY);
+            doc.text(`Contact (WhatsApp / Tél) : 0661 733 195`, 14, currentY + 6);
+            doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.setFont("helvetica", "italic");
+            doc.text(`Bilan officiel généré le ${new Date().toLocaleString('fr-FR')}`, 195, currentY + 6, { align: "right" });
+
+            let safeFileName = projetName.replace(/[^a-zA-Z0-9]/g, '_');
+            doc.save(`Bilan_Projet_${safeFileName}.pdf`);
+        }
+
 
         function openModal(id) { 
             document.getElementById(id).classList.add('active'); 
@@ -1088,13 +1189,11 @@
         }
         
 
-        // Mois (index 0-11) couverts par un enregistrement
         function moisIdxOf(c) {
             const n = MOIS_NOMS.map(m => m.toLowerCase());
             if (c.moisStr) return c.moisStr.split(',').map(x => n.indexOf(x.trim().toLowerCase())).filter(i => i > -1);
             return c.mois ? [parseInt(c.mois) - 1] : [];
         }
-        // Objet compatible .includes('jan') utilisé par les anciens affichages, mais en correspondance exacte
         function moisSetOf(list) {
             const set = new Set(); list.forEach(c => moisIdxOf(c).forEach(i => set.add(i)));
             return { has: i => set.has(i), includes: name => set.has(MOIS_NOMS.findIndex(m => m.toLowerCase() === String(name).toLowerCase())) };
@@ -1107,7 +1206,6 @@
         function consoYear(c) { return c.annee ? parseInt(c.annee) : (c.dateSaisie ? new Date(c.dateSaisie).getFullYear() : currentYear); }
         const MOIS_FULL = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
-        // Affiche uniquement les mois encore disponibles pour le lot sélectionné
         function renderPaiementMonths() {
             const aptSel = document.getElementById('form-apt');
             const grid = document.getElementById('form-months');
@@ -1118,20 +1216,23 @@
             const { paid, pending } = getMoisStatus(aptSel.value, currentYear);
             let html = '';
             MOIS_NOMS.forEach((m, i) => {
-                if (paid.has(i) || pending.has(i)) return; // mois déjà saisi : caché
-                html += `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateTotalModalPaiement()"><span class="month-btn">${m}</span></label>`;
+                if (paid.has(i) || pending.has(i)) {
+                    html += `<label class="month-cb" style="opacity: 0.4; cursor: not-allowed;"><input type="checkbox" value="${i+1}" disabled><span class="month-btn" style="border: 1px solid var(--success); color: var(--success); background: rgba(0, 255, 135, 0.05);"><i class="fa-solid fa-check"></i> ${m}</span></label>`;
+                } else {
+                    html += `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateTotalModalPaiement()"><span class="month-btn">${m}</span></label>`;
+                }
             });
 
             const libres = 12 - new Set([...paid, ...pending]).size;
             if (libres === 0) {
-                grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:16px; color:var(--success); font-size:0.85rem;"><i class="fa-solid fa-circle-check"></i> Tous les mois de ' + currentYear + ' sont déjà réglés pour ce lot.</div>';
+                grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:16px; color:var(--success); font-size:0.85rem;"><i class="fa-solid fa-circle-check"></i> Tous les mois de ' + currentYear + ' sont déjà réglés.</div>';
             } else {
                 grid.innerHTML = html;
             }
 
             let msg = [];
             if (paid.size) msg.push('<span style="color:var(--success);">Déjà validés (' + currentYear + ') : ' + [...paid].sort((a,b)=>a-b).map(i => MOIS_NOMS[i]).join(', ') + '</span>');
-            if (pending.size) msg.push('<span style="color:var(--warning);">En attente (à valider depuis le registre) : ' + [...pending].sort((a,b)=>a-b).map(i => MOIS_NOMS[i]).join(', ') + '</span>');
+            if (pending.size) msg.push('<span style="color:var(--warning);">En attente (à valider) : ' + [...pending].sort((a,b)=>a-b).map(i => MOIS_NOMS[i]).join(', ') + '</span>');
             info.innerHTML = msg.length ? msg.join('<br>') : 'Exercice ' + currentYear + ' : aucun mois enregistré pour ce lot.';
 
             if (btn) btn.disabled = (libres === 0);
@@ -1139,7 +1240,7 @@
         }
 
         function quickMonths(mode) {
-            const bx = [...document.querySelectorAll('#form-months input')];
+            const bx = [...document.querySelectorAll('#form-months input:not([disabled])')];
             bx.forEach((b, i) => { b.checked = mode === 'all' ? true : (mode === 'next' ? i === 0 : false); });
             updateTotalModalPaiement();
         }
@@ -1172,13 +1273,31 @@
             const m = document.getElementById('charge-montant'); 
             const st = document.getElementById('charge-desc-section'); 
             const l = document.getElementById('charge-montant-label'); 
+            const pSec = document.getElementById('charge-projet-section');
             m.readOnly = false; 
             m.style.background = '#000'; 
             
-            if(t === 'femme') { m.value = 500; st.style.display = 'none'; l.innerText = 'Base (DH/mois)'; } 
-            else if(t === 'ascenseur') { m.value = 150; st.style.display = 'none'; l.innerText = 'Base (DH/mois)'; } 
-            else if(t === 'electricite') { m.value = ''; st.style.display = 'none'; l.innerText = 'Base (DH/mois)'; } 
-            else if(t === 'projet' || t === 'custom') { m.value = ''; st.style.display = 'block'; l.innerText = 'Montant Total (DH)'; } 
+            if(t === 'projet') { 
+                m.value = ''; 
+                st.style.display = 'block'; 
+                pSec.style.display = 'block';
+                l.innerText = 'Montant Dépensé (DH)'; 
+                
+                // NOUVEAU: On remplit le menu déroulant avec les vrais projets existants
+                let pNames = [...new Set((db.cotisationsAnnexes || []).map(c => c.projet).filter(p => p && !p.toUpperCase().includes('REPORT EXERCICE')))];
+                if(pNames.length === 0) {
+                    document.getElementById('charge-projet-select').innerHTML = '<option value="">Aucun projet trouvé</option>';
+                } else {
+                    document.getElementById('charge-projet-select').innerHTML = pNames.map(p => `<option value="${s(p)}">${s(p)}</option>`).join('');
+                }
+            } 
+            else {
+                pSec.style.display = 'none';
+                if(t === 'femme') { m.value = 500; st.style.display = 'none'; l.innerText = 'Base (DH/mois)'; } 
+                else if(t === 'ascenseur') { m.value = 150; st.style.display = 'none'; l.innerText = 'Base (DH/mois)'; } 
+                else if(t === 'electricite') { m.value = ''; st.style.display = 'none'; l.innerText = 'Base (DH/mois)'; } 
+                else if(t === 'custom') { m.value = ''; st.style.display = 'block'; l.innerText = 'Montant Total (DH)'; } 
+            }
             
             renderChargeMonths();
             updateChargeTotal(); 
@@ -1191,7 +1310,11 @@
             return used;
         }
         function renderChargeMonths() {
-            const used = chargeMoisUsed(document.getElementById('charge-type').value), g = document.getElementById('charge-months');
+            const t = document.getElementById('charge-type').value;
+            const g = document.getElementById('charge-months');
+            if (t === 'projet' || t === 'custom') { g.innerHTML = ''; return; }
+            
+            const used = chargeMoisUsed(t);
             const h = MOIS_NOMS.map((m, i) => used.has(i) ? '' : `<label class="month-cb"><input type="checkbox" value="${i+1}" onchange="updateChargeTotal()"><span class="month-btn">${m}</span></label>`).join('');
             g.innerHTML = used.size >= 12 ? '<div style="grid-column:1/-1; text-align:center; padding:14px; color:var(--success); font-size:0.85rem;">Tous les mois de ' + currentYear + ' sont déjà saisis.</div>' : h;
         }
@@ -1244,14 +1367,16 @@
             const mt = parseFloat(document.getElementById('charge-montant').value) || 0; 
             if(!mt || mt <= 0) return toast('Montant invalide', 'error'); 
             
-            let cat, desc; 
+            let cat, desc, projetLie = ''; 
             if(t === 'femme') { cat = 'Hygiène'; desc = 'Entretien'; } 
             else if(t === 'ascenseur') { cat = 'Ascenseur'; desc = 'Maintenance'; } 
             else if(t === 'electricite') { cat = 'Énergie'; desc = 'Réseau ONE'; } 
             else if(t === 'projet') { 
                 cat = 'Projet'; 
-                desc = document.getElementById('charge-desc').value; 
+                desc = document.getElementById('charge-desc').value;
+                projetLie = document.getElementById('charge-projet-select').value;
                 if(!desc) return toast('Détail requis', 'error'); 
+                if(!projetLie) return toast('Aucun projet sélectionné', 'error');
             }
             else { 
                 cat = 'Autre'; 
@@ -1260,7 +1385,7 @@
             } 
             
             if (t === 'projet' || t === 'custom') {
-                db.charges.push({ id: Date.now(), cat: cat, date: d, desc: desc, montant: mt });
+                db.charges.push({ id: Date.now(), annee: currentYear, cat: cat, date: d, desc: desc, montant: mt, projet: projetLie });
             } else {
                 const bx = document.querySelectorAll('#charge-months input:checked'); 
                 if(bx.length === 0) return toast('Cycle requis', 'error'); 
@@ -1375,7 +1500,6 @@
             doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
             doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')} - Syndicat GH5-SN8`, 195, doc.lastAutoTable.finalY + 15, { align: "right" });
             doc.save(`Releve_Depenses_${year}.pdf`);
-            toast("Export PDF réussi !", "success");
         }
 
         function printBilanGlobal() {
@@ -1428,17 +1552,6 @@
             }
 
             doc.save(`Bilan_Annuel_${year}.pdf`); 
-            toast("Export PDF réussi !", "success");
-        }
-
-        function recuWA(id) {
-            const c = db.cotisations.find(x => x.id === id); if (!c) return;
-            const apt = db.apartments.find(a => a.id === c.aptId); if (!apt) return;
-            let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if (tel.startsWith('0')) tel = '212' + tel.substring(1);
-            const mois = c.moisStr || (c.mois ? MOIS_NOMS[c.mois - 1] : '');
-            const dt = c.date ? new Date(c.date).toLocaleDateString('fr-FR') : '';
-            const text = `السلام عليكم،\n\nتوصلنا بواجبات السنديك ديال الشقة ${apt.number}.\n\n✅ الأشهر: *${mois}* (${getYearOf(c)})\n💰 المبلغ: *${c.montant} درهم*\n📅 التاريخ: ${dt}\n\nشكرا ليكم، السنديك.`;
-            window.open(`https://wa.me/${tel}?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         function relanceWA(aptId, reste) { const apt = db.apartments.find(a => a.id === aptId); let actualYear = new Date().getFullYear(); let currentM = (currentYear < actualYear) ? 11 : new Date().getMonth(); const paiements = db.cotisations.filter(c => c.aptId === aptId && getYearOf(c) === currentYear && c.statut !== 'En attente'); let paidStr = moisSetOf(paiements); let unpaidMonths = []; let unpaidAmount = 0; for(let i = 0; i <= currentM; i++) { if(!paidStr.includes(MOIS_NOMS[i].toLowerCase())) { unpaidMonths.push(MOIS_NOMS[i]); unpaidAmount += COTISATION_MENSUELLE; } } if(unpaidMonths.length === 0) { toast("Appartement à jour pour les mois écoulés.", "info"); return; } let tel = apt.phone ? apt.phone.replace(/\s+/g, '') : ''; if(tel.startsWith('0')) tel = '212' + tel.substring(1); let text = `السلام عليكم،\n\nكنذكركم بلي واجبات السنديك ديال الشقة ${apt.number} بالنسبة للشهر (أو الأشهر): *${unpaidMonths.join(', ')}* مزال ما تخلصاتش (المبلغ: *${unpaidAmount} درهم*).\n\nالله يجازيكم بخير لي مزال ما خلصش يخلص في أقرب وقت.\n\nشكرا، السنديك.`; window.open(`https://wa.me/${tel}?text=${encodeURIComponent(text)}`, '_blank'); }
